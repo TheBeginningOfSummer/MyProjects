@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="STTech.BytesIO.Tcp" Version="2.12.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MyToolkit\MyToolkit.csproj" />
   </ItemGroup>
 

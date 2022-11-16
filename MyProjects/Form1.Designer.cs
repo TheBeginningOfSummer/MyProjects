@@ -45,14 +45,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PB_MyPicture.Location = new System.Drawing.Point(12, 12);
             this.PB_MyPicture.Name = "PB_MyPicture";
-            this.PB_MyPicture.Size = new System.Drawing.Size(602, 426);
+            this.PB_MyPicture.Size = new System.Drawing.Size(592, 457);
             this.PB_MyPicture.TabIndex = 0;
             this.PB_MyPicture.TabStop = false;
             // 
             // BTN_Test
             // 
             this.BTN_Test.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BTN_Test.Location = new System.Drawing.Point(713, 415);
+            this.BTN_Test.Location = new System.Drawing.Point(797, 446);
             this.BTN_Test.Name = "BTN_Test";
             this.BTN_Test.Size = new System.Drawing.Size(75, 23);
             this.BTN_Test.TabIndex = 1;
@@ -63,12 +63,12 @@
             // TB_Info
             // 
             this.TB_Info.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.TB_Info.Location = new System.Drawing.Point(620, 12);
+            this.TB_Info.Location = new System.Drawing.Point(608, 12);
             this.TB_Info.Margin = new System.Windows.Forms.Padding(1);
             this.TB_Info.Multiline = true;
             this.TB_Info.Name = "TB_Info";
             this.TB_Info.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TB_Info.Size = new System.Drawing.Size(170, 213);
+            this.TB_Info.Size = new System.Drawing.Size(266, 213);
             this.TB_Info.TabIndex = 2;
             // 
             // BTN_ProcessInput
@@ -76,7 +76,7 @@
             this.BTN_ProcessInput.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.BTN_ProcessInput.Location = new System.Drawing.Point(3, 48);
             this.BTN_ProcessInput.Name = "BTN_ProcessInput";
-            this.BTN_ProcessInput.Size = new System.Drawing.Size(164, 23);
+            this.BTN_ProcessInput.Size = new System.Drawing.Size(106, 23);
             this.BTN_ProcessInput.TabIndex = 3;
             this.BTN_ProcessInput.Text = "程序输入写入";
             this.BTN_ProcessInput.UseVisualStyleBackColor = true;
@@ -87,7 +87,7 @@
             this.TB_ConsoleInput.Dock = System.Windows.Forms.DockStyle.Top;
             this.TB_ConsoleInput.Location = new System.Drawing.Point(3, 19);
             this.TB_ConsoleInput.Name = "TB_ConsoleInput";
-            this.TB_ConsoleInput.Size = new System.Drawing.Size(164, 23);
+            this.TB_ConsoleInput.Size = new System.Drawing.Size(106, 23);
             this.TB_ConsoleInput.TabIndex = 4;
             // 
             // GB_ConsoleTest
@@ -95,24 +95,25 @@
             this.GB_ConsoleTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.GB_ConsoleTest.Controls.Add(this.TB_ConsoleInput);
             this.GB_ConsoleTest.Controls.Add(this.BTN_ProcessInput);
-            this.GB_ConsoleTest.Location = new System.Drawing.Point(620, 229);
+            this.GB_ConsoleTest.Location = new System.Drawing.Point(762, 229);
             this.GB_ConsoleTest.Name = "GB_ConsoleTest";
-            this.GB_ConsoleTest.Size = new System.Drawing.Size(170, 74);
+            this.GB_ConsoleTest.Size = new System.Drawing.Size(112, 74);
             this.GB_ConsoleTest.TabIndex = 5;
             this.GB_ConsoleTest.TabStop = false;
-            this.GB_ConsoleTest.Text = "控制台测试";
+            this.GB_ConsoleTest.Text = "控制台程序测试";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(884, 481);
             this.Controls.Add(this.GB_ConsoleTest);
             this.Controls.Add(this.TB_Info);
             this.Controls.Add(this.BTN_Test);
             this.Controls.Add(this.PB_MyPicture);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.PB_MyPicture)).EndInit();
             this.GB_ConsoleTest.ResumeLayout(false);
