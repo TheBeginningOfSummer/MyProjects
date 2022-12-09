@@ -1,15 +1,19 @@
 using MyToolkit;
 using STTech.BytesIO.Tcp;
+using System.Collections.Concurrent;
 
 namespace MyProjects
 {
     public partial class Form1 : Form
     {
-        readonly ProcessToolkit testProcess = new();
-        readonly ConnectionToolkit.SocketConnection server = new("127.0.0.1", 5000);
+        readonly ProcessToolkit testProcess = new("ipfs");
+        //readonly ConnectionToolkit.SocketConnection server = new("127.0.0.1", 5000);
         readonly TcpServer bytesIOServer = new();
-        Dictionary<string, MemoryStream> memoryStreamDic = new();
-
+        #region 网络传输数据拼接、缓存与接收开关
+        readonly Dictionary<string, MemoryStream> memoryStreamDic = new();
+        readonly ConcurrentQueue<UnpackagedMessage> cache = new();
+        readonly ManualResetEvent dataParseSwitch = new(false);
+        #endregion
         public Form1()
         {
             InitializeComponent();
@@ -19,21 +23,22 @@ namespace MyProjects
         {
             try
             {
+                bytesIOServer.Host = "127.0.0.1";
                 bytesIOServer.Port = 5000;
                 bytesIOServer.Started += BytesIOServer_Started;
                 bytesIOServer.Closed += BytesIOServer_Closed;
                 bytesIOServer.ClientConnected += BytesIOServer_ClientConnected;
                 bytesIOServer.ClientDisconnected += BytesIOServer_ClientDisconnected;
                 bytesIOServer.StartAsync();
-
+                ParseData();
                 //server.ReceiveFromClient += UpdateClientInfo;
                 //server.ClientListUpdate += UpdateClientList;
                 //server.StartListening();
                 //TB_Info.AppendText($"服务端监听开始{Environment.NewLine}");
 
-                testProcess.TargetProcess.OutputDataReceived += TargetProcess_OutputDataReceived;
-                testProcess.StartProcess("E:\\PythonProjects\\OpenCVTest\\dist\\main\\main.exe");
-                ShowMessage($"控制台程序启动完成");
+                //testProcess.TargetProcess.OutputDataReceived += TargetProcess_OutputDataReceived;
+                //testProcess.StartProcess("E:\\PythonProjects\\OpenCVTest\\dist\\main\\main.exe");
+                //ShowMessage($"控制台程序启动完成");
             }
             catch (Exception ex)
             {
@@ -61,34 +66,16 @@ namespace MyProjects
 
         private void Client_OnDataReceived(object? sender, STTech.BytesIO.Core.DataReceivedEventArgs e)
         {
-            UnpackagedMessage message = new(e.Data);
-            switch (message.Type)
+            try
             {
-                case TransferType.Text:
-                    ShowMessage(message.Data.EncodeToString());
-                    break;
-                case TransferType.FileInfo:
-                case TransferType.FileContent:
-                case TransferType.FileEnd:
-                    var fileName = message.Args.EncodeToString();
-                    if (message.Type == TransferType.FileInfo)
-                    {
-                        memoryStreamDic[fileName] = new();
-                    }
-                    else if (message.Type == TransferType.FileContent)
-                    {
-                        lock (memoryStreamDic[fileName])
-                            memoryStreamDic[fileName].Write(e.Data);
-                    }
-                    else if (message.Type == TransferType.FileEnd)
-                    {
-                        PB_MyPicture.Invoke(new Action(() => PB_MyPicture.Image = Image.FromStream(memoryStreamDic[fileName])));
-                        memoryStreamDic[fileName].Close();
-                        memoryStreamDic[fileName].Dispose();
-                    }
-                    break;
+                cache.Enqueue(new UnpackagedMessage(e.Data));
+                Thread.Sleep(10);
+                dataParseSwitch.Set();
             }
-            
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
         }
 
         private void BytesIOServer_Closed(object? sender, EventArgs e)
@@ -125,10 +112,50 @@ namespace MyProjects
                 TB_Info.AppendText($"[{DateTime.Now}]{message}\r\n")));
         }
 
+        private void ParseData()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    dataParseSwitch.WaitOne();
+                    Thread.Sleep(10);
+                    while (!cache.IsEmpty)
+                    {
+                        cache.TryDequeue(out var message);
+                        if (message != null)
+                            switch (message.Type)
+                            {
+                                case TransferType.Text:
+                                    ShowMessage(message.Data.EncodeToString());
+                                    break;
+                                case TransferType.FileInfo:
+                                    memoryStreamDic[message.Args.EncodeToString()] = new MemoryStream();
+                                    break;
+                                case TransferType.FileContent:
+                                    lock (memoryStreamDic[message.Args.EncodeToString()])
+                                        memoryStreamDic[message.Args.EncodeToString()].Write(message.Data);
+                                    break;
+                                case TransferType.FileEnd:
+                                    PB_MyPicture.Invoke(new Action(() => PB_MyPicture.Image = Image.FromStream(memoryStreamDic[message.Args.EncodeToString()])));
+                                    memoryStreamDic[message.Args.EncodeToString()].Close();
+                                    memoryStreamDic[message.Args.EncodeToString()].Dispose();
+                                    memoryStreamDic.Remove(message.Args.EncodeToString());
+                                    dataParseSwitch.Reset();
+                                    break;
+                            }
+                    }
+                }
+            });
+        }
+
         private void BTN_Test_Click(object sender, EventArgs e)
         {
-            PB_MyPicture.Image = Image.FromStream
-                (new MemoryStream(ImageToolkit.GetBinary("C:\\Users\\1\\Desktop\\autumn.jpg")));
+            //PB_MyPicture.Image = Image.FromStream
+            //    (new MemoryStream(ImageToolkit.GetBinary("C:\\Users\\1\\Desktop\\autumn.jpg")));
+            if (PB_MyPicture.Image != null)
+                PB_MyPicture.Image = null;
+            TB_Info.Clear();
         }
 
         private void BTN_ProcessInput_Click(object sender, EventArgs e)

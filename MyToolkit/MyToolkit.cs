@@ -1524,16 +1524,11 @@ namespace MyToolkit
         public Process TargetProcess { get; set; }
         public string Output { get; set; }
 
-        public ProcessToolkit()
+        public ProcessToolkit(string processPath)
         {
             TargetProcess = new Process();
             Output = "Default";
-        }
-
-        public void StartProcess(string processPath, string processArguments = "StartProcess")
-        {
             TargetProcess.StartInfo.FileName = processPath;
-            TargetProcess.StartInfo.Arguments = processArguments;
             TargetProcess.StartInfo.UseShellExecute = false;
             TargetProcess.StartInfo.CreateNoWindow = true;
             //p.StartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
@@ -1542,41 +1537,71 @@ namespace MyToolkit
             TargetProcess.StartInfo.RedirectStandardError = true;
             TargetProcess.OutputDataReceived += TargetProcess_OutputDataReceived;
             TargetProcess.ErrorDataReceived += TargetProcess_ErrorDataReceived;
-
+        }
+        /// <summary>
+        /// 开启一个进程
+        /// </summary>
+        /// <param name="processArguments">初始参数</param>
+        public void StartProcessAsyncReceive(string processArguments = "start")
+        {
+            TargetProcess.StartInfo.Arguments = processArguments;
             TargetProcess.Start();
             TargetProcess.BeginOutputReadLine();
-
-            //p.StandardInput.WriteLine("1");
-            //p.StandardInput.Close();
-            //p.WaitForExit();
-            //p.Close();
         }
-
+        /// <summary>
+        /// 输出接收委托
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">传输的数据</param>
         private void TargetProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Data))
                 Output = e.Data;
         }
-
+        /// <summary>
+        /// 错误接收委托
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">传输的数据</param>
+        /// <exception cref="NotImplementedException"></exception>
         private void TargetProcess_ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             throw new NotImplementedException();
         }
-
+        /// <summary>
+        /// 向标准输入流输入
+        /// </summary>
+        /// <param name="input">输入的信息</param>
         public void ProcessInput(string input)
         {
             TargetProcess.StandardInput.WriteLine(input);
+            TargetProcess.StandardInput.Close();
         }
-
+        /// <summary>
+        /// 异步向标准输入流输入
+        /// </summary>
+        /// <param name="input">输入的信息</param>
         public async void ProcessInputAsync(string input)
         {
             await TargetProcess.StandardInput.WriteLineAsync(input);
         }
 
+        public string StartProcess(string processArguments)
+        {
+            TargetProcess.StartInfo.Arguments = processArguments;
+            TargetProcess.Start();
+            Output = TargetProcess.StandardOutput.ReadToEnd();
+            TargetProcess.WaitForExit();
+            TargetProcess.Close();
+            return Output;
+        }
+        /// <summary>
+        /// 进程退出
+        /// </summary>
         public void ProcessClose()
         {
             //TargetProcess.CancelOutputRead();
-            TargetProcess.StandardInput.Close();
+            TargetProcess.WaitForExit();
             TargetProcess.Close();
         }
     }

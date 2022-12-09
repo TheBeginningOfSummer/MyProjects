@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyProjects", "MyProjects\MyProjects.csproj", "{1C1EEC98-9B5C-4BFF-BDF3-583CFE21B539}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyProjects", "MyProjects\MyProjects.csproj", "{1C1EEC98-9B5C-4BFF-BDF3-583CFE21B539}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyToolkit", "MyToolkit\MyToolkit.csproj", "{E6833508-C93B-4391-9016-2D22583E92A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyToolkit", "MyToolkit\MyToolkit.csproj", "{E6833508-C93B-4391-9016-2D22583E92A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPFSVideo", "IPFSVideo\IPFSVideo.csproj", "{04E3627F-B6FC-477E-9B3E-852B01208055}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E6833508-C93B-4391-9016-2D22583E92A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6833508-C93B-4391-9016-2D22583E92A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6833508-C93B-4391-9016-2D22583E92A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04E3627F-B6FC-477E-9B3E-852B01208055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04E3627F-B6FC-477E-9B3E-852B01208055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04E3627F-B6FC-477E-9B3E-852B01208055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04E3627F-B6FC-477E-9B3E-852B01208055}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
