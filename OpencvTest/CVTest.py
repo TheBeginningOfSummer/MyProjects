@@ -1,5 +1,7 @@
 import time
 import cv2
+import pytesseract
+
 import transfer as tf
 import io
 import socket
@@ -10,15 +12,17 @@ if __name__ == '__main__':
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(('127.0.0.1', 5000))
     while True:
-        code = input('指令：')
+        # print('输入指令：')
+        code = input()
         if code == '1':
             image = cv2.imread('Image/Mecanim.jpg')
             cv2.imshow('rose', image[::-1, :, :])
             cv2.waitKey()
             cv2.destroyAllWindows()
         elif code == '2':
-            image_name = input('输入图片名称：')
-            image = cv2.imread(f'Image/{image_name}')
+            print('输入图片名称：')
+            image_name = input()
+            image = cv2.imread(f'./Image/{image_name}')
             if image is not None:
                 img_bytes = cv2.imencode('.jpg', image)[1].tobytes()
                 file_name = bytes(image_name, 'utf-8')
@@ -43,3 +47,16 @@ if __name__ == '__main__':
                         break
         elif code == 'exit':
             break
+        elif code == '3':
+            config = '-l eng --oem 1 --psm 3'
+            print('配置完成')
+            image = cv2.imread('./Image/test1.png', cv2.IMREAD_COLOR)
+            
+            cv2.waitKey()
+            cv2.destroyAllWindows()
+            print('读取完成')
+            text = pytesseract.image_to_string(image, config=config)
+            print('转换完成')
+            print(text)
+        elif code == '4':
+            print('信息输出')

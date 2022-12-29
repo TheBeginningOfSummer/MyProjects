@@ -1535,18 +1535,27 @@ namespace MyToolkit
             TargetProcess.StartInfo.RedirectStandardInput = true;
             TargetProcess.StartInfo.RedirectStandardOutput = true;
             TargetProcess.StartInfo.RedirectStandardError = true;
-            TargetProcess.OutputDataReceived += TargetProcess_OutputDataReceived;
-            TargetProcess.ErrorDataReceived += TargetProcess_ErrorDataReceived;
+            //TargetProcess.OutputDataReceived += TargetProcess_OutputDataReceived;
+            //TargetProcess.ErrorDataReceived += TargetProcess_ErrorDataReceived;
         }
+
         /// <summary>
         /// 开启一个进程
         /// </summary>
         /// <param name="processArguments">初始参数</param>
-        public void StartProcessAsyncReceive(string processArguments = "start")
+        public void StartProcessAsync(string processArguments = "start")
         {
             TargetProcess.StartInfo.Arguments = processArguments;
             TargetProcess.Start();
             TargetProcess.BeginOutputReadLine();
+        }
+        /// <summary>
+        /// 异步向标准输入流输入
+        /// </summary>
+        /// <param name="input">输入的信息</param>
+        public async void ProcessInputAsync(string input)
+        {
+            await TargetProcess.StandardInput.WriteLineAsync(input);
         }
         /// <summary>
         /// 输出接收委托
@@ -1568,23 +1577,6 @@ namespace MyToolkit
         {
             throw new NotImplementedException();
         }
-        /// <summary>
-        /// 向标准输入流输入
-        /// </summary>
-        /// <param name="input">输入的信息</param>
-        public void ProcessInput(string input)
-        {
-            TargetProcess.StandardInput.WriteLine(input);
-            TargetProcess.StandardInput.Close();
-        }
-        /// <summary>
-        /// 异步向标准输入流输入
-        /// </summary>
-        /// <param name="input">输入的信息</param>
-        public async void ProcessInputAsync(string input)
-        {
-            await TargetProcess.StandardInput.WriteLineAsync(input);
-        }
 
         public string StartProcess(string processArguments)
         {
@@ -1594,6 +1586,15 @@ namespace MyToolkit
             TargetProcess.WaitForExit();
             TargetProcess.Close();
             return Output;
+        }
+        /// <summary>
+        /// 向标准输入流输入
+        /// </summary>
+        /// <param name="input">输入的信息</param>
+        public void ProcessInput(string input)
+        {
+            TargetProcess.StandardInput.WriteLine(input);
+            //TargetProcess.StandardInput.Close();
         }
         /// <summary>
         /// 进程退出

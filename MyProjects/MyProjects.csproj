@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.6.0.20220608" />
     <PackageReference Include="STTech.BytesIO.Tcp" Version="2.12.1" />
+    <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +31,15 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="tessdata\chi_sim.traineddata">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="tessdata\eng.traineddata">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
