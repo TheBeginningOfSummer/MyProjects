@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MyToolkit
 {
@@ -46,5 +51,61 @@ namespace MyToolkit
     public enum TransferType : byte
     {
         Text, FileInfo, FileContent, FileEnd, Picture, Shake,
+    }
+
+    public class DataTransfer
+    {
+        readonly Dictionary<string, MemoryStream> memoryStreamDic = new Dictionary<string, MemoryStream>();
+        public readonly ConcurrentQueue<UnpackagedMessage> Cache = new ConcurrentQueue<UnpackagedMessage>();
+        public readonly ManualResetEvent DataParseSwitch = new ManualResetEvent(false);
+        public Action<string>? TextReceiveAction;
+        public Action<MemoryStream>? MSReceiveAction;
+
+        public DataTransfer()
+        {
+
+        }
+
+        public void DataReceive()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    DataParseSwitch.WaitOne();
+                    Thread.Sleep(10);
+                    while (!Cache.IsEmpty)
+                    {
+                        Cache.TryDequeue(out var message);
+                        if (message != null)
+                            switch (message.Type)
+                            {
+                                case TransferType.Text:
+                                    TextReceiveAction?.Invoke(EncodeToString(message.Data));
+                                    break;
+                                case TransferType.FileInfo:
+                                    memoryStreamDic[EncodeToString(message.Args)] = new MemoryStream();
+                                    break;
+                                case TransferType.FileContent:
+                                    lock (memoryStreamDic[EncodeToString(message.Args)])
+                                        memoryStreamDic[EncodeToString(message.Args)].Write(message.Data);
+                                    break;
+                                case TransferType.FileEnd:
+                                    MSReceiveAction?.Invoke(memoryStreamDic[EncodeToString(message.Args)]);
+                                    memoryStreamDic[EncodeToString(message.Args)].Close();
+                                    memoryStreamDic[EncodeToString(message.Args)].Dispose();
+                                    memoryStreamDic.Remove(EncodeToString(message.Args));
+                                    DataParseSwitch.Reset();
+                                    break;
+                            }
+                    }
+                }
+            });
+        }
+
+        public string EncodeToString(IEnumerable<byte> data, string encode = "utf-8")
+        {
+            return Encoding.GetEncoding(encode).GetString(data.ToArray());
+        }
     }
 }

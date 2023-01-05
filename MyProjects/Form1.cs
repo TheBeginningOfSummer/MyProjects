@@ -1,5 +1,4 @@
 using MyToolkit;
-using OpenCvSharp;
 using STTech.BytesIO.Tcp;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -12,11 +11,7 @@ namespace MyProjects
         readonly ProcessToolkit testProcess = new("C:\\Users\\1\\Desktop\\MyProjects\\OpencvTest\\dist\\CVTest\\CVTest.exe");
         //readonly ConnectionToolkit.SocketConnection server = new("127.0.0.1", 5000);
         readonly TcpServer bytesIOServer = new();
-        #region 网络传输数据拼接、缓存与接收开关
-        readonly Dictionary<string, MemoryStream> memoryStreamDic = new();
-        readonly ConcurrentQueue<UnpackagedMessage> cache = new();
-        readonly ManualResetEvent dataParseSwitch = new(false);
-        #endregion
+        readonly DataTransfer dataTransfer = new();
         readonly TesseractEngine tess;
 
         public Form1()
@@ -39,7 +34,7 @@ namespace MyProjects
                 bytesIOServer.ClientConnected += BytesIOServer_ClientConnected;
                 bytesIOServer.ClientDisconnected += BytesIOServer_ClientDisconnected;
                 bytesIOServer.StartAsync();
-                ParseData();
+                dataTransfer.DataReceive();
 
                 //server.ReceiveFromClient += UpdateClientInfo;
                 //server.ClientListUpdate += UpdateClientList;
@@ -80,16 +75,15 @@ namespace MyProjects
         {
             ShowMessage($"客户端[{e.Client.Host}:{e.Client.Port}]连接成功");
             e.Client.OnDataReceived += Client_OnDataReceived;
-            
         }
 
         private void Client_OnDataReceived(object? sender, STTech.BytesIO.Core.DataReceivedEventArgs e)
         {
             try
             {
-                cache.Enqueue(new UnpackagedMessage(e.Data));
+                dataTransfer.Cache.Enqueue(new UnpackagedMessage(e.Data));
                 Thread.Sleep(10);
-                dataParseSwitch.Set();
+                dataTransfer.DataParseSwitch.Set();
             }
             catch (Exception ex)
             {
@@ -131,60 +125,29 @@ namespace MyProjects
                 ShowMessage(e.Data);
         }
 
-        private void ParseData()
-        {
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    dataParseSwitch.WaitOne();
-                    Thread.Sleep(10);
-                    while (!cache.IsEmpty)
-                    {
-                        cache.TryDequeue(out var message);
-                        if (message != null)
-                            switch (message.Type)
-                            {
-                                case TransferType.Text:
-                                    ShowMessage(message.Data.EncodeToString());
-                                    break;
-                                case TransferType.FileInfo:
-                                    memoryStreamDic[message.Args.EncodeToString()] = new MemoryStream();
-                                    break;
-                                case TransferType.FileContent:
-                                    lock (memoryStreamDic[message.Args.EncodeToString()])
-                                        memoryStreamDic[message.Args.EncodeToString()].Write(message.Data);
-                                    break;
-                                case TransferType.FileEnd:
-                                    PB_MyPicture.Invoke(new Action(() => PB_MyPicture.Image = Image.FromStream(memoryStreamDic[message.Args.EncodeToString()])));
-                                    memoryStreamDic[message.Args.EncodeToString()].Close();
-                                    memoryStreamDic[message.Args.EncodeToString()].Dispose();
-                                    memoryStreamDic.Remove(message.Args.EncodeToString());
-                                    dataParseSwitch.Reset();
-                                    break;
-                            }
-                    }
-                }
-            });
-        }
-
         private void BTN_Test_Click(object sender, EventArgs e)
         {
             try
             {
-                //if (PB_MyPicture.Image != null)
-                //    PB_MyPicture.Image = null;
-                //TB_Info.Clear();
-                MemoryStream imageStream = new(ImageToolkit.GetBinary("test1.png"));
+                if (PB_MyPicture.Image != null)
+                    PB_MyPicture.Image = null;
+                TB_Info.Clear();
+                openFileDialog1.Filter = "png图片|*.png|jpg图片|*.jpg";
+                if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    MemoryStream imageStream = new(ImageToolkit.GetBinary(Path.GetFullPath(openFileDialog1.FileName)));
+                    PB_MyPicture.Image = (Bitmap)Image.FromStream(imageStream);
+                    imageStream.Close();
+                }
+
+                //MemoryStream imageStream = new(ImageToolkit.GetBinary("test1.png"));
                 //Mat img = Mat.FromStream(imageStream, ImreadModes.Color);
                 //Cv2.ImShow("Input Image", img);
                 //Mat img2 = img.Threshold(29, 255, ThresholdTypes.Binary);
                 //Cv2.ImShow("Threshold", img2);
 
-                Bitmap image = (Bitmap)Image.FromStream(imageStream);
-                PB_MyPicture.Image = image;
-                var img = Pix.LoadFromMemory(ImageToolkit.GetBinary("test1.png"));
-                imageStream.Close();
+                //var img = Pix.LoadFromMemory(ImageToolkit.GetBinary("test1.png"));
+                var img = Pix.LoadFromFile(openFileDialog1.FileName);
                 var page = tess.Process(img);
                 var text = page.GetText();
                 ShowMessage(text);
@@ -194,6 +157,12 @@ namespace MyProjects
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void BTN_Test2_Click(object sender, EventArgs e)
+        {
+            OpenCVTool.IsStopRead = !OpenCVTool.IsStopRead;
+            //OpenCvSharp.Cv2.MoveWindow("video", 0, 0);
         }
 
         private void BTN_ProcessInput_Click(object sender, EventArgs e)
@@ -209,6 +178,25 @@ namespace MyProjects
             }
         }
 
-        
+        private void BTN_ReadImage_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "png图片|*.png|jpg图片|*.jpg";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                OpenCVTool.ReadImage(Path.GetFullPath(openFileDialog1.FileName));
+            }  
+        }
+
+        private void BTN_ReadVideo_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "mp4视频|*.mp4";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                OpenCVTool.ReadVideo(Path.GetFullPath(openFileDialog1.FileName), "video");
+            }
+            //OpenCVTool.ReadVideo(0, "video");
+        }
+
+
     }
 }

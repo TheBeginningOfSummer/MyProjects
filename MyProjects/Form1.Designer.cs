@@ -34,6 +34,10 @@
             this.BTN_ProcessInput = new System.Windows.Forms.Button();
             this.TB_ConsoleInput = new System.Windows.Forms.TextBox();
             this.GB_ConsoleTest = new System.Windows.Forms.GroupBox();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.BTN_ReadImage = new System.Windows.Forms.Button();
+            this.BTN_ReadVideo = new System.Windows.Forms.Button();
+            this.BTN_Test2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PB_MyPicture)).BeginInit();
             this.GB_ConsoleTest.SuspendLayout();
             this.SuspendLayout();
@@ -102,11 +106,48 @@
             this.GB_ConsoleTest.TabStop = false;
             this.GB_ConsoleTest.Text = "控制台程序测试";
             // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // BTN_ReadImage
+            // 
+            this.BTN_ReadImage.Location = new System.Drawing.Point(610, 446);
+            this.BTN_ReadImage.Name = "BTN_ReadImage";
+            this.BTN_ReadImage.Size = new System.Drawing.Size(75, 23);
+            this.BTN_ReadImage.TabIndex = 6;
+            this.BTN_ReadImage.Text = "读取图片";
+            this.BTN_ReadImage.UseVisualStyleBackColor = true;
+            this.BTN_ReadImage.Click += new System.EventHandler(this.BTN_ReadImage_Click);
+            // 
+            // BTN_ReadVideo
+            // 
+            this.BTN_ReadVideo.Location = new System.Drawing.Point(691, 446);
+            this.BTN_ReadVideo.Name = "BTN_ReadVideo";
+            this.BTN_ReadVideo.Size = new System.Drawing.Size(75, 23);
+            this.BTN_ReadVideo.TabIndex = 7;
+            this.BTN_ReadVideo.Text = "读取视频";
+            this.BTN_ReadVideo.UseVisualStyleBackColor = true;
+            this.BTN_ReadVideo.Click += new System.EventHandler(this.BTN_ReadVideo_Click);
+            // 
+            // BTN_Test2
+            // 
+            this.BTN_Test2.Location = new System.Drawing.Point(796, 417);
+            this.BTN_Test2.Name = "BTN_Test2";
+            this.BTN_Test2.Size = new System.Drawing.Size(75, 23);
+            this.BTN_Test2.TabIndex = 8;
+            this.BTN_Test2.Text = "测试2";
+            this.BTN_Test2.UseVisualStyleBackColor = true;
+            this.BTN_Test2.Click += new System.EventHandler(this.BTN_Test2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 481);
+            this.Controls.Add(this.BTN_Test2);
+            this.Controls.Add(this.BTN_ReadVideo);
+            this.Controls.Add(this.BTN_ReadImage);
             this.Controls.Add(this.GB_ConsoleTest);
             this.Controls.Add(this.TB_Info);
             this.Controls.Add(this.BTN_Test);
@@ -131,5 +172,9 @@
         private Button BTN_ProcessInput;
         private TextBox TB_ConsoleInput;
         private GroupBox GB_ConsoleTest;
+        private OpenFileDialog openFileDialog1;
+        private Button BTN_ReadImage;
+        private Button BTN_ReadVideo;
+        private Button BTN_Test2;
     }
 }

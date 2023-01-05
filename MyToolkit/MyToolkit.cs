@@ -49,7 +49,7 @@ namespace MyToolkit
             }
         }
 
-        public class SocketConnection
+        public class SocketTool
         {
             //基本参数
             public Socket SocketItem { get; set; }
@@ -65,14 +65,14 @@ namespace MyToolkit
             public Action<Socket, byte[]> ReceiveFromClient;
             public Action<byte[]> ReceiveFromServer;
 
-            public SocketConnection(int byteLength = 2048)
+            public SocketTool(int byteLength = 2048)
             {
                 SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 DataCache = new byte[byteLength];
                 SendByte = new byte[byteLength];
             }
 
-            public SocketConnection(string ip, int port, int byteLength = 2048)
+            public SocketTool(string ip, int port, int byteLength = 2048)
             {
                 SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 DataCache = new byte[byteLength];
@@ -396,6 +396,84 @@ namespace MyToolkit
         //        return true;
         //    }
         //}
+
+        /// <summary>
+        /// 字节工具接收类
+        /// </summary>
+        public class BytesReceiver
+        {
+            public int PackageMarkLength;
+            public byte[] PackageMark;
+            public int PackageLength;
+            public byte[] DataCache;
+            public Action<byte[]>? ReceiveBytes;
+
+            public BytesReceiver()
+            {
+                PackageMarkLength = 2;
+                PackageMark = new byte[2] { 0x7F, 0x7F };
+                PackageLength = 0;
+                DataCache = new byte[2048];
+            }
+
+            public void ClearCache()
+            {
+                PackageLength = 0;
+            }
+            /// <summary>
+            /// 将接收到的字节数组按包头包尾的标记拼包与分包
+            /// </summary>
+            /// <param name="receivedData">接收的字节数据</param>
+            public void DataReceive(byte[] receivedData)
+            {
+                if (receivedData.Length == 0) return;
+                Array.Copy(receivedData, 0, DataCache, PackageLength, receivedData.Length);
+                //下一次接收的起始位置以及现有的数据长度
+                PackageLength += receivedData.Length;
+
+                while (PackageLength > 0)
+                {
+                    //检测包头包尾
+                    ByteArrayToolkit.CheckPackage(DataCache, PackageMark, out int head, out int tail);
+                    //无包尾,返回继续拼接
+                    if (tail == -1) return;
+                    //有包头且在0位置
+                    if (head == 0)
+                    {
+                        //拼接好的数据包要放入的字节数组
+                        byte[] data = new byte[tail + PackageMarkLength];
+                        //将缓存中的数据拷贝到字节数组中
+                        Array.Copy(DataCache, 0, data, 0, tail + PackageMarkLength);
+                        //传出数据
+                        ReceiveBytes?.Invoke(data);
+                        //将提取的数据消除，将后面的数据前置
+                        ClearDataCache(tail + PackageMarkLength);
+                        //重新计算缓存区字节长度
+                        PackageLength -= (tail + PackageMarkLength);
+                    }
+                    else
+                    {
+                        //将提取的数据消除，将后面的数据前置
+                        ClearDataCache(tail + PackageMarkLength);
+                        //重新计算缓存区字节长度
+                        PackageLength -= (tail + PackageMarkLength);
+                    }
+                }
+            }
+            /// <summary>
+            /// 将指定长度的数据清除，并用后面的数据覆盖
+            /// </summary>
+            /// <param name="clearLength">清除数据的长度</param>
+            public void ClearDataCache(int clearLength)
+            {
+                //byte[] tempData = new byte[clearLength];
+                for (int i = 0; i < DataCache.Length - clearLength; i++)
+                {
+                    DataCache[i] = DataCache[clearLength + i];
+                }
+            }
+        }
+
     }
     /// <summary>
     /// 静态数据转换类
@@ -1021,82 +1099,6 @@ namespace MyToolkit
             return true;
         }
         #endregion
-    }
-    /// <summary>
-    /// 字节工具接收类
-    /// </summary>
-    public class BytesReceiveToolkit
-    {
-        public int PackageMarkLength;
-        public byte[] PackageMark;
-        public int PackageLength;
-        public byte[] DataCache;
-        public Action<byte[]> ReceiveBytes;
-
-        public BytesReceiveToolkit()
-        {
-            PackageMarkLength = 2;
-            PackageMark = new byte[2] { 0x7F, 0x7F };
-            PackageLength = 0;
-            DataCache = new byte[2048];
-        }
-
-        public void ClearCache()
-        {
-            PackageLength = 0;
-        }
-        /// <summary>
-        /// 将接收到的字节数组按包头包尾的标记拼包与分包
-        /// </summary>
-        /// <param name="receivedData">接收的字节数据</param>
-        public void DataReceive(byte[] receivedData)
-        {
-            if (receivedData.Length == 0) return;
-            Array.Copy(receivedData, 0, DataCache, PackageLength, receivedData.Length);
-            //下一次接收的起始位置以及现有的数据长度
-            PackageLength += receivedData.Length;
-
-            while (PackageLength > 0)
-            {
-                //检测包头包尾
-                ByteArrayToolkit.CheckPackage(DataCache, PackageMark, out int head, out int tail);
-                //无包尾,返回继续拼接
-                if (tail == -1) return;
-                //有包头且在0位置
-                if (head == 0)
-                {
-                    //拼接好的数据包要放入的字节数组
-                    byte[] data = new byte[tail + PackageMarkLength];
-                    //将缓存中的数据拷贝到字节数组中
-                    Array.Copy(DataCache, 0, data, 0, tail + PackageMarkLength);
-                    //传出数据
-                    ReceiveBytes?.Invoke(data);
-                    //将提取的数据消除，将后面的数据前置
-                    ClearDataCache(tail + PackageMarkLength);
-                    //重新计算缓存区字节长度
-                    PackageLength -= (tail + PackageMarkLength);
-                }
-                else
-                {
-                    //将提取的数据消除，将后面的数据前置
-                    ClearDataCache(tail + PackageMarkLength);
-                    //重新计算缓存区字节长度
-                    PackageLength -= (tail + PackageMarkLength);
-                }
-            }
-        }
-        /// <summary>
-        /// 将指定长度的数据清除，并用后面的数据覆盖
-        /// </summary>
-        /// <param name="clearLength">清除数据的长度</param>
-        public void ClearDataCache(int clearLength)
-        {
-            //byte[] tempData = new byte[clearLength];
-            for (int i = 0; i < DataCache.Length - clearLength; i++)
-            {
-                DataCache[i] = DataCache[clearLength + i];
-            }
-        }
     }
     /// <summary>
     /// 静态Fins工具类
