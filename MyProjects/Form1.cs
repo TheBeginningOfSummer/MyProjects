@@ -17,7 +17,7 @@ namespace MyProjects
         readonly ConcurrentQueue<UnpackagedMessage> cache = new();
         readonly ManualResetEvent dataParseSwitch = new(false);
         #endregion
-        TesseractEngine tess;
+        readonly TesseractEngine tess;
 
         public Form1()
         {
@@ -62,6 +62,12 @@ namespace MyProjects
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             bytesIOServer.CloseAsync();
+        }
+
+        private void ShowMessage(string message)
+        {
+            TB_Info.Invoke(new Action(() =>
+                TB_Info.AppendText($"[{DateTime.Now}]\r\n{message}\r\n")));
         }
 
         #region TCP通信事件
@@ -125,12 +131,6 @@ namespace MyProjects
                 ShowMessage(e.Data);
         }
 
-        private void ShowMessage(string message)
-        {
-            TB_Info.Invoke(new Action(() =>
-                TB_Info.AppendText($"[{DateTime.Now}]{message}\r\n")));
-        }
-
         private void ParseData()
         {
             Task.Run(() =>
@@ -181,12 +181,9 @@ namespace MyProjects
                 //Mat img2 = img.Threshold(29, 255, ThresholdTypes.Binary);
                 //Cv2.ImShow("Threshold", img2);
 
-                //Bitmap image = (Bitmap)Image.FromStream(imageStream);
-                //Bitmap image = (Bitmap)Image.FromFile("C:\\Users\\1\\Desktop\\MyProjects\\OpencvTest\\Image\\test1.png");
-                //PB_MyPicture.Image = image;
-
+                Bitmap image = (Bitmap)Image.FromStream(imageStream);
+                PB_MyPicture.Image = image;
                 var img = Pix.LoadFromMemory(ImageToolkit.GetBinary("test1.png"));
-                
                 imageStream.Close();
                 var page = tess.Process(img);
                 var text = page.GetText();

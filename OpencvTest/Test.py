@@ -1,5 +1,3 @@
-import time
-import io
 import transfer as tf
 
 if __name__ == '__main__':
