@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,32 +10,41 @@ namespace MyProjects
 {
     public class OpenCVTool
     {
-        public static bool IsStopRead = false;
+        public ManualResetEvent Suspend = new(true);
+        public bool IsStopRead = false;
+        public bool IsCaptureImage = false;
+        public Action<Mat>? VideoUpdateAction;
+        public MouseCallback? MouseCallbackEvent;
+
+        private Mat img = new Mat();
 
         public OpenCVTool()
         {
-
+            Debug.WriteLine("程序启动");
+            
         }
 
-        public static void ReadImage(string filePath)
+        public void ReadImage(string filePath)
         {
-            Mat img = Cv2.ImRead(filePath);
+            img = Cv2.ImRead(filePath);
             Cv2.ImShow("Input Image", img);
-            //Cv2.WaitKey();
+            Cv2.WaitKey();
             img.Release();
             Cv2.DestroyAllWindows();
         }
 
-        public static void ReadVideo(string videoPath, string windowName)
+        public void GetImage(string videoPath, string windowName, int delay = 30)
         {
             VideoCapture vc = new VideoCapture(videoPath);
-            Mat img = new Mat();
+            img = new Mat();
             while (vc.IsOpened())
             {
                 if (vc.Read(img))
                 {
+                    VideoUpdateAction?.Invoke(img);
                     Cv2.ImShow(windowName, img);
-                    Cv2.WaitKey(30);
+                    Cv2.WaitKey(delay);
+                    if (IsCaptureImage) Cv2.WaitKey();
                 }
                 else
                 {
@@ -47,16 +57,27 @@ namespace MyProjects
             Cv2.DestroyAllWindows();
         }
 
-        public static void ReadVideo(int camera, string windowName)
+        public void ReadVideo(string videoPath, string windowName, int delay = 30, bool window = true)
         {
-            VideoCapture vc = new VideoCapture(camera);
-            Mat img = new Mat();
+            VideoCapture vc = new VideoCapture(videoPath);
+            img = new Mat();
             while (vc.IsOpened())
             {
                 if (vc.Read(img))
                 {
-                    Cv2.ImShow(windowName, img);
-                    Cv2.WaitKey(30);
+                    if (window)
+                    {
+                        VideoUpdateAction?.Invoke(img);
+                        Cv2.ImShow(windowName, img);
+                        Cv2.WaitKey(delay);
+                        Suspend.WaitOne();
+                        if (IsStopRead) break;
+                    }
+                    else
+                    {
+                        VideoUpdateAction?.Invoke(img);
+                        Cv2.WaitKey(delay);
+                    }
                 }
                 else
                 {
@@ -67,6 +88,39 @@ namespace MyProjects
             vc.Release();
             img.Release();
             Cv2.DestroyAllWindows();
+        }
+
+        public void ReadCamera(int camera, string windowName, int delay = 30)
+        {
+            VideoCapture vc = new VideoCapture(camera);
+            img = new Mat();
+            while (vc.IsOpened())
+            {
+                if (vc.Read(img))
+                {
+                    Cv2.ImShow(windowName, img);
+                    Cv2.WaitKey(delay);
+                }
+                else
+                {
+                    break;
+                }
+                if (IsStopRead) break;
+            }
+            vc.Release();
+            img.Release();
+            Cv2.DestroyAllWindows();
+        }
+
+        public void Clear()
+        {
+            img.Release();
+            Cv2.DestroyAllWindows();
+        }
+
+        public void DrawShape()
+        {
+
         }
     }
 }

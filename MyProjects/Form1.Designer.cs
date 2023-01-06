@@ -38,6 +38,7 @@
             this.BTN_ReadImage = new System.Windows.Forms.Button();
             this.BTN_ReadVideo = new System.Windows.Forms.Button();
             this.BTN_Test2 = new System.Windows.Forms.Button();
+            this.BTN_Test3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PB_MyPicture)).BeginInit();
             this.GB_ConsoleTest.SuspendLayout();
             this.SuspendLayout();
@@ -56,7 +57,7 @@
             // BTN_Test
             // 
             this.BTN_Test.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BTN_Test.Location = new System.Drawing.Point(797, 446);
+            this.BTN_Test.Location = new System.Drawing.Point(799, 366);
             this.BTN_Test.Name = "BTN_Test";
             this.BTN_Test.Size = new System.Drawing.Size(75, 23);
             this.BTN_Test.TabIndex = 1;
@@ -72,7 +73,7 @@
             this.TB_Info.Multiline = true;
             this.TB_Info.Name = "TB_Info";
             this.TB_Info.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TB_Info.Size = new System.Drawing.Size(266, 213);
+            this.TB_Info.Size = new System.Drawing.Size(266, 350);
             this.TB_Info.TabIndex = 2;
             // 
             // BTN_ProcessInput
@@ -99,7 +100,7 @@
             this.GB_ConsoleTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.GB_ConsoleTest.Controls.Add(this.TB_ConsoleInput);
             this.GB_ConsoleTest.Controls.Add(this.BTN_ProcessInput);
-            this.GB_ConsoleTest.Location = new System.Drawing.Point(762, 229);
+            this.GB_ConsoleTest.Location = new System.Drawing.Point(610, 366);
             this.GB_ConsoleTest.Name = "GB_ConsoleTest";
             this.GB_ConsoleTest.Size = new System.Drawing.Size(112, 74);
             this.GB_ConsoleTest.TabIndex = 5;
@@ -112,6 +113,7 @@
             // 
             // BTN_ReadImage
             // 
+            this.BTN_ReadImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BTN_ReadImage.Location = new System.Drawing.Point(610, 446);
             this.BTN_ReadImage.Name = "BTN_ReadImage";
             this.BTN_ReadImage.Size = new System.Drawing.Size(75, 23);
@@ -122,6 +124,7 @@
             // 
             // BTN_ReadVideo
             // 
+            this.BTN_ReadVideo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BTN_ReadVideo.Location = new System.Drawing.Point(691, 446);
             this.BTN_ReadVideo.Name = "BTN_ReadVideo";
             this.BTN_ReadVideo.Size = new System.Drawing.Size(75, 23);
@@ -132,7 +135,8 @@
             // 
             // BTN_Test2
             // 
-            this.BTN_Test2.Location = new System.Drawing.Point(796, 417);
+            this.BTN_Test2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BTN_Test2.Location = new System.Drawing.Point(799, 395);
             this.BTN_Test2.Name = "BTN_Test2";
             this.BTN_Test2.Size = new System.Drawing.Size(75, 23);
             this.BTN_Test2.TabIndex = 8;
@@ -140,11 +144,22 @@
             this.BTN_Test2.UseVisualStyleBackColor = true;
             this.BTN_Test2.Click += new System.EventHandler(this.BTN_Test2_Click);
             // 
+            // BTN_Test3
+            // 
+            this.BTN_Test3.Location = new System.Drawing.Point(799, 424);
+            this.BTN_Test3.Name = "BTN_Test3";
+            this.BTN_Test3.Size = new System.Drawing.Size(75, 23);
+            this.BTN_Test3.TabIndex = 9;
+            this.BTN_Test3.Text = "测试3";
+            this.BTN_Test3.UseVisualStyleBackColor = true;
+            this.BTN_Test3.Click += new System.EventHandler(this.BTN_Test3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 481);
+            this.Controls.Add(this.BTN_Test3);
             this.Controls.Add(this.BTN_Test2);
             this.Controls.Add(this.BTN_ReadVideo);
             this.Controls.Add(this.BTN_ReadImage);
@@ -176,5 +191,6 @@
         private Button BTN_ReadImage;
         private Button BTN_ReadVideo;
         private Button BTN_Test2;
+        private Button BTN_Test3;
     }
 }

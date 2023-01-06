@@ -1,4 +1,6 @@
 using MyToolkit;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using STTech.BytesIO.Tcp;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -13,6 +15,7 @@ namespace MyProjects
         readonly TcpServer bytesIOServer = new();
         readonly DataTransfer dataTransfer = new();
         readonly TesseractEngine tess;
+        readonly OpenCVTool cvTool;
 
         public Form1()
         {
@@ -21,6 +24,7 @@ namespace MyProjects
             {
                 DefaultPageSegMode = PageSegMode.Auto
             };
+            cvTool = new OpenCVTool();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -36,6 +40,8 @@ namespace MyProjects
                 bytesIOServer.StartAsync();
                 dataTransfer.DataReceive();
 
+                //OpenCVTool.VideoUpdateAction += UpdatePicture;
+                cvTool.MouseCallbackEvent += MouseEvent;
                 //server.ReceiveFromClient += UpdateClientInfo;
                 //server.ClientListUpdate += UpdateClientList;
                 //server.StartListening();
@@ -47,11 +53,23 @@ namespace MyProjects
                 //ShowMessage($"控制台程序启动完成");
                 //ShowMessage($"{AppDomain.CurrentDomain.BaseDirectory}tessdata\\");
                 //ShowMessage(@"./tessdata");
+                
             }
             catch (Exception ex)
             {
                 TB_Info.AppendText($"初始化错误:{ex.Message}{Environment.NewLine}");
             }
+        }
+
+        private void MouseEvent(MouseEventTypes @event, int x, int y, MouseEventFlags flags, IntPtr userData)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void PB_MyPicture_Paint(object? sender, PaintEventArgs e)
+        {
+            Invalidate();
+            PB_MyPicture.Invalidate();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -63,6 +81,14 @@ namespace MyProjects
         {
             TB_Info.Invoke(new Action(() =>
                 TB_Info.AppendText($"[{DateTime.Now}]\r\n{message}\r\n")));
+        }
+
+        private void UpdatePicture(Mat picture)
+        {
+            //Invalidate();
+            //PB_MyPicture.Invalidate();
+            PB_MyPicture.Image = BitmapConverter.ToBitmap(picture);
+            //Application.DoEvents();
         }
 
         #region TCP通信事件
@@ -129,15 +155,16 @@ namespace MyProjects
         {
             try
             {
-                if (PB_MyPicture.Image != null)
-                    PB_MyPicture.Image = null;
-                TB_Info.Clear();
-                openFileDialog1.Filter = "png图片|*.png|jpg图片|*.jpg";
+                //if (PB_MyPicture.Image != null)
+                //    PB_MyPicture.Image = null;
+                //TB_Info.Clear();
+                openFileDialog1.Filter = "png图片|*.png|jpg图片|*.jpg|MP4|*.MP4";
                 if (openFileDialog1.ShowDialog() == DialogResult.OK)
                 {
-                    MemoryStream imageStream = new(ImageToolkit.GetBinary(Path.GetFullPath(openFileDialog1.FileName)));
-                    PB_MyPicture.Image = (Bitmap)Image.FromStream(imageStream);
-                    imageStream.Close();
+                    //MemoryStream imageStream = new(ImageToolkit.GetBinary(Path.GetFullPath(openFileDialog1.FileName)));
+                    //PB_MyPicture.Image = (Bitmap)Image.FromStream(imageStream);
+                    //imageStream.Close();
+                    cvTool.GetImage(Path.GetFullPath(openFileDialog1.FileName), "video");
                 }
 
                 //MemoryStream imageStream = new(ImageToolkit.GetBinary("test1.png"));
@@ -147,11 +174,12 @@ namespace MyProjects
                 //Cv2.ImShow("Threshold", img2);
 
                 //var img = Pix.LoadFromMemory(ImageToolkit.GetBinary("test1.png"));
-                var img = Pix.LoadFromFile(openFileDialog1.FileName);
-                var page = tess.Process(img);
-                var text = page.GetText();
-                ShowMessage(text);
-                page.Dispose();
+                //var img = Pix.LoadFromFile(openFileDialog1.FileName);
+                //var page = tess.Process(img);
+                //var text = page.GetText();
+                //ShowMessage(text);
+                //page.Dispose();
+
             }
             catch (Exception ex)
             {
@@ -161,8 +189,18 @@ namespace MyProjects
 
         private void BTN_Test2_Click(object sender, EventArgs e)
         {
-            OpenCVTool.IsStopRead = !OpenCVTool.IsStopRead;
+            //OpenCVTool.IsStopRead = !OpenCVTool.IsStopRead;
             //OpenCvSharp.Cv2.MoveWindow("video", 0, 0);
+            //if (OpenCVTool.IsStopRead)
+            //{
+            //    BTN_Test2.BackColor = Color.OrangeRed;
+            //}
+            //else
+            //{
+            //    BTN_Test2.BackColor = Color.White;
+            //}
+            //OpenCVTool.Suspend.Reset();
+            cvTool.IsCaptureImage = !cvTool.IsCaptureImage;
         }
 
         private void BTN_ProcessInput_Click(object sender, EventArgs e)
@@ -183,20 +221,35 @@ namespace MyProjects
             openFileDialog1.Filter = "png图片|*.png|jpg图片|*.jpg";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                OpenCVTool.ReadImage(Path.GetFullPath(openFileDialog1.FileName));
+                cvTool.ReadImage(Path.GetFullPath(openFileDialog1.FileName));
             }  
         }
 
         private void BTN_ReadVideo_Click(object sender, EventArgs e)
         {
+            //OpenCVTool.IsStopRead = true;
             openFileDialog1.Filter = "mp4视频|*.mp4";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                OpenCVTool.ReadVideo(Path.GetFullPath(openFileDialog1.FileName), "video");
+                Task.Run(() => { cvTool.IsStopRead = false; cvTool.ReadVideo(Path.GetFullPath(openFileDialog1.FileName), "video"); });
+                //OpenCVTool.IsStopRead = false; 
+                //OpenCVTool.ReadVideo(Path.GetFullPath(openFileDialog1.FileName), "video");
             }
             //OpenCVTool.ReadVideo(0, "video");
         }
 
-
+        private void BTN_Test3_Click(object sender, EventArgs e)
+        {
+            cvTool.IsStopRead = !cvTool.IsStopRead;
+            //OpenCvSharp.Cv2.MoveWindow("video", 0, 0);
+            if (cvTool.IsStopRead)
+            {
+                BTN_Test3.BackColor = Color.OrangeRed;
+            }
+            else
+            {
+                BTN_Test3.BackColor = Color.White;
+            }
+        }
     }
 }
