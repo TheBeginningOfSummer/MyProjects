@@ -41,7 +41,8 @@ namespace MyProjects
                 dataTransfer.DataReceive();
 
                 //OpenCVTool.VideoUpdateAction += UpdatePicture;
-                cvTool.MouseCallbackEvent += MouseEvent;
+                //cvTool.MouseCallbackEvent += MouseEvent;
+
                 //server.ReceiveFromClient += UpdateClientInfo;
                 //server.ClientListUpdate += UpdateClientList;
                 //server.StartListening();
@@ -80,7 +81,7 @@ namespace MyProjects
         private void ShowMessage(string message)
         {
             TB_Info.Invoke(new Action(() =>
-                TB_Info.AppendText($"[{DateTime.Now}]\r\n{message}\r\n")));
+                TB_Info.AppendText($"[{DateTime.Now}]{message}\r\n")));
         }
 
         private void UpdatePicture(Mat picture)
@@ -189,18 +190,21 @@ namespace MyProjects
 
         private void BTN_Test2_Click(object sender, EventArgs e)
         {
-            //OpenCVTool.IsStopRead = !OpenCVTool.IsStopRead;
+            cvTool.ClearDraw();
+        }
+
+        private void BTN_Test3_Click(object sender, EventArgs e)
+        {
+            cvTool.IsStopRead = !cvTool.IsStopRead;
             //OpenCvSharp.Cv2.MoveWindow("video", 0, 0);
-            //if (OpenCVTool.IsStopRead)
-            //{
-            //    BTN_Test2.BackColor = Color.OrangeRed;
-            //}
-            //else
-            //{
-            //    BTN_Test2.BackColor = Color.White;
-            //}
-            //OpenCVTool.Suspend.Reset();
-            cvTool.IsCaptureImage = !cvTool.IsCaptureImage;
+            if (cvTool.IsStopRead)
+            {
+                BTN_Test3.BackColor = Color.OrangeRed;
+            }
+            else
+            {
+                BTN_Test3.BackColor = Color.White;
+            }
         }
 
         private void BTN_ProcessInput_Click(object sender, EventArgs e)
@@ -218,10 +222,12 @@ namespace MyProjects
 
         private void BTN_ReadImage_Click(object sender, EventArgs e)
         {
+            //cvTool.Clear();
             openFileDialog1.Filter = "pngͼƬ|*.png|jpgͼƬ|*.jpg";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 cvTool.ReadImage(Path.GetFullPath(openFileDialog1.FileName));
+                //cvTool.Model1(Path.GetFullPath(openFileDialog1.FileName));
             }  
         }
 
@@ -238,17 +244,19 @@ namespace MyProjects
             //OpenCVTool.ReadVideo(0, "video");
         }
 
-        private void BTN_Test3_Click(object sender, EventArgs e)
+        private void RB_Line_CheckedChanged(object sender, EventArgs e)
         {
-            cvTool.IsStopRead = !cvTool.IsStopRead;
-            //OpenCvSharp.Cv2.MoveWindow("video", 0, 0);
-            if (cvTool.IsStopRead)
+            if (RB_Line.Checked)
             {
-                BTN_Test3.BackColor = Color.OrangeRed;
+                cvTool.DrawShape = 0;
             }
-            else
+            else if (RB_Rectangle.Checked)
             {
-                BTN_Test3.BackColor = Color.White;
+                cvTool.DrawShape = 1;
+            }
+            else if (RB_Circle.Checked)
+            {
+                cvTool.DrawShape = 2;
             }
         }
     }

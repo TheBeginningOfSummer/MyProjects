@@ -14,43 +14,56 @@ namespace MyProjects
         public bool IsStopRead = false;
         public bool IsCaptureImage = false;
         public Action<Mat>? VideoUpdateAction;
-        public MouseCallback? MouseCallbackEvent;
-        public int DrawShape = 1;
+        public MouseCallback MouseCallbackEvent;
 
-        private Mat img = new Mat();
+        private Mat sourceImage = new Mat();
+        #region 鼠标绘制图形
+        public int DrawShape = 0;
+        private readonly Mat drawingImage = new Mat();
+        private readonly Mat drewImage = new Mat();
         private Window? window;
         private OpenCvSharp.Point startPoint;
+        private OpenCvSharp.Point endPoint;
+        #endregion
+        #region 测量
+        private OpenCvSharp.Size kernalSize = new OpenCvSharp.Size(7, 7);
+        private Mat processedImage = new Mat();
+        private Mat edgeImage = new Mat();
+        #endregion
 
         public OpenCVTool()
         {
-            //MouseCallbackEvent += MouseDraw;
+            MouseCallbackEvent = new MouseCallback(MouseDraw);
             Debug.WriteLine("程序启动");
         }
 
         public void ReadImage(string filePath)
         {
-            MouseCallbackEvent = new MouseCallback(MouseDraw);
             window = new Window("Input Image");
             window.SetMouseCallback(MouseCallbackEvent);
 
-            img = Cv2.ImRead(filePath);
+            sourceImage = Cv2.ImRead(filePath);
+            sourceImage.CopyTo(drawingImage);
+            sourceImage.CopyTo(drewImage);
+
             //Cv2.ImShow("Input Image", img);
-            window.ShowImage(img);
+            window.ShowImage(drewImage);
             Cv2.WaitKey();
-            img.Release();
+
+            sourceImage.Release();
             Cv2.DestroyAllWindows();
         }
 
         public void GetImage(string videoPath, string windowName, int delay = 30)
         {
             VideoCapture vc = new VideoCapture(videoPath);
-            img = new Mat();
+            sourceImage = new Mat();
             while (vc.IsOpened())
             {
-                if (vc.Read(img))
+                if (vc.Read(sourceImage))
                 {
-                    VideoUpdateAction?.Invoke(img);
-                    Cv2.ImShow(windowName, img);
+                    VideoUpdateAction?.Invoke(sourceImage);
+                    Cv2.ImShow(windowName, sourceImage);
                     Cv2.WaitKey(delay);
                     if (IsCaptureImage) Cv2.WaitKey();
                 }
@@ -61,29 +74,29 @@ namespace MyProjects
                 if (IsStopRead) break;
             }
             vc.Release();
-            img.Release();
+            sourceImage.Release();
             Cv2.DestroyAllWindows();
         }
 
         public void ReadVideo(string videoPath, string windowName, int delay = 30, bool window = true)
         {
             VideoCapture vc = new VideoCapture(videoPath);
-            img = new Mat();
+            sourceImage = new Mat();
             while (vc.IsOpened())
             {
-                if (vc.Read(img))
+                if (vc.Read(sourceImage))
                 {
                     if (window)
                     {
-                        VideoUpdateAction?.Invoke(img);
-                        Cv2.ImShow(windowName, img);
+                        VideoUpdateAction?.Invoke(sourceImage);
+                        Cv2.ImShow(windowName, sourceImage);
                         Cv2.WaitKey(delay);
                         Suspend.WaitOne();
                         if (IsStopRead) break;
                     }
                     else
                     {
-                        VideoUpdateAction?.Invoke(img);
+                        VideoUpdateAction?.Invoke(sourceImage);
                         Cv2.WaitKey(delay);
                     }
                 }
@@ -94,19 +107,19 @@ namespace MyProjects
                 if (IsStopRead) break;
             }
             vc.Release();
-            img.Release();
+            sourceImage.Release();
             Cv2.DestroyAllWindows();
         }
 
         public void ReadCamera(int camera, string windowName, int delay = 30)
         {
             VideoCapture vc = new VideoCapture(camera);
-            img = new Mat();
+            sourceImage = new Mat();
             while (vc.IsOpened())
             {
-                if (vc.Read(img))
+                if (vc.Read(sourceImage))
                 {
-                    Cv2.ImShow(windowName, img);
+                    Cv2.ImShow(windowName, sourceImage);
                     Cv2.WaitKey(delay);
                 }
                 else
@@ -116,16 +129,16 @@ namespace MyProjects
                 if (IsStopRead) break;
             }
             vc.Release();
-            img.Release();
+            sourceImage.Release();
             Cv2.DestroyAllWindows();
         }
 
         public void Clear()
         {
-            img.Release();
+            sourceImage?.Release();
             Cv2.DestroyAllWindows();
         }
-        int mm;
+        
         public void MouseDraw(MouseEventTypes mouseEvent, int x, int y, MouseEventFlags flags, IntPtr userData)
         {
             if (mouseEvent == MouseEventTypes.LButtonDown)
@@ -135,58 +148,85 @@ namespace MyProjects
             }
             else if (mouseEvent == MouseEventTypes.MouseMove && flags == MouseEventFlags.LButton)
             {
-                OpenCvSharp.Point endPoint;
+                drewImage.CopyTo(drawingImage);
                 endPoint.X = x;
                 endPoint.Y = y;
                 if (DrawShape == 0)
                 {
-                    Cv2.Line(img, startPoint, endPoint, Scalar.AliceBlue, 1);
+                    Cv2.Line(drawingImage, startPoint, endPoint, Scalar.AliceBlue, 1);
                 }
                 else if (DrawShape == 1)
                 {
-                    Cv2.Rectangle(img, startPoint, endPoint, Scalar.AliceBlue, 1);
+                    Cv2.Rectangle(drawingImage, startPoint, endPoint, Scalar.AliceBlue, 1);
                 }
                 else if (DrawShape == 2)
                 {
                     int a = endPoint.X - startPoint.X;
                     int b = endPoint.Y - startPoint.Y;
-                    int r = (int)Math.Sqrt(a ^ 2 + b ^ 2);
-                    Cv2.Circle(img, startPoint, r, Scalar.AliceBlue, 1);
+                    int r = (int)Math.Sqrt(a * a + b * b);
+                    Cv2.Circle(drawingImage, startPoint, r, Scalar.AliceBlue, 1);
                     //Cv2.Polylines
                 }
                 else
                 {
                     return;
                 }
+                window?.ShowImage(drawingImage);
             }
             else if (mouseEvent == MouseEventTypes.LButtonUp)
             {
-                OpenCvSharp.Point endPoint;
+                drewImage.CopyTo(drawingImage);
                 endPoint.X = x;
                 endPoint.Y = y;
                 if (DrawShape == 0)
                 {
-                    Cv2.Line(img, startPoint, endPoint, Scalar.AliceBlue, 1);
+                    Cv2.Line(drawingImage, startPoint, endPoint, Scalar.Green, 1);
                 }
                 else if (DrawShape == 1)
                 {
-                    Cv2.Rectangle(img, startPoint, endPoint, Scalar.Green, 1);
+                    Cv2.Rectangle(drawingImage, startPoint, endPoint, Scalar.Green, 1);
                 }
                 else if (DrawShape == 2)
                 {
                     int a = endPoint.X - startPoint.X;
                     int b = endPoint.Y - startPoint.Y;
-                    int r = (int)Math.Sqrt(a ^ 2 + b ^ 2);
-                    Cv2.Circle(img, startPoint, r, Scalar.AliceBlue, 1);
+                    int r = (int)Math.Sqrt(a * a + b * b);
+                    Cv2.Circle(drawingImage, startPoint, r, Scalar.Green, 1);
                 }
                 else
                 {
                     return;
                 }
+                window?.ShowImage(drawingImage);
             }
-            window.ShowImage(img);
-            mm++;
-            Debug.WriteLine("鼠标调用" + mm);
+            else if (mouseEvent == MouseEventTypes.RButtonDown)
+            {
+                drawingImage.CopyTo(drewImage);
+                window?.ShowImage(drewImage);
+            }
+            
+            //Debug.WriteLine("鼠标调用" + mm);
+        }
+
+        public void ClearDraw()
+        {
+            sourceImage?.CopyTo(drewImage);
+            if (drewImage != null) window?.ShowImage(drewImage);
+        }
+
+        public void Model1(string filePath)
+        {
+            //window = new Window("Processed Image");
+            sourceImage = Cv2.ImRead(filePath);
+            Cv2.CvtColor(sourceImage, processedImage, ColorConversionCodes.BGR2GRAY);
+            Cv2.GaussianBlur(processedImage, processedImage, kernalSize, 0);
+
+            Cv2.Canny(processedImage, edgeImage, 50, 100);
+            //Mat element = Cv2.GetStructuringElement(MorphShapes.Ellipse,)
+            //Cv2.Dilate(edgeImage, edgeImage);
+
+            Cv2.ImShow("edgeImage", edgeImage);
+            Cv2.ImShow("processedImage", processedImage);
         }
     }
 }
