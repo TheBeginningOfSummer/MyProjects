@@ -222,8 +222,9 @@ namespace MyProjects
             Cv2.GaussianBlur(processedImage, processedImage, kernalSize, 0);
 
             Cv2.Canny(processedImage, edgeImage, 50, 100);
-            //Mat element = Cv2.GetStructuringElement(MorphShapes.Ellipse,)
-            //Cv2.Dilate(edgeImage, edgeImage);
+            Mat element = Cv2.GetStructuringElement(MorphShapes.Ellipse, new OpenCvSharp.Size(3, 3), new OpenCvSharp.Point(1, 1));
+            Cv2.Dilate(edgeImage, edgeImage, element);
+            Cv2.Erode(edgeImage, edgeImage, element);
 
             Cv2.ImShow("edgeImage", edgeImage);
             Cv2.ImShow("processedImage", processedImage);

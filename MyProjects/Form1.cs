@@ -226,8 +226,8 @@ namespace MyProjects
             openFileDialog1.Filter = "pngͼƬ|*.png|jpgͼƬ|*.jpg";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                cvTool.ReadImage(Path.GetFullPath(openFileDialog1.FileName));
-                //cvTool.Model1(Path.GetFullPath(openFileDialog1.FileName));
+                //cvTool.ReadImage(Path.GetFullPath(openFileDialog1.FileName));
+                cvTool.Model1(Path.GetFullPath(openFileDialog1.FileName));
             }  
         }
 
