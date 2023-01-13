@@ -213,7 +213,7 @@ namespace MyProjects
             sourceImage?.CopyTo(drewImage);
             if (drewImage != null) window?.ShowImage(drewImage);
         }
-
+        
         public void Model1(string filePath)
         {
             //window = new Window("Processed Image");
@@ -222,9 +222,13 @@ namespace MyProjects
             Cv2.GaussianBlur(processedImage, processedImage, kernalSize, 0);
 
             Cv2.Canny(processedImage, edgeImage, 50, 100);
-            Mat element = Cv2.GetStructuringElement(MorphShapes.Ellipse, new OpenCvSharp.Size(3, 3), new OpenCvSharp.Point(1, 1));
+            Mat element = Cv2.GetStructuringElement(MorphShapes.Ellipse, new OpenCvSharp.Size(1, 1), new OpenCvSharp.Point(0, 0));
             Cv2.Dilate(edgeImage, edgeImage, element);
             Cv2.Erode(edgeImage, edgeImage, element);
+            OpenCvSharp.Point[][] contours;
+            HierarchyIndex[] hierarchies;
+            Cv2.FindContours(edgeImage, out contours, out hierarchies, RetrievalModes.External, ContourApproximationModes.ApproxNone);
+            
 
             Cv2.ImShow("edgeImage", edgeImage);
             Cv2.ImShow("processedImage", processedImage);
