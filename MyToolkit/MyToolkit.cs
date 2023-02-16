@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -31,7 +32,7 @@ namespace MyToolkit
                 return ipAddressList;
             }
 
-            public static IPAddress GetTargetIPV4Address(string partialIP)
+            public static IPAddress? GetTargetIPV4Address(string partialIP)
             {
                 string[] targetPart = partialIP.Split('.');
                 foreach (var item in GetIPV4AddressList())
@@ -1099,6 +1100,38 @@ namespace MyToolkit
             return true;
         }
         #endregion
+
+        /// <summary>
+        /// 字节按每个字颠倒
+        /// </summary>
+        /// <param name="bytes">要调整的字节</param>
+        /// <returns>返回的结果</returns>
+        public static byte[] WordByteReverse(byte[] bytes)
+        {
+            if (bytes == null) return Encoding.ASCII.GetBytes("null:0");
+            if (bytes.Length == 0) return Encoding.ASCII.GetBytes("null:0");
+            List<byte> list = new List<byte>();
+            if ((bytes.Length % 2) == 0)
+            {
+                for (int i = 0; i < bytes.Length; i += 2)
+                {
+                    list.Add(bytes[i + 1]);
+                    list.Add(bytes[i]);
+                }
+                return list.ToArray();
+            }
+            else
+            {
+                for (int i = 0; i < bytes.Length - 1; i += 2)
+                {
+                    list.Add(bytes[i + 1]);
+                    list.Add(bytes[i]);
+                }
+                list.Add(bytes.Last());
+                return list.ToArray();
+            }
+        }
+
     }
     /// <summary>
     /// 静态Fins工具类

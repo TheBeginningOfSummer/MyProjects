@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyToolkit", "MyToolkit\MyTo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPFSVideo", "IPFSVideo\IPFSVideo.csproj", "{04E3627F-B6FC-477E-9B3E-852B01208055}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleToolkit", "SimpleToolkit\SimpleToolkit.csproj", "{663F0679-4DB0-4554-BB0D-2F9B097FD423}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleToolkit", "SimpleToolkit\SimpleToolkit.csproj", "{663F0679-4DB0-4554-BB0D-2F9B097FD423}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
