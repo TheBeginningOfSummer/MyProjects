@@ -56,7 +56,7 @@ namespace MyToolkit
             public Socket SocketItem { get; set; }
             public byte[] DataCache { get; set; }
             public byte[] SendByte { get; set; }
-            //服务端所需参数
+            //所需参数
             public Dictionary<string, Socket> ClientDic { get; set; }
             public IPAddress IP { get; set; }
             public int Port { get; set; }
@@ -66,26 +66,12 @@ namespace MyToolkit
             public Action<Socket, byte[]> ReceiveFromClient;
             public Action<byte[]> ReceiveFromServer;
 
-            public SocketTool(int byteLength = 2048)
+            public SocketTool(int byteLength = 4096)
             {
                 SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 DataCache = new byte[byteLength];
                 SendByte = new byte[byteLength];
-            }
-
-            public SocketTool(string ip, int port, int byteLength = 2048)
-            {
-                SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                DataCache = new byte[byteLength];
-                SendByte = new byte[byteLength];
-
                 ClientDic = new Dictionary<string, Socket>();
-
-                IPAddress.TryParse(ip, out IPAddress iPAddress);
-
-                this.IP = iPAddress;
-                this.Port = port;
-                this.IPEndPoint = new IPEndPoint(IP, Port);
             }
 
             private byte[] GetByteArray(byte[] byteArr, int satrt, int length)//截取特定长度的字节数组
@@ -176,10 +162,11 @@ namespace MyToolkit
             #endregion
 
             #region 服务端
-            public bool StartListening()
+            public bool StartListening(IPAddress ip, int port)
             {
                 try
                 {
+                    IPEndPoint = new IPEndPoint(ip, port);
                     SocketItem.Bind(IPEndPoint);
                     SocketItem.Listen(200);
                     ThreadPool.QueueUserWorkItem(new WaitCallback(StartAcceptClient), SocketItem);
