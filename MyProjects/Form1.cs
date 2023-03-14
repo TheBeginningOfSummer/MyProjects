@@ -54,7 +54,7 @@ namespace MyProjects
                 //ShowMessage($"控制台程序启动完成");
                 //ShowMessage($"{AppDomain.CurrentDomain.BaseDirectory}tessdata\\");
                 //ShowMessage(@"./tessdata");
-                
+
             }
             catch (Exception ex)
             {
@@ -207,6 +207,22 @@ namespace MyProjects
             }
         }
 
+        private void RB_Line_CheckedChanged(object sender, EventArgs e)
+        {
+            if (RB_Line.Checked)
+            {
+                cvTool.DrawShape = 0;
+            }
+            else if (RB_Rectangle.Checked)
+            {
+                cvTool.DrawShape = 1;
+            }
+            else if (RB_Circle.Checked)
+            {
+                cvTool.DrawShape = 2;
+            }
+        }
+
         private void BTN_ProcessInput_Click(object sender, EventArgs e)
         {
             try
@@ -228,7 +244,7 @@ namespace MyProjects
             {
                 //cvTool.ReadImage(Path.GetFullPath(openFileDialog1.FileName));
                 cvTool.Model1(Path.GetFullPath(openFileDialog1.FileName));
-            }  
+            }
         }
 
         private void BTN_ReadVideo_Click(object sender, EventArgs e)
@@ -244,20 +260,14 @@ namespace MyProjects
             //OpenCVTool.ReadVideo(0, "video");
         }
 
-        private void RB_Line_CheckedChanged(object sender, EventArgs e)
+        private void BTN_LocalCamera_Click(object sender, EventArgs e)
         {
-            if (RB_Line.Checked)
-            {
-                cvTool.DrawShape = 0;
-            }
-            else if (RB_Rectangle.Checked)
-            {
-                cvTool.DrawShape = 1;
-            }
-            else if (RB_Circle.Checked)
-            {
-                cvTool.DrawShape = 2;
-            }
+            Task.Run(() => { cvTool.IsStopRead = false; cvTool.ReadCamera(0, "video"); });
+        }
+
+        private void BTN_CVStop_Click(object sender, EventArgs e)
+        {
+            cvTool.IsStopRead = true;
         }
     }
 }

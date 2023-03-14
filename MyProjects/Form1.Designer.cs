@@ -28,263 +28,283 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.PB_MyPicture = new System.Windows.Forms.PictureBox();
-            this.BTN_Test = new System.Windows.Forms.Button();
-            this.TB_Info = new System.Windows.Forms.TextBox();
-            this.BTN_ProcessInput = new System.Windows.Forms.Button();
-            this.TB_ConsoleInput = new System.Windows.Forms.TextBox();
-            this.GB_ConsoleTest = new System.Windows.Forms.GroupBox();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.BTN_ReadImage = new System.Windows.Forms.Button();
-            this.BTN_ReadVideo = new System.Windows.Forms.Button();
-            this.BTN_Test2 = new System.Windows.Forms.Button();
-            this.BTN_Test3 = new System.Windows.Forms.Button();
-            this.RB_Line = new System.Windows.Forms.RadioButton();
-            this.RB_Rectangle = new System.Windows.Forms.RadioButton();
-            this.RB_Circle = new System.Windows.Forms.RadioButton();
-            this.TC_Main = new System.Windows.Forms.TabControl();
-            this.TB_CV = new System.Windows.Forms.TabPage();
-            this.GB_Test = new System.Windows.Forms.GroupBox();
-            this.GB_FigureSelect = new System.Windows.Forms.GroupBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            ((System.ComponentModel.ISupportInitialize)(this.PB_MyPicture)).BeginInit();
-            this.GB_ConsoleTest.SuspendLayout();
-            this.TC_Main.SuspendLayout();
-            this.TB_CV.SuspendLayout();
-            this.GB_Test.SuspendLayout();
-            this.GB_FigureSelect.SuspendLayout();
-            this.SuspendLayout();
+            PB_MyPicture = new PictureBox();
+            BTN_Test = new Button();
+            TB_Info = new TextBox();
+            BTN_ProcessInput = new Button();
+            TB_ConsoleInput = new TextBox();
+            GB_ConsoleTest = new GroupBox();
+            openFileDialog1 = new OpenFileDialog();
+            BTN_ReadImage = new Button();
+            BTN_ReadVideo = new Button();
+            BTN_Test2 = new Button();
+            BTN_Test3 = new Button();
+            RB_Line = new RadioButton();
+            RB_Rectangle = new RadioButton();
+            RB_Circle = new RadioButton();
+            TC_Main = new TabControl();
+            TB_CV = new TabPage();
+            BTN_LocalCamera = new Button();
+            GB_Test = new GroupBox();
+            GB_FigureSelect = new GroupBox();
+            tabPage2 = new TabPage();
+            BTN_CVStop = new Button();
+            ((System.ComponentModel.ISupportInitialize)PB_MyPicture).BeginInit();
+            GB_ConsoleTest.SuspendLayout();
+            TC_Main.SuspendLayout();
+            TB_CV.SuspendLayout();
+            GB_Test.SuspendLayout();
+            GB_FigureSelect.SuspendLayout();
+            SuspendLayout();
             // 
             // PB_MyPicture
             // 
-            this.PB_MyPicture.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.PB_MyPicture.Location = new System.Drawing.Point(6, 6);
-            this.PB_MyPicture.Name = "PB_MyPicture";
-            this.PB_MyPicture.Size = new System.Drawing.Size(624, 321);
-            this.PB_MyPicture.TabIndex = 0;
-            this.PB_MyPicture.TabStop = false;
+            PB_MyPicture.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PB_MyPicture.Location = new Point(6, 6);
+            PB_MyPicture.Name = "PB_MyPicture";
+            PB_MyPicture.Size = new Size(624, 321);
+            PB_MyPicture.TabIndex = 0;
+            PB_MyPicture.TabStop = false;
             // 
             // BTN_Test
             // 
-            this.BTN_Test.Location = new System.Drawing.Point(6, 20);
-            this.BTN_Test.Name = "BTN_Test";
-            this.BTN_Test.Size = new System.Drawing.Size(75, 23);
-            this.BTN_Test.TabIndex = 1;
-            this.BTN_Test.Text = "测试";
-            this.BTN_Test.UseVisualStyleBackColor = true;
-            this.BTN_Test.Click += new System.EventHandler(this.BTN_Test_Click);
+            BTN_Test.Location = new Point(6, 20);
+            BTN_Test.Name = "BTN_Test";
+            BTN_Test.Size = new Size(75, 23);
+            BTN_Test.TabIndex = 1;
+            BTN_Test.Text = "测试";
+            BTN_Test.UseVisualStyleBackColor = true;
+            BTN_Test.Click += BTN_Test_Click;
             // 
             // TB_Info
             // 
-            this.TB_Info.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TB_Info.Location = new System.Drawing.Point(6, 331);
-            this.TB_Info.Margin = new System.Windows.Forms.Padding(1);
-            this.TB_Info.Multiline = true;
-            this.TB_Info.Name = "TB_Info";
-            this.TB_Info.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TB_Info.Size = new System.Drawing.Size(624, 114);
-            this.TB_Info.TabIndex = 2;
+            TB_Info.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            TB_Info.Location = new Point(6, 331);
+            TB_Info.Margin = new Padding(1);
+            TB_Info.Multiline = true;
+            TB_Info.Name = "TB_Info";
+            TB_Info.ScrollBars = ScrollBars.Vertical;
+            TB_Info.Size = new Size(624, 114);
+            TB_Info.TabIndex = 2;
             // 
             // BTN_ProcessInput
             // 
-            this.BTN_ProcessInput.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.BTN_ProcessInput.Location = new System.Drawing.Point(3, 48);
-            this.BTN_ProcessInput.Name = "BTN_ProcessInput";
-            this.BTN_ProcessInput.Size = new System.Drawing.Size(106, 23);
-            this.BTN_ProcessInput.TabIndex = 3;
-            this.BTN_ProcessInput.Text = "程序输入写入";
-            this.BTN_ProcessInput.UseVisualStyleBackColor = true;
-            this.BTN_ProcessInput.Click += new System.EventHandler(this.BTN_ProcessInput_Click);
+            BTN_ProcessInput.Dock = DockStyle.Bottom;
+            BTN_ProcessInput.Location = new Point(3, 48);
+            BTN_ProcessInput.Name = "BTN_ProcessInput";
+            BTN_ProcessInput.Size = new Size(106, 23);
+            BTN_ProcessInput.TabIndex = 3;
+            BTN_ProcessInput.Text = "程序输入写入";
+            BTN_ProcessInput.UseVisualStyleBackColor = true;
+            BTN_ProcessInput.Click += BTN_ProcessInput_Click;
             // 
             // TB_ConsoleInput
             // 
-            this.TB_ConsoleInput.Dock = System.Windows.Forms.DockStyle.Top;
-            this.TB_ConsoleInput.Location = new System.Drawing.Point(3, 19);
-            this.TB_ConsoleInput.Name = "TB_ConsoleInput";
-            this.TB_ConsoleInput.Size = new System.Drawing.Size(106, 23);
-            this.TB_ConsoleInput.TabIndex = 4;
+            TB_ConsoleInput.Dock = DockStyle.Top;
+            TB_ConsoleInput.Location = new Point(3, 19);
+            TB_ConsoleInput.Name = "TB_ConsoleInput";
+            TB_ConsoleInput.Size = new Size(106, 23);
+            TB_ConsoleInput.TabIndex = 4;
             // 
             // GB_ConsoleTest
             // 
-            this.GB_ConsoleTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.GB_ConsoleTest.Controls.Add(this.TB_ConsoleInput);
-            this.GB_ConsoleTest.Controls.Add(this.BTN_ProcessInput);
-            this.GB_ConsoleTest.Location = new System.Drawing.Point(636, 6);
-            this.GB_ConsoleTest.Name = "GB_ConsoleTest";
-            this.GB_ConsoleTest.Size = new System.Drawing.Size(112, 74);
-            this.GB_ConsoleTest.TabIndex = 5;
-            this.GB_ConsoleTest.TabStop = false;
-            this.GB_ConsoleTest.Text = "控制台程序测试";
+            GB_ConsoleTest.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            GB_ConsoleTest.Controls.Add(TB_ConsoleInput);
+            GB_ConsoleTest.Controls.Add(BTN_ProcessInput);
+            GB_ConsoleTest.Location = new Point(636, 6);
+            GB_ConsoleTest.Name = "GB_ConsoleTest";
+            GB_ConsoleTest.Size = new Size(112, 74);
+            GB_ConsoleTest.TabIndex = 5;
+            GB_ConsoleTest.TabStop = false;
+            GB_ConsoleTest.Text = "控制台程序测试";
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.FileName = "openFileDialog1";
+            openFileDialog1.FileName = "openFileDialog1";
             // 
             // BTN_ReadImage
             // 
-            this.BTN_ReadImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BTN_ReadImage.Location = new System.Drawing.Point(634, 420);
-            this.BTN_ReadImage.Name = "BTN_ReadImage";
-            this.BTN_ReadImage.Size = new System.Drawing.Size(75, 23);
-            this.BTN_ReadImage.TabIndex = 6;
-            this.BTN_ReadImage.Text = "读取图片";
-            this.BTN_ReadImage.UseVisualStyleBackColor = true;
-            this.BTN_ReadImage.Click += new System.EventHandler(this.BTN_ReadImage_Click);
+            BTN_ReadImage.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            BTN_ReadImage.Location = new Point(634, 420);
+            BTN_ReadImage.Name = "BTN_ReadImage";
+            BTN_ReadImage.Size = new Size(75, 23);
+            BTN_ReadImage.TabIndex = 6;
+            BTN_ReadImage.Text = "读取图片";
+            BTN_ReadImage.UseVisualStyleBackColor = true;
+            BTN_ReadImage.Click += BTN_ReadImage_Click;
             // 
             // BTN_ReadVideo
             // 
-            this.BTN_ReadVideo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BTN_ReadVideo.Location = new System.Drawing.Point(715, 420);
-            this.BTN_ReadVideo.Name = "BTN_ReadVideo";
-            this.BTN_ReadVideo.Size = new System.Drawing.Size(75, 23);
-            this.BTN_ReadVideo.TabIndex = 7;
-            this.BTN_ReadVideo.Text = "读取视频";
-            this.BTN_ReadVideo.UseVisualStyleBackColor = true;
-            this.BTN_ReadVideo.Click += new System.EventHandler(this.BTN_ReadVideo_Click);
+            BTN_ReadVideo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            BTN_ReadVideo.Location = new Point(715, 420);
+            BTN_ReadVideo.Name = "BTN_ReadVideo";
+            BTN_ReadVideo.Size = new Size(75, 23);
+            BTN_ReadVideo.TabIndex = 7;
+            BTN_ReadVideo.Text = "读取视频";
+            BTN_ReadVideo.UseVisualStyleBackColor = true;
+            BTN_ReadVideo.Click += BTN_ReadVideo_Click;
             // 
             // BTN_Test2
             // 
-            this.BTN_Test2.Location = new System.Drawing.Point(6, 47);
-            this.BTN_Test2.Name = "BTN_Test2";
-            this.BTN_Test2.Size = new System.Drawing.Size(75, 23);
-            this.BTN_Test2.TabIndex = 8;
-            this.BTN_Test2.Text = "测试2";
-            this.BTN_Test2.UseVisualStyleBackColor = true;
-            this.BTN_Test2.Click += new System.EventHandler(this.BTN_Test2_Click);
+            BTN_Test2.Location = new Point(6, 47);
+            BTN_Test2.Name = "BTN_Test2";
+            BTN_Test2.Size = new Size(75, 23);
+            BTN_Test2.TabIndex = 8;
+            BTN_Test2.Text = "测试2";
+            BTN_Test2.UseVisualStyleBackColor = true;
+            BTN_Test2.Click += BTN_Test2_Click;
             // 
             // BTN_Test3
             // 
-            this.BTN_Test3.Location = new System.Drawing.Point(6, 74);
-            this.BTN_Test3.Name = "BTN_Test3";
-            this.BTN_Test3.Size = new System.Drawing.Size(75, 23);
-            this.BTN_Test3.TabIndex = 9;
-            this.BTN_Test3.Text = "测试3";
-            this.BTN_Test3.UseVisualStyleBackColor = true;
-            this.BTN_Test3.Click += new System.EventHandler(this.BTN_Test3_Click);
+            BTN_Test3.Location = new Point(6, 74);
+            BTN_Test3.Name = "BTN_Test3";
+            BTN_Test3.Size = new Size(75, 23);
+            BTN_Test3.TabIndex = 9;
+            BTN_Test3.Text = "测试3";
+            BTN_Test3.UseVisualStyleBackColor = true;
+            BTN_Test3.Click += BTN_Test3_Click;
             // 
             // RB_Line
             // 
-            this.RB_Line.AutoSize = true;
-            this.RB_Line.Checked = true;
-            this.RB_Line.Location = new System.Drawing.Point(6, 22);
-            this.RB_Line.Name = "RB_Line";
-            this.RB_Line.Size = new System.Drawing.Size(50, 21);
-            this.RB_Line.TabIndex = 10;
-            this.RB_Line.TabStop = true;
-            this.RB_Line.Text = "直线";
-            this.RB_Line.UseVisualStyleBackColor = true;
-            this.RB_Line.CheckedChanged += new System.EventHandler(this.RB_Line_CheckedChanged);
+            RB_Line.AutoSize = true;
+            RB_Line.Checked = true;
+            RB_Line.Location = new Point(6, 22);
+            RB_Line.Name = "RB_Line";
+            RB_Line.Size = new Size(50, 21);
+            RB_Line.TabIndex = 10;
+            RB_Line.TabStop = true;
+            RB_Line.Text = "直线";
+            RB_Line.UseVisualStyleBackColor = true;
+            RB_Line.CheckedChanged += RB_Line_CheckedChanged;
             // 
             // RB_Rectangle
             // 
-            this.RB_Rectangle.AutoSize = true;
-            this.RB_Rectangle.Location = new System.Drawing.Point(6, 49);
-            this.RB_Rectangle.Name = "RB_Rectangle";
-            this.RB_Rectangle.Size = new System.Drawing.Size(50, 21);
-            this.RB_Rectangle.TabIndex = 11;
-            this.RB_Rectangle.Text = "矩形";
-            this.RB_Rectangle.UseVisualStyleBackColor = true;
-            this.RB_Rectangle.CheckedChanged += new System.EventHandler(this.RB_Line_CheckedChanged);
+            RB_Rectangle.AutoSize = true;
+            RB_Rectangle.Location = new Point(6, 49);
+            RB_Rectangle.Name = "RB_Rectangle";
+            RB_Rectangle.Size = new Size(50, 21);
+            RB_Rectangle.TabIndex = 11;
+            RB_Rectangle.Text = "矩形";
+            RB_Rectangle.UseVisualStyleBackColor = true;
+            RB_Rectangle.CheckedChanged += RB_Line_CheckedChanged;
             // 
             // RB_Circle
             // 
-            this.RB_Circle.AutoSize = true;
-            this.RB_Circle.Location = new System.Drawing.Point(6, 76);
-            this.RB_Circle.Name = "RB_Circle";
-            this.RB_Circle.Size = new System.Drawing.Size(50, 21);
-            this.RB_Circle.TabIndex = 12;
-            this.RB_Circle.Text = "圆形";
-            this.RB_Circle.UseVisualStyleBackColor = true;
-            this.RB_Circle.CheckedChanged += new System.EventHandler(this.RB_Line_CheckedChanged);
+            RB_Circle.AutoSize = true;
+            RB_Circle.Location = new Point(6, 76);
+            RB_Circle.Name = "RB_Circle";
+            RB_Circle.Size = new Size(50, 21);
+            RB_Circle.TabIndex = 12;
+            RB_Circle.Text = "圆形";
+            RB_Circle.UseVisualStyleBackColor = true;
+            RB_Circle.CheckedChanged += RB_Line_CheckedChanged;
             // 
             // TC_Main
             // 
-            this.TC_Main.Controls.Add(this.TB_CV);
-            this.TC_Main.Controls.Add(this.tabPage2);
-            this.TC_Main.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TC_Main.Location = new System.Drawing.Point(0, 0);
-            this.TC_Main.Name = "TC_Main";
-            this.TC_Main.SelectedIndex = 0;
-            this.TC_Main.Size = new System.Drawing.Size(884, 481);
-            this.TC_Main.TabIndex = 13;
+            TC_Main.Controls.Add(TB_CV);
+            TC_Main.Controls.Add(tabPage2);
+            TC_Main.Dock = DockStyle.Fill;
+            TC_Main.Location = new Point(0, 0);
+            TC_Main.Name = "TC_Main";
+            TC_Main.SelectedIndex = 0;
+            TC_Main.Size = new Size(884, 481);
+            TC_Main.TabIndex = 13;
             // 
             // TB_CV
             // 
-            this.TB_CV.Controls.Add(this.GB_Test);
-            this.TB_CV.Controls.Add(this.GB_FigureSelect);
-            this.TB_CV.Controls.Add(this.PB_MyPicture);
-            this.TB_CV.Controls.Add(this.TB_Info);
-            this.TB_CV.Controls.Add(this.BTN_ReadVideo);
-            this.TB_CV.Controls.Add(this.GB_ConsoleTest);
-            this.TB_CV.Controls.Add(this.BTN_ReadImage);
-            this.TB_CV.Location = new System.Drawing.Point(4, 26);
-            this.TB_CV.Name = "TB_CV";
-            this.TB_CV.Padding = new System.Windows.Forms.Padding(3);
-            this.TB_CV.Size = new System.Drawing.Size(876, 451);
-            this.TB_CV.TabIndex = 0;
-            this.TB_CV.Text = "CV";
-            this.TB_CV.UseVisualStyleBackColor = true;
+            TB_CV.Controls.Add(BTN_CVStop);
+            TB_CV.Controls.Add(BTN_LocalCamera);
+            TB_CV.Controls.Add(GB_Test);
+            TB_CV.Controls.Add(GB_FigureSelect);
+            TB_CV.Controls.Add(PB_MyPicture);
+            TB_CV.Controls.Add(TB_Info);
+            TB_CV.Controls.Add(BTN_ReadVideo);
+            TB_CV.Controls.Add(GB_ConsoleTest);
+            TB_CV.Controls.Add(BTN_ReadImage);
+            TB_CV.Location = new Point(4, 26);
+            TB_CV.Name = "TB_CV";
+            TB_CV.Padding = new Padding(3);
+            TB_CV.Size = new Size(876, 451);
+            TB_CV.TabIndex = 0;
+            TB_CV.Text = "CV";
+            TB_CV.UseVisualStyleBackColor = true;
+            // 
+            // BTN_LocalCamera
+            // 
+            BTN_LocalCamera.Location = new Point(715, 391);
+            BTN_LocalCamera.Name = "BTN_LocalCamera";
+            BTN_LocalCamera.Size = new Size(75, 23);
+            BTN_LocalCamera.TabIndex = 15;
+            BTN_LocalCamera.Text = "本地相机";
+            BTN_LocalCamera.UseVisualStyleBackColor = true;
+            BTN_LocalCamera.Click += BTN_LocalCamera_Click;
             // 
             // GB_Test
             // 
-            this.GB_Test.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.GB_Test.Controls.Add(this.BTN_Test);
-            this.GB_Test.Controls.Add(this.BTN_Test2);
-            this.GB_Test.Controls.Add(this.BTN_Test3);
-            this.GB_Test.Location = new System.Drawing.Point(720, 86);
-            this.GB_Test.Name = "GB_Test";
-            this.GB_Test.Size = new System.Drawing.Size(98, 106);
-            this.GB_Test.TabIndex = 14;
-            this.GB_Test.TabStop = false;
-            this.GB_Test.Text = "测试";
+            GB_Test.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            GB_Test.Controls.Add(BTN_Test);
+            GB_Test.Controls.Add(BTN_Test2);
+            GB_Test.Controls.Add(BTN_Test3);
+            GB_Test.Location = new Point(720, 86);
+            GB_Test.Name = "GB_Test";
+            GB_Test.Size = new Size(98, 106);
+            GB_Test.TabIndex = 14;
+            GB_Test.TabStop = false;
+            GB_Test.Text = "测试";
             // 
             // GB_FigureSelect
             // 
-            this.GB_FigureSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.GB_FigureSelect.Controls.Add(this.RB_Line);
-            this.GB_FigureSelect.Controls.Add(this.RB_Rectangle);
-            this.GB_FigureSelect.Controls.Add(this.RB_Circle);
-            this.GB_FigureSelect.Location = new System.Drawing.Point(639, 86);
-            this.GB_FigureSelect.Name = "GB_FigureSelect";
-            this.GB_FigureSelect.Size = new System.Drawing.Size(75, 106);
-            this.GB_FigureSelect.TabIndex = 14;
-            this.GB_FigureSelect.TabStop = false;
-            this.GB_FigureSelect.Text = "图形";
+            GB_FigureSelect.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            GB_FigureSelect.Controls.Add(RB_Line);
+            GB_FigureSelect.Controls.Add(RB_Rectangle);
+            GB_FigureSelect.Controls.Add(RB_Circle);
+            GB_FigureSelect.Location = new Point(639, 86);
+            GB_FigureSelect.Name = "GB_FigureSelect";
+            GB_FigureSelect.Size = new Size(75, 106);
+            GB_FigureSelect.TabIndex = 14;
+            GB_FigureSelect.TabStop = false;
+            GB_FigureSelect.Text = "图形";
             // 
             // tabPage2
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 26);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(876, 451);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            tabPage2.Location = new Point(4, 26);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(876, 451);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "tabPage2";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // BTN_CVStop
+            // 
+            BTN_CVStop.Location = new Point(795, 391);
+            BTN_CVStop.Name = "BTN_CVStop";
+            BTN_CVStop.Size = new Size(75, 23);
+            BTN_CVStop.TabIndex = 16;
+            BTN_CVStop.Text = "停止";
+            BTN_CVStop.UseVisualStyleBackColor = true;
+            BTN_CVStop.Click += BTN_CVStop_Click;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(884, 481);
-            this.Controls.Add(this.TC_Main);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
-            this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.PB_MyPicture)).EndInit();
-            this.GB_ConsoleTest.ResumeLayout(false);
-            this.GB_ConsoleTest.PerformLayout();
-            this.TC_Main.ResumeLayout(false);
-            this.TB_CV.ResumeLayout(false);
-            this.TB_CV.PerformLayout();
-            this.GB_Test.ResumeLayout(false);
-            this.GB_FigureSelect.ResumeLayout(false);
-            this.GB_FigureSelect.PerformLayout();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(884, 481);
+            Controls.Add(TC_Main);
+            Name = "Form1";
+            Text = "Form1";
+            FormClosed += Form1_FormClosed;
+            Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)PB_MyPicture).EndInit();
+            GB_ConsoleTest.ResumeLayout(false);
+            GB_ConsoleTest.PerformLayout();
+            TC_Main.ResumeLayout(false);
+            TB_CV.ResumeLayout(false);
+            TB_CV.PerformLayout();
+            GB_Test.ResumeLayout(false);
+            GB_FigureSelect.ResumeLayout(false);
+            GB_FigureSelect.PerformLayout();
+            ResumeLayout(false);
         }
 
         #endregion
@@ -308,5 +328,7 @@
         private GroupBox GB_Test;
         private GroupBox GB_FigureSelect;
         private TabPage tabPage2;
+        private Button BTN_LocalCamera;
+        private Button BTN_CVStop;
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.DataFormats;
 
 namespace IPFSVideo
 {
@@ -146,15 +148,36 @@ namespace IPFSVideo
 
     public class HttpClientAPI
     {
-        static readonly HttpClient httpClient = new HttpClient();
+        public readonly HttpClient HttpRequest = new();
 
         public void GetMessage()
         {
-            var respones = httpClient.GetAsync("http://baidu.com");
+            var respones = HttpRequest.GetAsync("http://baidu.com");
             var stream = respones.Result.Content.ReadAsStreamAsync();
             var postContent = new MultipartFormDataContent();
             //postContent.Add(new StreamContent());
-            var respones2 = httpClient.PostAsync("http://baidu.com", postContent);
+            var respones2 = HttpRequest.PostAsync("http://baidu.com", postContent);
+        }
+
+        public string GetId()
+        {
+            return HttpRequest.GetAsync("http://localhost:5001/api/v0/id").Result.Content.ReadAsStringAsync().Result;
+        }
+
+        public string Add(string path = "C:\\Users\\1\\Desktop\\autumn.jpg")
+        {
+            string url = $"http://localhost:5001/api/v0/add{path}?chunker=size-262144&recursive=false";
+            var fileStream = new FileStream("C:\\Users\\1\\Desktop\\autumn.jpg", FileMode.Open);
+            var buffer = new byte[1024];
+            int bytesRead;
+            Stream stream = new MemoryStream();
+            while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                stream.Write(buffer, 0, bytesRead);
+            }
+            HttpContent content = new StreamContent(stream);
+            var respones = HttpRequest.PostAsync(url, content);
+            return respones.Result.Content.ReadAsStringAsync().Result;
         }
     }
 }

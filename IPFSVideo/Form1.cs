@@ -5,6 +5,7 @@ namespace IPFSVideo
     public partial class Form1 : Form
     {
         readonly ProcessToolkit ipfsProcess = new("ipfs");
+        HttpClientAPI clientAPI = new HttpClientAPI();
 
         public Form1()
         {
@@ -30,7 +31,7 @@ namespace IPFSVideo
 
         private void BTN_Test_Click(object sender, EventArgs e)
         {
-            ShowMessage(ipfsProcess.StartProcess("id"));
+            ShowMessage(clientAPI.GetId());
         }
     }
 }
