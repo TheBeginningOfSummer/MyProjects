@@ -31,7 +31,14 @@ namespace IPFSVideo
 
         private void BTN_Test_Click(object sender, EventArgs e)
         {
-            ShowMessage(clientAPI.GetId());
+            try
+            {
+                ShowMessage(clientAPI.DoCommand(TB_Test.Text).Result);
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
         }
     }
 }

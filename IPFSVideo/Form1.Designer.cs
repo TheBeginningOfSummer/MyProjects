@@ -28,47 +28,59 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.TB_Info = new System.Windows.Forms.TextBox();
-            this.BTN_Test = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            TB_Info = new TextBox();
+            BTN_Test = new Button();
+            TB_Test = new TextBox();
+            SuspendLayout();
             // 
             // TB_Info
             // 
-            this.TB_Info.Location = new System.Drawing.Point(12, 12);
-            this.TB_Info.Multiline = true;
-            this.TB_Info.Name = "TB_Info";
-            this.TB_Info.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TB_Info.Size = new System.Drawing.Size(695, 426);
-            this.TB_Info.TabIndex = 0;
+            TB_Info.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            TB_Info.Location = new Point(12, 12);
+            TB_Info.Multiline = true;
+            TB_Info.Name = "TB_Info";
+            TB_Info.ScrollBars = ScrollBars.Vertical;
+            TB_Info.Size = new Size(695, 401);
+            TB_Info.TabIndex = 0;
             // 
             // BTN_Test
             // 
-            this.BTN_Test.Location = new System.Drawing.Point(713, 12);
-            this.BTN_Test.Name = "BTN_Test";
-            this.BTN_Test.Size = new System.Drawing.Size(75, 23);
-            this.BTN_Test.TabIndex = 1;
-            this.BTN_Test.Text = "测试";
-            this.BTN_Test.UseVisualStyleBackColor = true;
-            this.BTN_Test.Click += new System.EventHandler(this.BTN_Test_Click);
+            BTN_Test.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            BTN_Test.Location = new Point(713, 419);
+            BTN_Test.Name = "BTN_Test";
+            BTN_Test.Size = new Size(75, 23);
+            BTN_Test.TabIndex = 1;
+            BTN_Test.Text = "测试";
+            BTN_Test.UseVisualStyleBackColor = true;
+            BTN_Test.Click += BTN_Test_Click;
+            // 
+            // TB_Test
+            // 
+            TB_Test.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            TB_Test.Location = new Point(12, 419);
+            TB_Test.Name = "TB_Test";
+            TB_Test.Size = new Size(695, 23);
+            TB_Test.TabIndex = 2;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.BTN_Test);
-            this.Controls.Add(this.TB_Info);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Controls.Add(TB_Test);
+            Controls.Add(BTN_Test);
+            Controls.Add(TB_Info);
+            Name = "Form1";
+            Text = "Form1";
+            Load += Form1_Load;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private TextBox TB_Info;
         private Button BTN_Test;
+        private TextBox TB_Test;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.DataFormats;
@@ -150,18 +151,29 @@ namespace IPFSVideo
     {
         public readonly HttpClient HttpRequest = new();
 
-        public void GetMessage()
+        public HttpClientAPI()
+        {
+            HttpRequest.BaseAddress = new Uri("http://localhost:5001/api/v0/");
+        }
+
+        public string GetMessage()
         {
             var respones = HttpRequest.GetAsync("http://baidu.com");
-            var stream = respones.Result.Content.ReadAsStreamAsync();
-            var postContent = new MultipartFormDataContent();
+            var stream = respones.Result.Content.ReadAsStringAsync();
+            return stream.Result;
+            //HttpContent postContent = new MultipartFormDataContent();
             //postContent.Add(new StreamContent());
-            var respones2 = HttpRequest.PostAsync("http://baidu.com", postContent);
+            //var respones2 = HttpRequest.PostAsync("http://baidu.com", postContent);
         }
 
         public string GetId()
         {
             return HttpRequest.GetAsync("http://localhost:5001/api/v0/id").Result.Content.ReadAsStringAsync().Result;
+        }
+
+        public async Task<string> DoCommand(string command)
+        {
+            return await HttpRequest.PostAsync(command, null).Result.Content.ReadAsStringAsync();
         }
 
         public string Add(string path = "C:\\Users\\1\\Desktop\\autumn.jpg")
