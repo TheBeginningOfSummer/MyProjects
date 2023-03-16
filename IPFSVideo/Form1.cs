@@ -29,14 +29,15 @@ namespace IPFSVideo
                 TB_Info.AppendText($"[{DateTime.Now}]{message}\r\n")));
         }
 
-        private void BTN_Test_Click(object sender, EventArgs e)
+        private async void BTN_Test_Click(object sender, EventArgs e)
         {
             try
             {
                 //string result = clientAPI.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Test.Text)).Result;
-                string result = clientAPI.UploadAsync(HttpClientAPI.BuildCommand("add",null,"recursive=false"),
-                    new StreamContent(FileManager.GetFileStream())).Result;
-                ShowMessage(result);
+                string result = await clientAPI.UploadAsync(HttpClientAPI.BuildCommand("add"),
+                    new StreamContent(FileManager.GetFileStream()));
+                //Stream stream = await clientAPI.DownloadAsync(HttpClientAPI.BuildCommand("cat", "Qmb3Ln3gkSthhbNGmSPArwn83wLAfnEQ6pf1JLAq7mv6KJ"));
+                ShowMessage(result.ToString());
             }
             catch (Exception ex)
             {

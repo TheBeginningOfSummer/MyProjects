@@ -582,7 +582,7 @@ namespace MyToolkit
 
         public static Stream GetFileStream(string path = "C:\\Users\\1\\Desktop\\autumn.jpg", int cacheLength = 4096)
         {
-            var fileStream = new FileStream(path, FileMode.Open);
+            using var fileStream = new FileStream(path, FileMode.Open);
             var buffer = new byte[cacheLength];
             int bytesRead;
             Stream stream = new MemoryStream();
@@ -590,6 +590,7 @@ namespace MyToolkit
             {
                 stream.Write(buffer, 0, bytesRead);
             }
+            fileStream.Close();
             return stream;
         }
 
