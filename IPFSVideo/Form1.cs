@@ -33,7 +33,10 @@ namespace IPFSVideo
         {
             try
             {
-                ShowMessage(clientAPI.DoCommand(TB_Test.Text).Result);
+                //string result = clientAPI.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Test.Text)).Result;
+                string result = clientAPI.UploadAsync(HttpClientAPI.BuildCommand("add",null,"recursive=false"),
+                    new StreamContent(FileManager.GetFileStream())).Result;
+                ShowMessage(result);
             }
             catch (Exception ex)
             {

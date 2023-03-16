@@ -580,7 +580,20 @@ namespace MyToolkit
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
         }
 
-        public static void AppendStreamString(string path, string fileName, string message, FileMode fileMode)
+        public static Stream GetFileStream(string path = "C:\\Users\\1\\Desktop\\autumn.jpg", int cacheLength = 4096)
+        {
+            var fileStream = new FileStream(path, FileMode.Open);
+            var buffer = new byte[cacheLength];
+            int bytesRead;
+            Stream stream = new MemoryStream();
+            while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                stream.Write(buffer, 0, bytesRead);
+            }
+            return stream;
+        }
+
+        public static void AppendFlieString(string path, string fileName, string message, FileMode fileMode)
         {
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             path += "/" + fileName;
@@ -620,7 +633,7 @@ namespace MyToolkit
         {
             string log = DateTime.Now.ToString("yyy-MM-dd HH:mm:ss") + "\t" + message + Environment.NewLine;
             SetTableHeader(path, fileName, tableHeader);
-            AppendStreamString(path, fileName, log, FileMode.Append);
+            AppendFlieString(path, fileName, log, FileMode.Append);
         }
 
     }
