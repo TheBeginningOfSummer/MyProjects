@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.DataFormats;
 using MyToolkit;
-using System.Net.Http;
 
 namespace IPFSVideo
 {
@@ -157,7 +156,7 @@ namespace IPFSVideo
 
         public HttpClientAPI()
         {
-            
+            //HttpRequest.BaseAddress = new Uri("http://localhost:5001/api/v0/");
         }
 
         public string GetMessage()
@@ -213,46 +212,20 @@ namespace IPFSVideo
             return new Uri(new Uri(Environment.GetEnvironmentVariable("IpfsHttpApi")
                     ?? "http://localhost:5001"), url);
         }
-        /// <summary>
-        /// 发送指令
-        /// </summary>
-        /// <param name="command">指令</param>
-        /// <returns>json格式返回值</returns>
+
         public async Task<string> DoCommandAsync(Uri command)
         {
             return await HttpApi.PostAsync(command, null).Result.Content.ReadAsStringAsync();
         }
-        /// <summary>
-        /// 下载流信息
-        /// </summary>
-        /// <param name="command">下载指令</param>
-        /// <returns>信息流</returns>
+
         public async Task<Stream> DownloadAsync(Uri command)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, command);
             var response = await HttpApi.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             return await response.Content.ReadAsStreamAsync();
         }
-        /// <summary>
-        /// 下载流信息
-        /// </summary>
-        /// <param name="command">下载指令</param>
-        /// <returns>信息流</returns>
-        public async Task<string> DownloadStringAsync(Uri command)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, command);
-            var response = await HttpApi.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            return await response.Content.ReadAsStringAsync();
-        }
-        /// <summary>
-        /// 上传数据
-        /// </summary>
-        /// <param name="command">上传指令</param>
-        /// <param name="streamContent">数据</param>
-        /// <param name="name">名称</param>
-        /// <param name="options">条件</param>
-        /// <returns>上传结果，json格式</returns>
-        public async Task<string> UploadAsync(Uri command, StreamContent streamContent, string? name = null)
+
+        public async Task<string> UploadAsync(Uri command, StreamContent streamContent, string? name = null, params string[] options)
         {
             var content = new MultipartFormDataContent();
             streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -263,96 +236,17 @@ namespace IPFSVideo
 
             var response = await HttpApi.PostAsync(command, content);
             //await ThrowOnErrorAsync(response);
-            return await response.Content.ReadAsStringAsync();
+            var json = await response.Content.ReadAsStringAsync();
+            return json;
         }
 
-        public async Task<string> AddAsync(Stream stream, string name = "", AddFileOptions? options = null)
+        public string Add(string path)
         {
-            options ??= new AddFileOptions();
-            var opts = new List<string>();
-            if (!options.Pin) opts.Add("pin=false");
-            if (options.Wrap) opts.Add("wrap-with-directory=true");
-            if (options.RawLeaves) opts.Add("raw-leaves=true");
-            if (options.OnlyHash) opts.Add("only-hash=true");
-            if (options.Trickle) opts.Add("trickle=true");
-            //if (options.Progress != null)opts.Add("progress=true");
-            if (options.Hash != "sha2-256") opts.Add($"hash=${options.Hash}");
-            if (options.Encoding != "base58btc") opts.Add($"cid-base=${options.Encoding}");
-            if (!string.IsNullOrWhiteSpace(options.ProtectionKey)) opts.Add($"protect={options.ProtectionKey}");
-            opts.Add($"chunker=size-{options.ChunkSize}");
-            opts.Add($"recursive=false");
-            //opts.Add("progress=true");
-            //opts.Add($"cid-version=1");
+            string url = $"http://localhost:5001/api/v0/add{path}?chunker=size-262144&recursive=false";
 
-            StreamContent content = new(stream);
-            return await UploadAsync(BuildCommand("add", null, opts.ToArray()), content, name);
+            HttpContent content = new StreamContent(FileManager.GetFileStream());
+            var respones = HttpApi.PostAsync(url, content);
+            return respones.Result.Content.ReadAsStringAsync().Result;
         }
-
     }
-
-    public class AddFileOptions
-    {
-        /// <summary>
-        /// Determines if the data is pinned to local storage.
-        /// If true the data is pinned to local storage and will not be garbage collected.
-        ///  The default is true.
-        /// </summary>
-        public bool Pin { get; set; } = true;
-
-        /// <summary>
-        /// The maximum number of data bytes in a block.
-        /// The default is 256 * 1024 (‭262,144) bytes.‬
-        /// </summary>
-        public int ChunkSize { get; set; } = 262144;
-
-        /// <summary>
-        /// Determines if the trickle-dag format is used for dag generation.
-        /// The default is false.
-        /// </summary>
-        public bool Trickle { get; set; }
-
-        /// <summary>
-        /// Determines if added file(s) are wrapped in a directory object.
-        /// The default is false.
-        /// </summary>
-        public bool Wrap { get; set; }
-
-        /// <summary>
-        /// Determines if raw blocks are used for leaf data blocks.
-        /// The default is false.
-        /// RawLeaves and Ipfs.CoreApi.AddFileOptions.ProtectionKey are mutually exclusive.
-        /// </summary>
-        public bool RawLeaves { get; set; }
- 
-        /// <summary>
-        /// The hashing algorithm name to use.
-        /// The Ipfs.MultiHash algorithm name used to produce the Ipfs.Cid. Defaults to Ipfs.MultiHash.DefaultAlgorithmName.
-        /// </summary>
-        public string Hash { get; set; } = "sha2-256";
-
-        /// <summary>
-        /// The encoding algorithm name to use.
-        /// The Ipfs.MultiBase algorithm name used to produce the Ipfs.Cid. Defaults to Ipfs.MultiBase.DefaultAlgorithmName.
-        /// </summary>
-        public string Encoding { get; set; } = "base58btc";
-
-        /// <summary>
-        /// Determines if only file information is produced.
-        /// If true no data is added to IPFS. The default is false.
-        /// </summary>
-        public bool OnlyHash { get; set; }
-
-        /// <summary>
-        /// The key name used to protect (encrypt) the file contents.
-        /// The name of an existing key.
-        /// ProtectionKey and Ipfs.CoreApi.AddFileOptions.RawLeaves are mutually exclusive.
-        /// </summary>
-        public string? ProtectionKey { get; set; }
-
-        //
-        // 摘要:
-        //     Used to report the progress of a file transfer.
-        //public IProgress<TransferProgress> Progress { get; set; }
-    }
-
 }

@@ -590,6 +590,7 @@ namespace MyToolkit
             {
                 stream.Write(buffer, 0, bytesRead);
             }
+            fileStream.Close();
             return stream;
         }
 
@@ -1655,5 +1656,10 @@ namespace MyToolkit
             return data;
         }
 
+        //public Image GetPicture(byte[] binaryImage)
+        //{
+        //    MemoryStream memoryStream = new MemoryStream(binaryImage);
+        //    return Image.FromStream(memoryStream);
+        //}
     }
 }

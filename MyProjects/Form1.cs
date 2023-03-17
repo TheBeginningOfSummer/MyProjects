@@ -256,6 +256,7 @@ namespace MyProjects
                 Task.Run(() => { cvTool.IsStopRead = false; cvTool.ReadVideo(Path.GetFullPath(openFileDialog1.FileName), "video"); });
                 //OpenCVTool.IsStopRead = false; 
                 //OpenCVTool.ReadVideo(Path.GetFullPath(openFileDialog1.FileName), "video");
+                //OpenCVTool.ReadVideo("http://192.168.1.6:4747/mjpegfeed?1920x1080", "video");
             }
             //OpenCVTool.ReadVideo(0, "video");
         }
