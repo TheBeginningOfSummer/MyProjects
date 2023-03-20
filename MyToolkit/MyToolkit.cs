@@ -58,13 +58,13 @@ namespace MyToolkit
             public byte[] SendByte { get; set; }
             //所需参数
             public Dictionary<string, Socket> ClientDic { get; set; }
-            public IPAddress IP { get; set; }
+            public IPAddress? IP { get; set; }
             public int Port { get; set; }
-            public IPEndPoint IPEndPoint { get; set; }
+            public IPEndPoint? IPEndPoint { get; set; }
             //数据收发更新委托
-            public Action ClientListUpdate;
-            public Action<Socket, byte[]> ReceiveFromClient;
-            public Action<byte[]> ReceiveFromServer;
+            public Action? ClientListUpdate;
+            public Action<Socket, byte[]>? ReceiveFromClient;
+            public Action<byte[]>? ReceiveFromServer;
 
             public SocketTool(int byteLength = 4096)
             {
@@ -580,7 +580,16 @@ namespace MyToolkit
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
         }
 
-        public static Stream GetFileStream(string path = "C:\\Users\\1\\Desktop\\autumn.jpg", int cacheLength = 4096)
+        public static byte[] GetFileBinary(string path)
+        {
+            FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            byte[] data = new byte[fileStream.Length];
+            fileStream.Read(data, 0, data.Length);
+            fileStream.Close();
+            return data;
+        }
+
+        public static Stream GetFileStream(string path, int cacheLength = 10240)
         {
             using var fileStream = new FileStream(path, FileMode.Open);
             var buffer = new byte[cacheLength];
@@ -590,7 +599,7 @@ namespace MyToolkit
             {
                 stream.Write(buffer, 0, bytesRead);
             }
-            fileStream.Close();
+            stream.Seek(0, SeekOrigin.Begin);
             return stream;
         }
 
@@ -693,9 +702,7 @@ namespace MyToolkit
             try
             {
                 if (!Directory.Exists(path))
-                {
                     Directory.CreateDirectory(path);
-                }
                 path += "/" + fileName;
                 if (File.Exists(path))
                 {
@@ -710,9 +717,9 @@ namespace MyToolkit
             }
             catch (Exception)
             {
-                
+
             }
-            return default(T);
+            return default!;
         }
 
         public static JsonData ReadSimpleJsonString(string path)
@@ -1642,24 +1649,6 @@ namespace MyToolkit
             TargetProcess.Close();
         }
     }
-    /// <summary>
-    /// 图片管理工具
-    /// </summary>
-    public class ImageToolkit
-    {
-        public static byte[] GetBinary(string imagePath)
-        {
-            FileStream fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
-            byte[] data = new byte[fileStream.Length];
-            fileStream.Read(data, 0, data.Length);
-            fileStream.Close();
-            return data;
-        }
-
-        //public Image GetPicture(byte[] binaryImage)
-        //{
-        //    MemoryStream memoryStream = new MemoryStream(binaryImage);
-        //    return Image.FromStream(memoryStream);
-        //}
-    }
+    
+    
 }

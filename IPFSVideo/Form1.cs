@@ -5,7 +5,7 @@ namespace IPFSVideo
     public partial class Form1 : Form
     {
         readonly ProcessToolkit ipfsProcess = new("ipfs");
-        HttpClientAPI clientAPI = new HttpClientAPI();
+        readonly HttpClientAPI api = new HttpClientAPI();
 
         public Form1()
         {
@@ -33,10 +33,8 @@ namespace IPFSVideo
         {
             try
             {
-                //string result = clientAPI.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Test.Text)).Result;
-                string result = await clientAPI.UploadAsync(HttpClientAPI.BuildCommand("add"),
-                    new StreamContent(FileManager.GetFileStream()));
-                //Stream stream = await clientAPI.DownloadAsync(HttpClientAPI.BuildCommand("cat", "Qmb3Ln3gkSthhbNGmSPArwn83wLAfnEQ6pf1JLAq7mv6KJ"));
+                string result = await api.UploadAsync(HttpClientAPI.BuildCommand("add"),
+                    new StreamContent(FileManager.GetFileStream("C:\\Users\\Summer\\Desktop\\20230312155239.png")));
                 ShowMessage(result.ToString());
             }
             catch (Exception ex)
@@ -44,5 +42,33 @@ namespace IPFSVideo
                 ShowMessage(ex.Message);
             }
         }
+
+        private async void BTN_Download_ClickAsync(object sender, EventArgs e)
+        {
+            try
+            {
+                Stream stream = await api.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_Test.Text));
+                PB_Image.Image = Image.FromStream(stream);
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
+        }
+
+        private async void BTN_Upload_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string result = await api.UploadAsync(HttpClientAPI.BuildCommand("add"),
+                    new StreamContent(FileManager.GetFileStream("C:\\Users\\Summer\\Desktop\\20230312155239.png")));
+                ShowMessage(result.ToString());
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
+        }
+
     }
 }
