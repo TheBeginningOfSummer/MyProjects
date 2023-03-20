@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LibVLCSharp" Version="3.6.8" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MyToolkit\MyToolkit.csproj" />
   </ItemGroup>
 

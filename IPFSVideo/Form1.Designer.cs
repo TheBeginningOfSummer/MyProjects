@@ -56,7 +56,7 @@
             BTN_Test.TabIndex = 1;
             BTN_Test.Text = "测试";
             BTN_Test.UseVisualStyleBackColor = true;
-            BTN_Test.Click += BTN_Test_Click;
+            BTN_Test.Click += BTN_Test_ClickAsync;
             // 
             // TB_Test
             // 
