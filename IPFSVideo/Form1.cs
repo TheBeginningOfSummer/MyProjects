@@ -1,7 +1,6 @@
 using MyToolkit;
 using LibVLCSharp.Shared;
-using System.IO;
-using System;
+using System.Runtime.Intrinsics.Arm;
 
 namespace IPFSVideo
 {
@@ -9,10 +8,12 @@ namespace IPFSVideo
     {
         readonly ProcessToolkit ipfsProcess = new("ipfs");
         readonly HttpClientAPI ipfsApi = new();
-        private readonly LibVLC libVLC;
-        private readonly MediaPlayer mediaPlayer;
+        readonly LibVLC libVLC;
+        readonly MediaPlayer mediaPlayer;
+        MemoryStream cache = new MemoryStream();
+        StreamMediaInput? streamMedia;
 
-        private string uploadPath = "C:\\Users\\Summer\\Desktop\\20230312155239.png";
+        readonly OpenFileDialog fileDialog = new();
 
         public Form1()
         {
@@ -21,8 +22,13 @@ namespace IPFSVideo
             libVLC = new LibVLC();
             mediaPlayer = new MediaPlayer(libVLC);
             mediaPlayer.Hwnd = PB_Image.Handle;
+            mediaPlayer.Stopped += MediaPlayer_Stopped;
+        }
 
-            uploadPath = "E:\\สำฦต\\MV\\AMV.mp4";
+        private void MediaPlayer_Stopped(object? sender, EventArgs e)
+        {
+            cache?.Dispose();
+            streamMedia?.Dispose();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -46,36 +52,30 @@ namespace IPFSVideo
         {
             try
             {
-
-                Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", "Qmd63D8VL9DkR7DvPaUvZNfrnVgoWACczFBHXxiWt2YNDx"));
-                //TB_Info.Clear();
-                byte[] data = new byte[10240];
-                int length;
-                using (FileStream file = new FileStream("Qmd63D8VL9DkR7DvPaUvZNfrnVgoWACczFBHXxiWt2YNDx.mp4", FileMode.OpenOrCreate))
-                {
-                    while ((length = await stream.ReadAsync(data)) != 0)
-                    {
-                        await file.WriteAsync(data, 0, length);
-                    }
-                }
-                
-                Media video = new Media(libVLC, "Qmd63D8VL9DkR7DvPaUvZNfrnVgoWACczFBHXxiWt2YNDx.mp4");
-                mediaPlayer.Play(video);
-                video.Dispose();
+                //Media video = new(libVLC, "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx.mp4", FromType.FromPath);
+                //video.AddOption($":sout=#rtp{{sdp = rtsp://127.0.0.1:8554/video}} :sout-all :sout-keep");
+                string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text));
+                ShowMessage(result.ToString());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ShowMessage(ex.Message);
+
+                throw;
             }
         }
 
-        private async void BTN_Upload_Click(object sender, EventArgs e)
+        private async void BTN_Upload_ClickAsync(object sender, EventArgs e)
         {
             try
             {
-                string result = await ipfsApi.UploadAsync(HttpClientAPI.BuildCommand("add"),
-                    new StreamContent(FileManager.GetFileStream(uploadPath)));
-                ShowMessage(result.ToString());
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string result = await ipfsApi.
+                        AddAsync(FileManager.GetFileStream(fileDialog.FileName), fileDialog.FileName.Split('\\').LastOrDefault("nofile"));
+                    ShowMessage(result.ToString());
+                }
+                //string result = await ipfsApi.UploadAsync(HttpClientAPI.BuildCommand("add"),
+                //    new StreamContent(FileManager.GetFileStream(uploadPath)));
             }
             catch (Exception ex)
             {
@@ -96,7 +96,46 @@ namespace IPFSVideo
             }
         }
 
-        
-
+        private async void BTN_Play_ClickAsync(object sender, EventArgs e)
+        {
+            try
+            {
+                //Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx"));
+                //TB_Info.Clear();
+                //byte[] data = new byte[10240];
+                //int length;
+                //using (FileStream file = new FileStream("QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx.mp4", FileMode.OpenOrCreate))
+                //{
+                //    while ((length = await stream.ReadAsync(data)) != 0)
+                //    {
+                //        await file.WriteAsync(data, 0, length);
+                //    }
+                //}
+                mediaPlayer.Stop();
+                cache?.Close();
+                streamMedia?.Close();
+                
+                using (Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx")))
+                {
+                    cache = new MemoryStream();
+                    byte[] buffer = new byte[10240]; int length;
+                    while ((length = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        var pos = cache.Position;
+                        cache.Position = cache.Length;
+                        cache.Write(buffer, 0, length);
+                        cache.Position = pos;
+                    }
+                    streamMedia = new(cache);
+                    Media video = new(libVLC, streamMedia);
+                    mediaPlayer.Play(video);
+                    video.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
+        }
     }
 }

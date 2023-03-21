@@ -34,17 +34,21 @@
             PB_Image = new PictureBox();
             BTN_Download = new Button();
             BTN_Upload = new Button();
+            BTN_Play = new Button();
+            LB_CID = new Label();
+            TB_Command = new TextBox();
+            LB_Command = new Label();
             ((System.ComponentModel.ISupportInitialize)PB_Image).BeginInit();
             SuspendLayout();
             // 
             // TB_Info
             // 
             TB_Info.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            TB_Info.Location = new Point(12, 327);
+            TB_Info.Location = new Point(12, 255);
             TB_Info.Multiline = true;
             TB_Info.Name = "TB_Info";
             TB_Info.ScrollBars = ScrollBars.Vertical;
-            TB_Info.Size = new Size(695, 86);
+            TB_Info.Size = new Size(695, 158);
             TB_Info.TabIndex = 0;
             // 
             // BTN_Test
@@ -60,10 +64,10 @@
             // 
             // TB_Test
             // 
-            TB_Test.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            TB_Test.Location = new Point(12, 419);
+            TB_Test.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            TB_Test.Location = new Point(48, 419);
             TB_Test.Name = "TB_Test";
-            TB_Test.Size = new Size(695, 23);
+            TB_Test.Size = new Size(365, 23);
             TB_Test.TabIndex = 2;
             // 
             // PB_Image
@@ -71,7 +75,7 @@
             PB_Image.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PB_Image.Location = new Point(12, 12);
             PB_Image.Name = "PB_Image";
-            PB_Image.Size = new Size(695, 309);
+            PB_Image.Size = new Size(695, 237);
             PB_Image.SizeMode = PictureBoxSizeMode.Zoom;
             PB_Image.TabIndex = 3;
             PB_Image.TabStop = false;
@@ -79,7 +83,7 @@
             // BTN_Download
             // 
             BTN_Download.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_Download.Location = new Point(713, 390);
+            BTN_Download.Location = new Point(713, 361);
             BTN_Download.Name = "BTN_Download";
             BTN_Download.Size = new Size(75, 23);
             BTN_Download.TabIndex = 4;
@@ -90,19 +94,62 @@
             // BTN_Upload
             // 
             BTN_Upload.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_Upload.Location = new Point(713, 361);
+            BTN_Upload.Location = new Point(713, 332);
             BTN_Upload.Name = "BTN_Upload";
             BTN_Upload.Size = new Size(75, 23);
             BTN_Upload.TabIndex = 5;
             BTN_Upload.Text = "上传";
             BTN_Upload.UseVisualStyleBackColor = true;
-            BTN_Upload.Click += BTN_Upload_Click;
+            BTN_Upload.Click += BTN_Upload_ClickAsync;
+            // 
+            // BTN_Play
+            // 
+            BTN_Play.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            BTN_Play.Location = new Point(713, 390);
+            BTN_Play.Name = "BTN_Play";
+            BTN_Play.Size = new Size(75, 23);
+            BTN_Play.TabIndex = 6;
+            BTN_Play.Text = "播放";
+            BTN_Play.UseVisualStyleBackColor = true;
+            BTN_Play.Click += BTN_Play_ClickAsync;
+            // 
+            // LB_CID
+            // 
+            LB_CID.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            LB_CID.AutoSize = true;
+            LB_CID.Location = new Point(12, 422);
+            LB_CID.Name = "LB_CID";
+            LB_CID.Size = new Size(32, 17);
+            LB_CID.TabIndex = 7;
+            LB_CID.Text = "CID:";
+            // 
+            // TB_Command
+            // 
+            TB_Command.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            TB_Command.Location = new Point(496, 419);
+            TB_Command.Name = "TB_Command";
+            TB_Command.Size = new Size(211, 23);
+            TB_Command.TabIndex = 8;
+            // 
+            // LB_Command
+            // 
+            LB_Command.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            LB_Command.AutoSize = true;
+            LB_Command.Location = new Point(419, 422);
+            LB_Command.Name = "LB_Command";
+            LB_Command.Size = new Size(71, 17);
+            LB_Command.TabIndex = 9;
+            LB_Command.Text = "Command:";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(LB_Command);
+            Controls.Add(TB_Command);
+            Controls.Add(LB_CID);
+            Controls.Add(BTN_Play);
             Controls.Add(BTN_Upload);
             Controls.Add(BTN_Download);
             Controls.Add(PB_Image);
@@ -110,7 +157,8 @@
             Controls.Add(BTN_Test);
             Controls.Add(TB_Info);
             Name = "Form1";
-            Text = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "IPFS";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)PB_Image).EndInit();
             ResumeLayout(false);
@@ -125,5 +173,9 @@
         private PictureBox PB_Image;
         private Button BTN_Download;
         private Button BTN_Upload;
+        private Button BTN_Play;
+        private Label LB_CID;
+        private TextBox TB_Command;
+        private Label LB_Command;
     }
 }
