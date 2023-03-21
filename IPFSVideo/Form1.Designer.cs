@@ -30,7 +30,7 @@
         {
             TB_Info = new TextBox();
             BTN_Test = new Button();
-            TB_Test = new TextBox();
+            TB_CID = new TextBox();
             PB_Image = new PictureBox();
             BTN_Download = new Button();
             BTN_Upload = new Button();
@@ -62,13 +62,13 @@
             BTN_Test.UseVisualStyleBackColor = true;
             BTN_Test.Click += BTN_Test_ClickAsync;
             // 
-            // TB_Test
+            // TB_CID
             // 
-            TB_Test.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            TB_Test.Location = new Point(48, 419);
-            TB_Test.Name = "TB_Test";
-            TB_Test.Size = new Size(365, 23);
-            TB_Test.TabIndex = 2;
+            TB_CID.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            TB_CID.Location = new Point(48, 419);
+            TB_CID.Name = "TB_CID";
+            TB_CID.Size = new Size(365, 23);
+            TB_CID.TabIndex = 2;
             // 
             // PB_Image
             // 
@@ -153,7 +153,7 @@
             Controls.Add(BTN_Upload);
             Controls.Add(BTN_Download);
             Controls.Add(PB_Image);
-            Controls.Add(TB_Test);
+            Controls.Add(TB_CID);
             Controls.Add(BTN_Test);
             Controls.Add(TB_Info);
             Name = "Form1";
@@ -169,7 +169,7 @@
 
         private TextBox TB_Info;
         private Button BTN_Test;
-        private TextBox TB_Test;
+        private TextBox TB_CID;
         private PictureBox PB_Image;
         private Button BTN_Download;
         private Button BTN_Upload;

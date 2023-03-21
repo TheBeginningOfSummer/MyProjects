@@ -1,6 +1,6 @@
 using MyToolkit;
 using LibVLCSharp.Shared;
-using System.Runtime.Intrinsics.Arm;
+using Microsoft.IO;
 
 namespace IPFSVideo
 {
@@ -10,8 +10,12 @@ namespace IPFSVideo
         readonly HttpClientAPI ipfsApi = new();
         readonly LibVLC libVLC;
         readonly MediaPlayer mediaPlayer;
-        MemoryStream cache = new MemoryStream();
+        #region ÄÚ´æ»º´æ
+        readonly byte[] buffer = new byte[1024 * 1024];
+        static readonly RecyclableMemoryStreamManager streamManager = new();
+        MemoryStream? cache;
         StreamMediaInput? streamMedia;
+        #endregion
 
         readonly OpenFileDialog fileDialog = new();
 
@@ -28,7 +32,6 @@ namespace IPFSVideo
         private void MediaPlayer_Stopped(object? sender, EventArgs e)
         {
             cache?.Dispose();
-            streamMedia?.Dispose();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -87,7 +90,7 @@ namespace IPFSVideo
         {
             try
             {
-                Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_Test.Text));
+                Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
                 PB_Image.Image = Image.FromStream(stream);
             }
             catch (Exception ex)
@@ -112,19 +115,16 @@ namespace IPFSVideo
                 //    }
                 //}
                 mediaPlayer.Stop();
-                cache?.Close();
-                streamMedia?.Close();
-                
-                using (Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx")))
+                using (Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text)))
                 {
-                    cache = new MemoryStream();
-                    byte[] buffer = new byte[10240]; int length;
+                    cache = streamManager.GetStream();
+                    int length;
                     while ((length = stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        var pos = cache.Position;
-                        cache.Position = cache.Length;
+                        //var pos = cache.Position;
+                        //cache.Position = cache.Length;
                         cache.Write(buffer, 0, length);
-                        cache.Position = pos;
+                        //cache.Position = pos;
                     }
                     streamMedia = new(cache);
                     Media video = new(libVLC, streamMedia);
