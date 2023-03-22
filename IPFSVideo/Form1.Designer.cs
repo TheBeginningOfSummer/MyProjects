@@ -31,14 +31,14 @@
             TB_Info = new TextBox();
             BTN_Test = new Button();
             TB_CID = new TextBox();
-            PB_Image = new PictureBox();
             BTN_Download = new Button();
             BTN_Upload = new Button();
             BTN_Play = new Button();
             LB_CID = new Label();
             TB_Command = new TextBox();
             LB_Command = new Label();
-            ((System.ComponentModel.ISupportInitialize)PB_Image).BeginInit();
+            PB_Screen = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
             SuspendLayout();
             // 
             // TB_Info
@@ -69,16 +69,6 @@
             TB_CID.Name = "TB_CID";
             TB_CID.Size = new Size(365, 23);
             TB_CID.TabIndex = 2;
-            // 
-            // PB_Image
-            // 
-            PB_Image.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            PB_Image.Location = new Point(12, 12);
-            PB_Image.Name = "PB_Image";
-            PB_Image.Size = new Size(695, 237);
-            PB_Image.SizeMode = PictureBoxSizeMode.Zoom;
-            PB_Image.TabIndex = 3;
-            PB_Image.TabStop = false;
             // 
             // BTN_Download
             // 
@@ -141,18 +131,27 @@
             LB_Command.TabIndex = 9;
             LB_Command.Text = "Command:";
             // 
+            // PB_Screen
+            // 
+            PB_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            PB_Screen.Location = new Point(12, 12);
+            PB_Screen.Name = "PB_Screen";
+            PB_Screen.Size = new Size(695, 237);
+            PB_Screen.TabIndex = 10;
+            PB_Screen.TabStop = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(PB_Screen);
             Controls.Add(LB_Command);
             Controls.Add(TB_Command);
             Controls.Add(LB_CID);
             Controls.Add(BTN_Play);
             Controls.Add(BTN_Upload);
             Controls.Add(BTN_Download);
-            Controls.Add(PB_Image);
             Controls.Add(TB_CID);
             Controls.Add(BTN_Test);
             Controls.Add(TB_Info);
@@ -160,7 +159,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "IPFS";
             Load += Form1_Load;
-            ((System.ComponentModel.ISupportInitialize)PB_Image).EndInit();
+            ((System.ComponentModel.ISupportInitialize)PB_Screen).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -170,12 +169,12 @@
         private TextBox TB_Info;
         private Button BTN_Test;
         private TextBox TB_CID;
-        private PictureBox PB_Image;
         private Button BTN_Download;
         private Button BTN_Upload;
         private Button BTN_Play;
         private Label LB_CID;
         private TextBox TB_Command;
         private Label LB_Command;
+        private PictureBox PB_Screen;
     }
 }

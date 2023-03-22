@@ -10,7 +10,9 @@
 
   <ItemGroup>
     <PackageReference Include="LibVLCSharp" Version="3.6.8" />
+    <PackageReference Include="LibVLCSharp.WinForms" Version="3.6.8" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
   </ItemGroup>
 
   <ItemGroup>

@@ -25,13 +25,28 @@ namespace IPFSVideo
             Core.Initialize();
             libVLC = new LibVLC();
             mediaPlayer = new MediaPlayer(libVLC);
-            mediaPlayer.Hwnd = PB_Image.Handle;
+            mediaPlayer.Hwnd = PB_Screen.Handle;
             mediaPlayer.Stopped += MediaPlayer_Stopped;
+            mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
+        }
+
+        private void MediaPlayer_TimeChanged(object? sender, MediaPlayerTimeChangedEventArgs e)
+        {
+            Invoke(new Action(() =>
+            {
+                TB_Info.Text = $"{mediaPlayer.Time}/{mediaPlayer.Length}";
+            }));
+            
         }
 
         private void MediaPlayer_Stopped(object? sender, EventArgs e)
         {
             cache?.Dispose();
+            Invoke(new Action(() =>
+            {
+                TB_Info.Text = $"Íê³É";
+
+            }));
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -57,8 +72,9 @@ namespace IPFSVideo
             {
                 //Media video = new(libVLC, "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx.mp4", FromType.FromPath);
                 //video.AddOption($":sout=#rtp{{sdp = rtsp://127.0.0.1:8554/video}} :sout-all :sout-keep");
-                string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text));
-                ShowMessage(result.ToString());
+                //string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text));
+                //ShowMessage(result.ToString());
+                mediaPlayer.Stop();
             }
             catch (Exception)
             {
@@ -91,7 +107,7 @@ namespace IPFSVideo
             try
             {
                 Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
-                PB_Image.Image = Image.FromStream(stream);
+                PB_Screen.Image = Image.FromStream(stream);
             }
             catch (Exception ex)
             {
