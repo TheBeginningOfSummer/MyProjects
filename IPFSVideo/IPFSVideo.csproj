@@ -19,4 +19,8 @@
     <ProjectReference Include="..\MyToolkit\MyToolkit.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="libs\" />
+  </ItemGroup>
+
 </Project>

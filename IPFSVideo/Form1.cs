@@ -10,6 +10,7 @@ namespace IPFSVideo
         readonly HttpClientAPI ipfsApi = new();
         readonly LibVLC libVLC;
         readonly MediaPlayer mediaPlayer;
+
         #region 内存缓存
         readonly byte[] buffer = new byte[1024 * 1024];
         static readonly RecyclableMemoryStreamManager streamManager = new();
@@ -36,7 +37,7 @@ namespace IPFSVideo
             {
                 TB_Info.Text = $"{mediaPlayer.Time}/{mediaPlayer.Length}";
             }));
-            
+
         }
 
         private void MediaPlayer_Stopped(object? sender, EventArgs e)
@@ -47,6 +48,11 @@ namespace IPFSVideo
                 TB_Info.Text = $"完成";
 
             }));
+        }
+
+        private void TM_Play_Tick(object sender, EventArgs e)
+        {
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -66,7 +72,8 @@ namespace IPFSVideo
                 TB_Info.AppendText($"[{DateTime.Now}] {message}\r\n")));
         }
 
-        private async void BTN_Test_ClickAsync(object sender, EventArgs e)
+        #region 按钮
+        private void BTN_Test_ClickAsync(object sender, EventArgs e)
         {
             try
             {
@@ -153,5 +160,7 @@ namespace IPFSVideo
                 ShowMessage(ex.Message);
             }
         }
+        #endregion
+
     }
 }

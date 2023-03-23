@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             TB_Info = new TextBox();
             BTN_Test = new Button();
             TB_CID = new TextBox();
@@ -38,7 +39,10 @@
             TB_Command = new TextBox();
             LB_Command = new Label();
             PB_Screen = new PictureBox();
+            VV_Screen = new LibVLCSharp.WinForms.VideoView();
+            TM_Play = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)VV_Screen).BeginInit();
             SuspendLayout();
             // 
             // TB_Info
@@ -133,18 +137,36 @@
             // 
             // PB_Screen
             // 
-            PB_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            PB_Screen.Location = new Point(12, 12);
+            PB_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            PB_Screen.Location = new Point(549, 12);
             PB_Screen.Name = "PB_Screen";
-            PB_Screen.Size = new Size(695, 237);
+            PB_Screen.Size = new Size(158, 237);
+            PB_Screen.SizeMode = PictureBoxSizeMode.Zoom;
             PB_Screen.TabIndex = 10;
             PB_Screen.TabStop = false;
+            // 
+            // VV_Screen
+            // 
+            VV_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            VV_Screen.BackColor = Color.Black;
+            VV_Screen.Location = new Point(12, 12);
+            VV_Screen.MediaPlayer = null;
+            VV_Screen.Name = "VV_Screen";
+            VV_Screen.Size = new Size(531, 237);
+            VV_Screen.TabIndex = 11;
+            VV_Screen.Text = "videoView1";
+            // 
+            // TM_Play
+            // 
+            TM_Play.Interval = 1000;
+            TM_Play.Tick += TM_Play_Tick;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(VV_Screen);
             Controls.Add(PB_Screen);
             Controls.Add(LB_Command);
             Controls.Add(TB_Command);
@@ -160,6 +182,7 @@
             Text = "IPFS";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)PB_Screen).EndInit();
+            ((System.ComponentModel.ISupportInitialize)VV_Screen).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -176,5 +199,7 @@
         private TextBox TB_Command;
         private Label LB_Command;
         private PictureBox PB_Screen;
+        private LibVLCSharp.WinForms.VideoView VV_Screen;
+        private System.Windows.Forms.Timer TM_Play;
     }
 }
