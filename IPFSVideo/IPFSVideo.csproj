@@ -12,11 +12,13 @@
     <PackageReference Include="LibVLCSharp" Version="3.6.8" />
     <PackageReference Include="LibVLCSharp.WinForms" Version="3.6.8" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MyToolkit\MyToolkit.csproj" />
+    <ProjectReference Include="..\WinFormsLibrary\WinFormsLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

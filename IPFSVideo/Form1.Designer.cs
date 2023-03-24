@@ -41,6 +41,8 @@
             PB_Screen = new PictureBox();
             VV_Screen = new LibVLCSharp.WinForms.VideoView();
             TM_Play = new System.Windows.Forms.Timer(components);
+            CTB_PlayerTrack = new WinFormsLibrary.CustomTrackBar();
+            LB_Duration = new Label();
             ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
             ((System.ComponentModel.ISupportInitialize)VV_Screen).BeginInit();
             SuspendLayout();
@@ -48,11 +50,11 @@
             // TB_Info
             // 
             TB_Info.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            TB_Info.Location = new Point(12, 255);
+            TB_Info.Location = new Point(12, 271);
             TB_Info.Multiline = true;
             TB_Info.Name = "TB_Info";
             TB_Info.ScrollBars = ScrollBars.Vertical;
-            TB_Info.Size = new Size(695, 158);
+            TB_Info.Size = new Size(695, 142);
             TB_Info.TabIndex = 0;
             // 
             // BTN_Test
@@ -73,6 +75,7 @@
             TB_CID.Name = "TB_CID";
             TB_CID.Size = new Size(365, 23);
             TB_CID.TabIndex = 2;
+            TB_CID.Text = "QmQYpBaAdjmkqAHsXbfawF7PHUKzNf6o5LVYJUVGfaXyJG";
             // 
             // BTN_Download
             // 
@@ -161,11 +164,40 @@
             TM_Play.Interval = 1000;
             TM_Play.Tick += TM_Play_Tick;
             // 
+            // CTB_PlayerTrack
+            // 
+            CTB_PlayerTrack.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            CTB_PlayerTrack.L_BarColor = Color.FromArgb(224, 224, 224);
+            CTB_PlayerTrack.L_BarSize = 10;
+            CTB_PlayerTrack.L_IsRound = true;
+            CTB_PlayerTrack.L_Maximum = 100;
+            CTB_PlayerTrack.L_Minimum = 0;
+            CTB_PlayerTrack.L_Orientation = WinFormsLibrary.Orientation.Horizontal_LR;
+            CTB_PlayerTrack.L_SliderColor = SystemColors.Highlight;
+            CTB_PlayerTrack.L_Value = 0;
+            CTB_PlayerTrack.Location = new Point(121, 255);
+            CTB_PlayerTrack.Name = "CTB_PlayerTrack";
+            CTB_PlayerTrack.Size = new Size(424, 10);
+            CTB_PlayerTrack.TabIndex = 12;
+            CTB_PlayerTrack.Text = "customTrackBar1";
+            // 
+            // LB_Duration
+            // 
+            LB_Duration.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            LB_Duration.AutoSize = true;
+            LB_Duration.Location = new Point(12, 252);
+            LB_Duration.Name = "LB_Duration";
+            LB_Duration.Size = new Size(109, 17);
+            LB_Duration.TabIndex = 13;
+            LB_Duration.Text = "00:00:00/00:00:00";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(LB_Duration);
+            Controls.Add(CTB_PlayerTrack);
             Controls.Add(VV_Screen);
             Controls.Add(PB_Screen);
             Controls.Add(LB_Command);
@@ -201,5 +233,7 @@
         private PictureBox PB_Screen;
         private LibVLCSharp.WinForms.VideoView VV_Screen;
         private System.Windows.Forms.Timer TM_Play;
+        private WinFormsLibrary.CustomTrackBar CTB_PlayerTrack;
+        private Label LB_Duration;
     }
 }

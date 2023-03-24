@@ -1,6 +1,9 @@
 using MyToolkit;
 using LibVLCSharp.Shared;
 using Microsoft.IO;
+using System;
+using SQLite;
+using IPFSVideo.Models;
 
 namespace IPFSVideo
 {
@@ -10,6 +13,7 @@ namespace IPFSVideo
         readonly HttpClientAPI ipfsApi = new();
         readonly LibVLC libVLC;
         readonly MediaPlayer mediaPlayer;
+        Media? video;
 
         #region 内存缓存
         readonly byte[] buffer = new byte[1024 * 1024];
@@ -18,6 +22,11 @@ namespace IPFSVideo
         StreamMediaInput? streamMedia;
         #endregion
 
+        private static readonly string databasePath = "data.db";
+        private SQLiteAsyncConnection? sqlconnection;
+        public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(databasePath);
+        public List<VideoAlbum>? DataSource;
+
         readonly OpenFileDialog fileDialog = new();
 
         public Form1()
@@ -25,29 +34,57 @@ namespace IPFSVideo
             InitializeComponent();
             Core.Initialize();
             libVLC = new LibVLC();
-            mediaPlayer = new MediaPlayer(libVLC);
-            mediaPlayer.Hwnd = PB_Screen.Handle;
+            //mediaPlayer = new MediaPlayer(libVLC);
+            //mediaPlayer.Hwnd = PB_Screen.Handle;
+            mediaPlayer = VV_Screen.MediaPlayer = new MediaPlayer(libVLC);
             mediaPlayer.Stopped += MediaPlayer_Stopped;
             mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
+            mediaPlayer.Playing += MediaPlayer_Playing;
+
+            InitializeDatabase();
+            var data = new VideoAlbum("name", "2022-03-21", "112233");
+            //data.VideoInfo.Add("第一集", "2334");
+            //data.VideoInfo.Add("第二集", "2335");
+            SQLConnection.InsertAsync(data);
+        }
+
+        public async void InitializeDatabase()
+        {
+            try
+            {
+                DataSource = await SQLConnection.Table<VideoAlbum>().ToListAsync();
+            }
+            catch (Exception e)
+            {
+                if (e.Message == "no such table: VideoAlbum")
+                    await SQLConnection.CreateTableAsync<VideoAlbum>();
+            }
+        }
+
+        private void MediaPlayer_Playing(object? sender, EventArgs e)
+        {
+            CTB_PlayerTrack.L_Minimum = 0;
+            CTB_PlayerTrack.L_Maximum = (int)(mediaPlayer.Length / 1000);
         }
 
         private void MediaPlayer_TimeChanged(object? sender, MediaPlayerTimeChangedEventArgs e)
         {
+            CTB_PlayerTrack.L_Value = (int)mediaPlayer.Time / 1000;
             Invoke(new Action(() =>
             {
-                TB_Info.Text = $"{mediaPlayer.Time}/{mediaPlayer.Length}";
+                LB_Duration.Text = $"{GetTimeString(CTB_PlayerTrack.L_Value)}/{GetTimeString((int)mediaPlayer.Length / 1000)}";
             }));
-
+            
+            if (mediaPlayer.Time / 1000 == mediaPlayer.Length / 1000)
+            {
+                Task.Run(mediaPlayer.Stop);
+                CTB_PlayerTrack.L_Value = 0;
+            }
         }
 
         private void MediaPlayer_Stopped(object? sender, EventArgs e)
         {
             cache?.Dispose();
-            Invoke(new Action(() =>
-            {
-                TB_Info.Text = $"完成";
-
-            }));
         }
 
         private void TM_Play_Tick(object sender, EventArgs e)
@@ -72,16 +109,47 @@ namespace IPFSVideo
                 TB_Info.AppendText($"[{DateTime.Now}] {message}\r\n")));
         }
 
+        private static string GetTimeString(int val)
+        {
+            int hour = val / 3600;
+            val %= 3600;
+            int minute = val / 60;
+            int second = val % 60;
+            return string.Format("{0:00}:{1:00}:{2:00}", hour, minute, second);
+        }
+
+        private void Play()
+        {
+            streamMedia = new(cache!);
+            video = new(libVLC, streamMedia);
+            mediaPlayer.Play(video);
+            video.Dispose();
+        }
+
         #region 按钮
-        private void BTN_Test_ClickAsync(object sender, EventArgs e)
+        private async void BTN_Test_ClickAsync(object sender, EventArgs e)
         {
             try
             {
                 //Media video = new(libVLC, "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx.mp4", FromType.FromPath);
                 //video.AddOption($":sout=#rtp{{sdp = rtsp://127.0.0.1:8554/video}} :sout-all :sout-keep");
-                //string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text));
-                //ShowMessage(result.ToString());
-                mediaPlayer.Stop();
+                string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text, TB_CID.Text));
+                ShowMessage(result.ToString());
+
+                //Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
+                //TB_Info.Clear();
+                //byte[] data = new byte[10240];
+                //int length;
+                //using (FileStream file = new FileStream("test.mp4", FileMode.OpenOrCreate))
+                //{
+                //    while ((length = await stream.ReadAsync(data)) != 0)
+                //    {
+                //        await file.WriteAsync(data, 0, length);
+                //    }
+                //}
+
+                //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", $"http://localhost:8080/ipfs/{TB_CID.Text}");
+
             }
             catch (Exception)
             {
@@ -100,8 +168,6 @@ namespace IPFSVideo
                         AddAsync(FileManager.GetFileStream(fileDialog.FileName), fileDialog.FileName.Split('\\').LastOrDefault("nofile"));
                     ShowMessage(result.ToString());
                 }
-                //string result = await ipfsApi.UploadAsync(HttpClientAPI.BuildCommand("add"),
-                //    new StreamContent(FileManager.GetFileStream(uploadPath)));
             }
             catch (Exception ex)
             {
@@ -126,17 +192,7 @@ namespace IPFSVideo
         {
             try
             {
-                //Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx"));
-                //TB_Info.Clear();
-                //byte[] data = new byte[10240];
-                //int length;
-                //using (FileStream file = new FileStream("QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx.mp4", FileMode.OpenOrCreate))
-                //{
-                //    while ((length = await stream.ReadAsync(data)) != 0)
-                //    {
-                //        await file.WriteAsync(data, 0, length);
-                //    }
-                //}
+                
                 mediaPlayer.Stop();
                 using (Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text)))
                 {
@@ -146,14 +202,12 @@ namespace IPFSVideo
                     {
                         //var pos = cache.Position;
                         //cache.Position = cache.Length;
-                        cache.Write(buffer, 0, length);
+                        await cache.WriteAsync(buffer.AsMemory(0, length));
                         //cache.Position = pos;
                     }
-                    streamMedia = new(cache);
-                    Media video = new(libVLC, streamMedia);
-                    mediaPlayer.Play(video);
-                    video.Dispose();
+                    await Task.Run(Play);
                 }
+                
             }
             catch (Exception ex)
             {
