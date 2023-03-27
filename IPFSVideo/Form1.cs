@@ -4,6 +4,7 @@ using Microsoft.IO;
 using System;
 using SQLite;
 using IPFSVideo.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IPFSVideo
 {
@@ -26,8 +27,10 @@ namespace IPFSVideo
         private SQLiteAsyncConnection? sqlconnection;
         public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(databasePath);
         public List<VideoAlbum>? DataSource;
+        public List<Animation>? AnimationSource;
 
         readonly OpenFileDialog fileDialog = new();
+        readonly UploadForm uploadForm = new();
 
         public Form1()
         {
@@ -42,9 +45,10 @@ namespace IPFSVideo
             mediaPlayer.Playing += MediaPlayer_Playing;
 
             InitializeDatabase();
-            var data = new VideoAlbum("name", "2022-03-21", "112233");
-            //data.VideoInfo.Add("第一集", "2334");
-            //data.VideoInfo.Add("第二集", "2335");
+            //var data = new VideoAlbum("name", "2022-03-22", "112233", "\"vidoe3\":\"hash3\"", "\"vidoe4\":\"hash4\"");
+            var data = new Animation("animation", "2022-03-22", "112233",
+                VideoAlbum.GetJson("video5", "value5"),
+                "\"vidoe4\":\"hash4\"");
             SQLConnection.InsertAsync(data);
         }
 
@@ -53,11 +57,14 @@ namespace IPFSVideo
             try
             {
                 DataSource = await SQLConnection.Table<VideoAlbum>().ToListAsync();
+                AnimationSource = await SQLConnection.Table<Animation>().ToListAsync();
+                var dd = new Animation(DataSource[0]);
             }
             catch (Exception e)
             {
                 if (e.Message == "no such table: VideoAlbum")
                     await SQLConnection.CreateTableAsync<VideoAlbum>();
+                await SQLConnection.CreateTableAsync<Animation>();
             }
         }
 
@@ -74,7 +81,7 @@ namespace IPFSVideo
             {
                 LB_Duration.Text = $"{GetTimeString(CTB_PlayerTrack.L_Value)}/{GetTimeString((int)mediaPlayer.Length / 1000)}";
             }));
-            
+
             if (mediaPlayer.Time / 1000 == mediaPlayer.Length / 1000)
             {
                 Task.Run(mediaPlayer.Stop);
@@ -166,6 +173,11 @@ namespace IPFSVideo
                 {
                     string result = await ipfsApi.
                         AddAsync(FileManager.GetFileStream(fileDialog.FileName), fileDialog.FileName.Split('\\').LastOrDefault("nofile"));
+                    var resultDic = VideoAlbum.GetObject(result);
+                    var data = new Animation("animation", "2022-03-22", "112233",
+                    VideoAlbum.GetJson("video5", "value5"),
+                    "\"vidoe4\":\"hash4\"");
+                    await SQLConnection.InsertAsync(data);
                     ShowMessage(result.ToString());
                 }
             }
@@ -192,7 +204,6 @@ namespace IPFSVideo
         {
             try
             {
-                
                 mediaPlayer.Stop();
                 using (Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text)))
                 {
@@ -207,7 +218,7 @@ namespace IPFSVideo
                     }
                     await Task.Run(Play);
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -216,5 +227,9 @@ namespace IPFSVideo
         }
         #endregion
 
+        private void TSB_UploadSet_Click(object sender, EventArgs e)
+        {
+            uploadForm.ShowDialog();
+        }
     }
 }

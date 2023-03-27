@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             TB_Info = new TextBox();
             BTN_Test = new Button();
             TB_CID = new TextBox();
@@ -43,8 +44,11 @@
             TM_Play = new System.Windows.Forms.Timer(components);
             CTB_PlayerTrack = new WinFormsLibrary.CustomTrackBar();
             LB_Duration = new Label();
+            toolStrip1 = new ToolStrip();
+            TSB_UploadSet = new ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
             ((System.ComponentModel.ISupportInitialize)VV_Screen).BeginInit();
+            toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // TB_Info
@@ -141,9 +145,9 @@
             // PB_Screen
             // 
             PB_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            PB_Screen.Location = new Point(549, 12);
+            PB_Screen.Location = new Point(549, 28);
             PB_Screen.Name = "PB_Screen";
-            PB_Screen.Size = new Size(158, 237);
+            PB_Screen.Size = new Size(158, 221);
             PB_Screen.SizeMode = PictureBoxSizeMode.Zoom;
             PB_Screen.TabIndex = 10;
             PB_Screen.TabStop = false;
@@ -152,10 +156,10 @@
             // 
             VV_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             VV_Screen.BackColor = Color.Black;
-            VV_Screen.Location = new Point(12, 12);
+            VV_Screen.Location = new Point(12, 28);
             VV_Screen.MediaPlayer = null;
             VV_Screen.Name = "VV_Screen";
-            VV_Screen.Size = new Size(531, 237);
+            VV_Screen.Size = new Size(531, 221);
             VV_Screen.TabIndex = 11;
             VV_Screen.Text = "videoView1";
             // 
@@ -191,11 +195,32 @@
             LB_Duration.TabIndex = 13;
             LB_Duration.Text = "00:00:00/00:00:00";
             // 
+            // toolStrip1
+            // 
+            toolStrip1.GripStyle = ToolStripGripStyle.Hidden;
+            toolStrip1.Items.AddRange(new ToolStripItem[] { TSB_UploadSet });
+            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new Size(800, 25);
+            toolStrip1.TabIndex = 14;
+            toolStrip1.Text = "toolStrip1";
+            // 
+            // TSB_UploadSet
+            // 
+            TSB_UploadSet.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            TSB_UploadSet.Image = (Image)resources.GetObject("TSB_UploadSet.Image");
+            TSB_UploadSet.ImageTransparentColor = Color.Magenta;
+            TSB_UploadSet.Name = "TSB_UploadSet";
+            TSB_UploadSet.Size = new Size(60, 22);
+            TSB_UploadSet.Text = "上传设置";
+            TSB_UploadSet.Click += TSB_UploadSet_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(toolStrip1);
             Controls.Add(LB_Duration);
             Controls.Add(CTB_PlayerTrack);
             Controls.Add(VV_Screen);
@@ -215,6 +240,8 @@
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)PB_Screen).EndInit();
             ((System.ComponentModel.ISupportInitialize)VV_Screen).EndInit();
+            toolStrip1.ResumeLayout(false);
+            toolStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -235,5 +262,7 @@
         private System.Windows.Forms.Timer TM_Play;
         private WinFormsLibrary.CustomTrackBar CTB_PlayerTrack;
         private Label LB_Duration;
+        private ToolStrip toolStrip1;
+        private ToolStripButton TSB_UploadSet;
     }
 }
