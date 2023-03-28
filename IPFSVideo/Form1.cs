@@ -5,10 +5,11 @@ using System;
 using SQLite;
 using IPFSVideo.Models;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Windows.Forms;
 
 namespace IPFSVideo
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IProgress<TransferProgress>
     {
         readonly ProcessToolkit ipfsProcess = new("ipfs");
         readonly HttpClientAPI ipfsApi = new();
@@ -110,10 +111,17 @@ namespace IPFSVideo
                 ShowMessage(e.Data);
         }
 
-        private void ShowMessage(string message)
+        private void ShowMessage(string? message)
+        {
+            if (message != null)
+                TB_Info.Invoke(new Action(() =>
+                    TB_Info.AppendText($"[{DateTime.Now}] {message}\r\n")));
+        }
+
+        public void Report(TransferProgress value)
         {
             TB_Info.Invoke(new Action(() =>
-                TB_Info.AppendText($"[{DateTime.Now}] {message}\r\n")));
+                TB_Info.AppendText($"[{DateTime.Now}] {value.Name} {(float)value.Bytes / value.AllLength * 100}%\r\n")));
         }
 
         private static string GetTimeString(int val)
@@ -171,14 +179,23 @@ namespace IPFSVideo
             {
                 if (fileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    string result = await ipfsApi.
-                        AddAsync(FileManager.GetFileStream(fileDialog.FileName), fileDialog.FileName.Split('\\').LastOrDefault("nofile"));
-                    var resultDic = VideoAlbum.GetObject(result);
-                    var data = new Animation("animation", "2022-03-22", "112233",
-                    VideoAlbum.GetJson("video5", "value5"),
-                    "\"vidoe4\":\"hash4\"");
-                    await SQLConnection.InsertAsync(data);
-                    ShowMessage(result.ToString());
+                    AddFileOptions options = new(this);
+                    long fileLength = new FileInfo(fileDialog.FileName).Length;
+                    await Task.Run(async () =>
+                    {
+                        var result = await ipfsApi.
+                        AddAsync(FileManager.GetFileStream(fileDialog.FileName),
+                        fileDialog.FileName.Split('\\').LastOrDefault("nofile"), options, fileLength);
+                        //var resultDic = VideoAlbum.GetObject(result);
+                        //var data = new Animation("animation", "2022-03-22", "112233",
+                        //VideoAlbum.GetJson("video5", "value5"),
+                        //"\"vidoe4\":\"hash4\"");
+                        //await SQLConnection.InsertAsync(data);
+                        ShowMessage(result!.Name);
+                        ShowMessage(result!.Cid);
+                        ShowMessage(result!.Size.ToString());
+                    });
+
                 }
             }
             catch (Exception ex)
@@ -231,5 +248,7 @@ namespace IPFSVideo
         {
             uploadForm.ShowDialog();
         }
+
+        
     }
 }

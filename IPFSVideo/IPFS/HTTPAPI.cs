@@ -10,6 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.DataFormats;
 using MyToolkit;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using IPFSVideo.Models;
 
 namespace IPFSVideo
 {
@@ -115,6 +118,20 @@ namespace IPFSVideo
             //await ThrowOnErrorAsync(response);
             return await response.Content.ReadAsStringAsync();
         }
+
+        public async Task<Stream> UploadGetStreamAsync(Uri command, StreamContent streamContent, string? name = null)
+        {
+            var content = new MultipartFormDataContent();
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            if (string.IsNullOrEmpty(name))
+                content.Add(streamContent, "file", "unknown");
+            else
+                content.Add(streamContent, "file", name);
+
+            var response = await HttpApi.PostAsync(command, content);
+            //await ThrowOnErrorAsync(response);
+            return await response.Content.ReadAsStreamAsync();
+        }
         /// <summary>
         /// 上传文件
         /// </summary>
@@ -122,8 +139,9 @@ namespace IPFSVideo
         /// <param name="name">文件名</param>
         /// <param name="options">参数设置</param>
         /// <returns>结果</returns>
-        public async Task<string> AddAsync(Stream stream, string name = "", AddFileOptions? options = null)
+        public async Task<FileData?> AddAsync(Stream stream, string name = "", AddFileOptions? options = null, long fileLength = 0)
         {
+            #region 上传参数
             options ??= new AddFileOptions();
             var opts = new List<string>();
             if (!options.Pin)
@@ -136,8 +154,8 @@ namespace IPFSVideo
                 opts.Add("only-hash=true");
             if (options.Trickle)
                 opts.Add("trickle=true");
-            //if (options.Progress != null)
-            //    opts.Add("progress=true");
+            if (options.Progress != null)
+                opts.Add("progress=true");
             //if (options.Hash != MultiHash.DefaultAlgorithmName)
             //    opts.Add($"hash=${options.Hash}");
             //if (options.Encoding != MultiBase.DefaultAlgorithmName)
@@ -146,9 +164,35 @@ namespace IPFSVideo
                 opts.Add($"protect={options.ProtectionKey}");
             opts.Add($"chunker=size-{options.ChunkSize}");
             opts.Add($"recursive=false");
+            #endregion
 
             StreamContent content = new(stream);
-            return await UploadAsync(BuildCommand("add", null, opts.ToArray()), content, name);
+            var response = await UploadGetStreamAsync(BuildCommand("add", null, opts.ToArray()), content, name);
+            FileData? fileData = null;
+            using (var sr = new StreamReader(response))
+            using (var jr = new JsonTextReader(sr) { SupportMultipleContent = true })
+            {
+                while (jr.Read())
+                {
+                    JObject r = await JObject.LoadAsync(jr);
+                    // If a progress report.
+                    if (r.ContainsKey("Bytes"))
+                    {
+                        options.Progress?.Report(new TransferProgress
+                        {
+                            Name = (string)r["Name"]!,
+                            Bytes = (ulong)r["Bytes"]!,
+                            AllLength = fileLength
+                        });
+                    }
+                    // Else must be an added file.
+                    else
+                    {
+                        fileData = new FileData(name, (string)r["Hash"]!, long.Parse((string)r["Size"]!));
+                    }
+                }
+            }
+            return fileData;
         }
     }
 
@@ -231,6 +275,16 @@ namespace IPFSVideo
         /// <summary>
         /// Used to report the progress of a file transfer.
         /// </summary>
-        //public IProgress<TransferProgress> Progress { get; set; }
+        public IProgress<TransferProgress>? Progress { get; set; }
+
+        public AddFileOptions(IProgress<TransferProgress> progress)
+        {
+            Progress = progress;
+        }
+
+        public AddFileOptions()
+        {
+
+        }
     }
 }

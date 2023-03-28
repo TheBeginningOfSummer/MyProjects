@@ -4,6 +4,25 @@ using System.Windows.Forms;
 
 namespace IPFSVideo.Models
 {
+    public class FileData
+    {
+        public string? Name { get; set; }
+        public string? Cid { get; set; }
+        public long? Size { get; set; }
+
+        public FileData(string name, string cid, long size)
+        {
+            Name = name;
+            Cid = cid;
+            Size = size;
+        }
+
+        public FileData()
+        {
+
+        }
+    }
+
     public class VideoAlbum
     {
         [PrimaryKey, AutoIncrement]
@@ -11,18 +30,18 @@ namespace IPFSVideo.Models
         public string? AlbumName { get; set; }
         public string? PublishDate { get; set; }
         public string? CoverHash { get; set; }
-        public string? VideoData { get; set; }
+        public string? VideosJson { get; set; }
 
         public VideoAlbum(string albumName, string publishDate, string coverHash, params string[] videoInfo)
         {
             AlbumName = albumName;
             PublishDate = publishDate;
             CoverHash = coverHash;
-            VideoData += "{";
+            VideosJson += "{";
             foreach (var info in videoInfo)
-                VideoData += info + ",";
-            VideoData = VideoData[..^1];
-            VideoData += "}";
+                VideosJson += info + ",";
+            VideosJson = VideosJson[..^1];
+            VideosJson += "}";
         }
 
         public VideoAlbum()
@@ -47,16 +66,22 @@ namespace IPFSVideo.Models
         {
             return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonString);
         }
+
+        public static async Task<Dictionary<string, string>?> GetObjectAsync(Stream jsonStream)
+        {
+            return await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(jsonStream);
+        }
     }
 
     public class Animation : VideoAlbum
     {
         public Dictionary<string, string>? VideoInfo;
+        public Dictionary<string, FileData>? VideosData;
 
         public Animation(string albumName, string publishDate, string coverHash, params string[] videoInfo)
             : base(albumName, publishDate, coverHash, videoInfo)
         {
-            VideoInfo = GetObject(VideoData!);
+            VideoInfo = GetObject(VideosJson!);
         }
 
         public Animation(VideoAlbum videoAlbum)
@@ -65,13 +90,25 @@ namespace IPFSVideo.Models
             AlbumName = videoAlbum.AlbumName;
             PublishDate = videoAlbum.PublishDate;
             CoverHash = videoAlbum.CoverHash;
-            VideoData = videoAlbum.VideoData;
-            VideoInfo = GetObject(VideoData!);
+            VideosJson = videoAlbum.VideosJson;
+
+            VideoInfo = GetObject(VideosJson!);
+            VideosData = GetVideosData(VideosJson!);
         }
 
         public Animation()
         {
 
+        }
+
+        public static string GetVideosDataJson(Dictionary<string, FileData> videosData)
+        {
+            return JsonSerializer.Serialize(videosData);
+        }
+
+        public static Dictionary<string, FileData>? GetVideosData(string videosJson)
+        {
+            return JsonSerializer.Deserialize<Dictionary<string, FileData>>(videosJson);
         }
     }
 
