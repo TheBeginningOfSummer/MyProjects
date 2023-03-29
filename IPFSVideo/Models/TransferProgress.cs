@@ -13,5 +13,6 @@ namespace IPFSVideo.Models
         public ulong Bytes;
 
         public long AllLength;
+
     }
 }

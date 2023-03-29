@@ -13,6 +13,9 @@ using MyToolkit;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using IPFSVideo.Models;
+using static System.Windows.Forms.Design.AxImporter;
+using System.Xml.Linq;
+using IPFSVideo.IPFS;
 
 namespace IPFSVideo
 {
@@ -22,6 +25,7 @@ namespace IPFSVideo
 
         public HttpClientAPI()
         {
+            HttpApi.Timeout = TimeSpan.FromSeconds(300);
             //HttpRequest.BaseAddress = new Uri("http://localhost:5001/api/v0/");
         }
 
@@ -119,7 +123,7 @@ namespace IPFSVideo
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<Stream> UploadGetStreamAsync(Uri command, StreamContent streamContent, string? name = null)
+        public async Task<Stream> UploadGetStreamAsync(Uri command, HttpContent streamContent, string? name = null)
         {
             var content = new MultipartFormDataContent();
             streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -130,6 +134,7 @@ namespace IPFSVideo
 
             var response = await HttpApi.PostAsync(command, content);
             //await ThrowOnErrorAsync(response);
+            
             return await response.Content.ReadAsStreamAsync();
         }
         /// <summary>
@@ -167,28 +172,38 @@ namespace IPFSVideo
             #endregion
 
             StreamContent content = new(stream);
+            //ProgressableHttpContent progressableHttpContent =
+            //    new ProgressableHttpContent(content, 4096, options.Progress, name, fileLength);
             var response = await UploadGetStreamAsync(BuildCommand("add", null, opts.ToArray()), content, name);
+            return await ReadStreamAsync(response, options, name, fileLength);
+        }
+
+        public static async Task<FileData?> ReadStreamAsync(Stream response, AddFileOptions options, string name = "", long fileLength = 0)
+        {
             FileData? fileData = null;
-            using (var sr = new StreamReader(response))
-            using (var jr = new JsonTextReader(sr) { SupportMultipleContent = true })
+            if(response != null)
             {
-                while (jr.Read())
+                using (var sr = new StreamReader(response))
+                using (var jr = new JsonTextReader(sr) { SupportMultipleContent = true })
                 {
-                    JObject r = await JObject.LoadAsync(jr);
-                    // If a progress report.
-                    if (r.ContainsKey("Bytes"))
+                    while (jr.Read())
                     {
-                        options.Progress?.Report(new TransferProgress
+                        JObject r = await JObject.LoadAsync(jr);
+                        // If a progress report.
+                        if (r.ContainsKey("Bytes"))
                         {
-                            Name = (string)r["Name"]!,
-                            Bytes = (ulong)r["Bytes"]!,
-                            AllLength = fileLength
-                        });
-                    }
-                    // Else must be an added file.
-                    else
-                    {
-                        fileData = new FileData(name, (string)r["Hash"]!, long.Parse((string)r["Size"]!));
+                            options.Progress?.Report(new TransferProgress
+                            {
+                                Name = (string)r["Name"]!,
+                                Bytes = (ulong)r["Bytes"]!,
+                                AllLength = fileLength
+                            });
+                        }
+                        // Else must be an added file.
+                        else
+                        {
+                            fileData = new FileData(name, (string)r["Hash"]!, long.Parse((string)r["Size"]!));
+                        }
                     }
                 }
             }

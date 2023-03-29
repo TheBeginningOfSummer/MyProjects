@@ -179,23 +179,23 @@ namespace IPFSVideo
             {
                 if (fileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    AddFileOptions options = new(this);
+                    AddFileOptions options = new AddFileOptions(this);
                     long fileLength = new FileInfo(fileDialog.FileName).Length;
-                    await Task.Run(async () =>
-                    {
-                        var result = await ipfsApi.
-                        AddAsync(FileManager.GetFileStream(fileDialog.FileName),
-                        fileDialog.FileName.Split('\\').LastOrDefault("nofile"), options, fileLength);
-                        //var resultDic = VideoAlbum.GetObject(result);
-                        //var data = new Animation("animation", "2022-03-22", "112233",
-                        //VideoAlbum.GetJson("video5", "value5"),
-                        //"\"vidoe4\":\"hash4\"");
-                        //await SQLConnection.InsertAsync(data);
-                        ShowMessage(result!.Name);
-                        ShowMessage(result!.Cid);
-                        ShowMessage(result!.Size.ToString());
-                    });
 
+                    var result = await ipfsApi.
+                        AddAsync(FileManager.GetFileStream(fileDialog.FileName),
+                        fileDialog.FileName.Split('\\').LastOrDefault("nofile"),
+                        options, fileLength);
+
+                    ShowMessage(result?.Name);
+                    ShowMessage(result?.Cid);
+                    ShowMessage(result?.Size.ToString());
+
+                    //var resultDic = VideoAlbum.GetObject(result);
+                    //var data = new Animation("animation", "2022-03-22", "112233",
+                    //VideoAlbum.GetJson("video5", "value5"),
+                    //"\"vidoe4\":\"hash4\"");
+                    //await SQLConnection.InsertAsync(data);
                 }
             }
             catch (Exception ex)
