@@ -39,129 +39,85 @@
             LB_CID = new Label();
             TB_Command = new TextBox();
             LB_Command = new Label();
-            PB_Screen = new PictureBox();
             VV_Screen = new LibVLCSharp.WinForms.VideoView();
             TM_Play = new System.Windows.Forms.Timer(components);
             CTB_PlayerTrack = new WinFormsLibrary.CustomTrackBar();
             LB_Duration = new Label();
             toolStrip1 = new ToolStrip();
             TSB_UploadSet = new ToolStripButton();
-            ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
+            TSB_Display = new ToolStripButton();
+            TC_Main = new TabControl();
+            TP_Video = new TabPage();
+            PB_Screen = new PictureBox();
+            TP_Data = new TabPage();
+            PN_VideoInfo = new Panel();
             ((System.ComponentModel.ISupportInitialize)VV_Screen).BeginInit();
             toolStrip1.SuspendLayout();
+            TC_Main.SuspendLayout();
+            TP_Video.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
+            TP_Data.SuspendLayout();
             SuspendLayout();
             // 
             // TB_Info
             // 
-            TB_Info.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            TB_Info.Location = new Point(12, 271);
-            TB_Info.Multiline = true;
+            resources.ApplyResources(TB_Info, "TB_Info");
             TB_Info.Name = "TB_Info";
-            TB_Info.ScrollBars = ScrollBars.Vertical;
-            TB_Info.Size = new Size(695, 142);
-            TB_Info.TabIndex = 0;
             // 
             // BTN_Test
             // 
-            BTN_Test.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_Test.Location = new Point(713, 419);
+            resources.ApplyResources(BTN_Test, "BTN_Test");
             BTN_Test.Name = "BTN_Test";
-            BTN_Test.Size = new Size(75, 23);
-            BTN_Test.TabIndex = 1;
-            BTN_Test.Text = "测试";
             BTN_Test.UseVisualStyleBackColor = true;
             BTN_Test.Click += BTN_Test_ClickAsync;
             // 
             // TB_CID
             // 
-            TB_CID.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            TB_CID.Location = new Point(48, 419);
+            resources.ApplyResources(TB_CID, "TB_CID");
             TB_CID.Name = "TB_CID";
-            TB_CID.Size = new Size(365, 23);
-            TB_CID.TabIndex = 2;
-            TB_CID.Text = "QmQYpBaAdjmkqAHsXbfawF7PHUKzNf6o5LVYJUVGfaXyJG";
             // 
             // BTN_Download
             // 
-            BTN_Download.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_Download.Location = new Point(713, 361);
+            resources.ApplyResources(BTN_Download, "BTN_Download");
             BTN_Download.Name = "BTN_Download";
-            BTN_Download.Size = new Size(75, 23);
-            BTN_Download.TabIndex = 4;
-            BTN_Download.Text = "下载";
             BTN_Download.UseVisualStyleBackColor = true;
             BTN_Download.Click += BTN_Download_ClickAsync;
             // 
             // BTN_Upload
             // 
-            BTN_Upload.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_Upload.Location = new Point(713, 332);
+            resources.ApplyResources(BTN_Upload, "BTN_Upload");
             BTN_Upload.Name = "BTN_Upload";
-            BTN_Upload.Size = new Size(75, 23);
-            BTN_Upload.TabIndex = 5;
-            BTN_Upload.Text = "上传";
             BTN_Upload.UseVisualStyleBackColor = true;
             BTN_Upload.Click += BTN_Upload_ClickAsync;
             // 
             // BTN_Play
             // 
-            BTN_Play.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_Play.Location = new Point(713, 390);
+            resources.ApplyResources(BTN_Play, "BTN_Play");
             BTN_Play.Name = "BTN_Play";
-            BTN_Play.Size = new Size(75, 23);
-            BTN_Play.TabIndex = 6;
-            BTN_Play.Text = "播放";
             BTN_Play.UseVisualStyleBackColor = true;
             BTN_Play.Click += BTN_Play_ClickAsync;
             // 
             // LB_CID
             // 
-            LB_CID.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            LB_CID.AutoSize = true;
-            LB_CID.Location = new Point(12, 422);
+            resources.ApplyResources(LB_CID, "LB_CID");
             LB_CID.Name = "LB_CID";
-            LB_CID.Size = new Size(32, 17);
-            LB_CID.TabIndex = 7;
-            LB_CID.Text = "CID:";
             // 
             // TB_Command
             // 
-            TB_Command.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            TB_Command.Location = new Point(496, 419);
+            resources.ApplyResources(TB_Command, "TB_Command");
             TB_Command.Name = "TB_Command";
-            TB_Command.Size = new Size(211, 23);
-            TB_Command.TabIndex = 8;
             // 
             // LB_Command
             // 
-            LB_Command.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            LB_Command.AutoSize = true;
-            LB_Command.Location = new Point(419, 422);
+            resources.ApplyResources(LB_Command, "LB_Command");
             LB_Command.Name = "LB_Command";
-            LB_Command.Size = new Size(71, 17);
-            LB_Command.TabIndex = 9;
-            LB_Command.Text = "Command:";
-            // 
-            // PB_Screen
-            // 
-            PB_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            PB_Screen.Location = new Point(549, 28);
-            PB_Screen.Name = "PB_Screen";
-            PB_Screen.Size = new Size(158, 221);
-            PB_Screen.SizeMode = PictureBoxSizeMode.Zoom;
-            PB_Screen.TabIndex = 10;
-            PB_Screen.TabStop = false;
             // 
             // VV_Screen
             // 
-            VV_Screen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            resources.ApplyResources(VV_Screen, "VV_Screen");
             VV_Screen.BackColor = Color.Black;
-            VV_Screen.Location = new Point(12, 28);
             VV_Screen.MediaPlayer = null;
             VV_Screen.Name = "VV_Screen";
-            VV_Screen.Size = new Size(531, 221);
-            VV_Screen.TabIndex = 11;
-            VV_Screen.Text = "videoView1";
             // 
             // TM_Play
             // 
@@ -170,7 +126,7 @@
             // 
             // CTB_PlayerTrack
             // 
-            CTB_PlayerTrack.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            resources.ApplyResources(CTB_PlayerTrack, "CTB_PlayerTrack");
             CTB_PlayerTrack.L_BarColor = Color.FromArgb(224, 224, 224);
             CTB_PlayerTrack.L_BarSize = 10;
             CTB_PlayerTrack.L_IsRound = true;
@@ -179,69 +135,98 @@
             CTB_PlayerTrack.L_Orientation = WinFormsLibrary.Orientation.Horizontal_LR;
             CTB_PlayerTrack.L_SliderColor = SystemColors.Highlight;
             CTB_PlayerTrack.L_Value = 0;
-            CTB_PlayerTrack.Location = new Point(121, 255);
             CTB_PlayerTrack.Name = "CTB_PlayerTrack";
-            CTB_PlayerTrack.Size = new Size(424, 10);
-            CTB_PlayerTrack.TabIndex = 12;
-            CTB_PlayerTrack.Text = "customTrackBar1";
             // 
             // LB_Duration
             // 
-            LB_Duration.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            LB_Duration.AutoSize = true;
-            LB_Duration.Location = new Point(12, 252);
+            resources.ApplyResources(LB_Duration, "LB_Duration");
             LB_Duration.Name = "LB_Duration";
-            LB_Duration.Size = new Size(109, 17);
-            LB_Duration.TabIndex = 13;
-            LB_Duration.Text = "00:00:00/00:00:00";
             // 
             // toolStrip1
             // 
             toolStrip1.GripStyle = ToolStripGripStyle.Hidden;
-            toolStrip1.Items.AddRange(new ToolStripItem[] { TSB_UploadSet });
-            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Items.AddRange(new ToolStripItem[] { TSB_UploadSet, TSB_Display });
+            resources.ApplyResources(toolStrip1, "toolStrip1");
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(800, 25);
-            toolStrip1.TabIndex = 14;
-            toolStrip1.Text = "toolStrip1";
             // 
             // TSB_UploadSet
             // 
             TSB_UploadSet.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            TSB_UploadSet.Image = (Image)resources.GetObject("TSB_UploadSet.Image");
-            TSB_UploadSet.ImageTransparentColor = Color.Magenta;
+            resources.ApplyResources(TSB_UploadSet, "TSB_UploadSet");
             TSB_UploadSet.Name = "TSB_UploadSet";
-            TSB_UploadSet.Size = new Size(60, 22);
-            TSB_UploadSet.Text = "上传设置";
             TSB_UploadSet.Click += TSB_UploadSet_Click;
+            // 
+            // TSB_Display
+            // 
+            TSB_Display.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(TSB_Display, "TSB_Display");
+            TSB_Display.Name = "TSB_Display";
+            TSB_Display.Click += TSB_Display_Click;
+            // 
+            // TC_Main
+            // 
+            resources.ApplyResources(TC_Main, "TC_Main");
+            TC_Main.Controls.Add(TP_Video);
+            TC_Main.Controls.Add(TP_Data);
+            TC_Main.Name = "TC_Main";
+            TC_Main.SelectedIndex = 0;
+            // 
+            // TP_Video
+            // 
+            TP_Video.Controls.Add(PB_Screen);
+            TP_Video.Controls.Add(LB_Command);
+            TP_Video.Controls.Add(LB_Duration);
+            TP_Video.Controls.Add(TB_Command);
+            TP_Video.Controls.Add(VV_Screen);
+            TP_Video.Controls.Add(LB_CID);
+            TP_Video.Controls.Add(TB_CID);
+            TP_Video.Controls.Add(CTB_PlayerTrack);
+            TP_Video.Controls.Add(BTN_Play);
+            TP_Video.Controls.Add(TB_Info);
+            TP_Video.Controls.Add(BTN_Upload);
+            TP_Video.Controls.Add(BTN_Download);
+            TP_Video.Controls.Add(BTN_Test);
+            resources.ApplyResources(TP_Video, "TP_Video");
+            TP_Video.Name = "TP_Video";
+            TP_Video.UseVisualStyleBackColor = true;
+            // 
+            // PB_Screen
+            // 
+            resources.ApplyResources(PB_Screen, "PB_Screen");
+            PB_Screen.BackColor = Color.Silver;
+            PB_Screen.Name = "PB_Screen";
+            PB_Screen.TabStop = false;
+            // 
+            // TP_Data
+            // 
+            TP_Data.Controls.Add(PN_VideoInfo);
+            resources.ApplyResources(TP_Data, "TP_Data");
+            TP_Data.Name = "TP_Data";
+            TP_Data.UseVisualStyleBackColor = true;
+            // 
+            // PN_VideoInfo
+            // 
+            resources.ApplyResources(PN_VideoInfo, "PN_VideoInfo");
+            PN_VideoInfo.Name = "PN_VideoInfo";
+            PN_VideoInfo.SizeChanged += PN_VideoInfo_SizeChanged;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 17F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
             Controls.Add(toolStrip1);
-            Controls.Add(LB_Duration);
-            Controls.Add(CTB_PlayerTrack);
-            Controls.Add(VV_Screen);
-            Controls.Add(PB_Screen);
-            Controls.Add(LB_Command);
-            Controls.Add(TB_Command);
-            Controls.Add(LB_CID);
-            Controls.Add(BTN_Play);
-            Controls.Add(BTN_Upload);
-            Controls.Add(BTN_Download);
-            Controls.Add(TB_CID);
-            Controls.Add(BTN_Test);
-            Controls.Add(TB_Info);
+            Controls.Add(TC_Main);
             Name = "Form1";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "IPFS";
             Load += Form1_Load;
-            ((System.ComponentModel.ISupportInitialize)PB_Screen).EndInit();
+            SizeChanged += Form1_SizeChanged;
             ((System.ComponentModel.ISupportInitialize)VV_Screen).EndInit();
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
+            TC_Main.ResumeLayout(false);
+            TP_Video.ResumeLayout(false);
+            TP_Video.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)PB_Screen).EndInit();
+            TP_Data.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -257,12 +242,17 @@
         private Label LB_CID;
         private TextBox TB_Command;
         private Label LB_Command;
-        private PictureBox PB_Screen;
         private LibVLCSharp.WinForms.VideoView VV_Screen;
         private System.Windows.Forms.Timer TM_Play;
         private WinFormsLibrary.CustomTrackBar CTB_PlayerTrack;
         private Label LB_Duration;
         private ToolStrip toolStrip1;
         private ToolStripButton TSB_UploadSet;
+        private TabControl TC_Main;
+        private TabPage TP_Video;
+        private TabPage TP_Data;
+        private ToolStripButton TSB_Display;
+        private Panel PN_VideoInfo;
+        private PictureBox PB_Screen;
     }
 }

@@ -21,6 +21,11 @@ namespace IPFSVideo.Models
         {
 
         }
+
+        public string GetInfo()
+        {
+            return $"{Name} {Cid} {Size}";
+        }
     }
 
     public class VideoAlbum
@@ -32,21 +37,17 @@ namespace IPFSVideo.Models
         public string? CoverHash { get; set; }
         public string? VideosJson { get; set; }
 
-        public VideoAlbum(string albumName, string publishDate, string coverHash, params string[] videoInfo)
+        public VideoAlbum(string albumName, string publishDate, string coverHash, string videoJson)
         {
             AlbumName = albumName;
             PublishDate = publishDate;
             CoverHash = coverHash;
-            VideosJson += "{";
-            foreach (var info in videoInfo)
-                VideosJson += info + ",";
-            VideosJson = VideosJson[..^1];
-            VideosJson += "}";
+            VideosJson = videoJson;
         }
 
         public VideoAlbum()
         {
-            
+
         }
 
         public static string GetJson(string key, string value)
@@ -75,13 +76,12 @@ namespace IPFSVideo.Models
 
     public class Animation : VideoAlbum
     {
-        public Dictionary<string, string>? VideoInfo;
         public Dictionary<string, FileData>? VideosData;
 
-        public Animation(string albumName, string publishDate, string coverHash, params string[] videoInfo)
-            : base(albumName, publishDate, coverHash, videoInfo)
+        public Animation(string albumName, string publishDate, string coverHash, string videoJson)
+            : base(albumName, publishDate, coverHash, videoJson)
         {
-            VideoInfo = GetObject(VideosJson!);
+            VideosData = GetVideosData(VideosJson!);
         }
 
         public Animation(VideoAlbum videoAlbum)
@@ -91,14 +91,17 @@ namespace IPFSVideo.Models
             PublishDate = videoAlbum.PublishDate;
             CoverHash = videoAlbum.CoverHash;
             VideosJson = videoAlbum.VideosJson;
-
-            VideoInfo = GetObject(VideosJson!);
             VideosData = GetVideosData(VideosJson!);
         }
 
         public Animation()
         {
 
+        }
+
+        public void GetVideosData()
+        {
+            VideosData = GetVideosData(VideosJson!);
         }
 
         public static string GetVideosDataJson(Dictionary<string, FileData> videosData)
@@ -109,6 +112,19 @@ namespace IPFSVideo.Models
         public static Dictionary<string, FileData>? GetVideosData(string videosJson)
         {
             return JsonSerializer.Deserialize<Dictionary<string, FileData>>(videosJson);
+        }
+
+        public string GetInfo()
+        {
+            string info = $"专辑名：{AlbumName} 发布日期：{PublishDate} 封面：{CoverHash}{Environment.NewLine}";
+            if (VideosData != null)
+            {
+                foreach (var video in VideosData)
+                {
+                    info += video.Value.GetInfo() + Environment.NewLine;
+                }
+            }
+            return info;
         }
     }
 

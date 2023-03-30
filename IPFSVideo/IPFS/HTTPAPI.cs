@@ -172,8 +172,6 @@ namespace IPFSVideo
             #endregion
 
             StreamContent content = new(stream);
-            //ProgressableHttpContent progressableHttpContent =
-            //    new ProgressableHttpContent(content, 4096, options.Progress, name, fileLength);
             var response = await UploadGetStreamAsync(BuildCommand("add", null, opts.ToArray()), content, name);
             return await ReadStreamAsync(response, options, name, fileLength);
         }

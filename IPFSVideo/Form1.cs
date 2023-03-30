@@ -1,11 +1,9 @@
 using MyToolkit;
 using LibVLCSharp.Shared;
 using Microsoft.IO;
-using System;
 using SQLite;
 using IPFSVideo.Models;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Windows.Forms;
+using IPFSVideo.Service;
 
 namespace IPFSVideo
 {
@@ -24,14 +22,17 @@ namespace IPFSVideo
         StreamMediaInput? streamMedia;
         #endregion
 
+        #region 数据
         private static readonly string databasePath = "data.db";
         private SQLiteAsyncConnection? sqlconnection;
         public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(databasePath);
         public List<VideoAlbum>? DataSource;
         public List<Animation>? AnimationSource;
+        #endregion
 
         readonly OpenFileDialog fileDialog = new();
         readonly UploadForm uploadForm = new();
+        readonly VideoInfoPageService videoInfoPage;
 
         public Form1()
         {
@@ -44,22 +45,32 @@ namespace IPFSVideo
             mediaPlayer.Stopped += MediaPlayer_Stopped;
             mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             mediaPlayer.Playing += MediaPlayer_Playing;
-
+            var test = new Dictionary<string, FileData>();
+            test.Add("key", new FileData("转台视频.mp4", "QmQYpBaAdjmkqAHsXbfawF7PHUKzNf6o5LVYJUVGfaXyJG", 500));
+            Animation animation = new Animation("animation", "2022-09-11", "Qmb3Ln3gkSthhbNGmSPArwn83wLAfnEQ6pf1JLAq7mv6KJ",
+                Animation.GetVideosDataJson(test));
+            //SQLConnection.InsertAsync(animation);
             InitializeDatabase();
-            //var data = new VideoAlbum("name", "2022-03-22", "112233", "\"vidoe3\":\"hash3\"", "\"vidoe4\":\"hash4\"");
-            var data = new Animation("animation", "2022-03-22", "112233",
-                VideoAlbum.GetJson("video5", "value5"),
-                "\"vidoe4\":\"hash4\"");
-            SQLConnection.InsertAsync(data);
+            PB_Screen.Image = Image.FromStream(new MemoryStream(FileManager.GetFileBinary("autumn.jpg")));
+            videoInfoPage = new VideoInfoPageService(PN_VideoInfo, 20, 100, 140);
+            videoInfoPage.UpdatePage();
         }
 
+        private void TargetProcess_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+                ShowMessage(e.Data);
+        }
+
+        #region 方法
         public async void InitializeDatabase()
         {
             try
             {
                 DataSource = await SQLConnection.Table<VideoAlbum>().ToListAsync();
                 AnimationSource = await SQLConnection.Table<Animation>().ToListAsync();
-                var dd = new Animation(DataSource[0]);
+                foreach (var dataSource in AnimationSource)
+                    dataSource.GetVideosData();
             }
             catch (Exception e)
             {
@@ -69,6 +80,61 @@ namespace IPFSVideo
             }
         }
 
+        private static string GetTimeString(int val)
+        {
+            int hour = val / 3600;
+            val %= 3600;
+            int minute = val / 60;
+            int second = val % 60;
+            return string.Format("{0:00}:{1:00}:{2:00}", hour, minute, second);
+        }
+
+        private void ShowMessage(string? message)
+        {
+            if (message != null)
+                TB_Info.Invoke(new Action(() =>
+                    TB_Info.AppendText($"[{DateTime.Now}] {message}\r\n")));
+        }
+
+        public void Report(TransferProgress value)
+        {
+            TB_Info.Invoke(new Action(() =>
+                TB_Info.AppendText($"[{DateTime.Now}] {value.Name} {(float)value.Bytes / value.AllLength * 100}%\r\n")));
+        }
+
+        private void Play()
+        {
+            streamMedia = new(cache!);
+            video = new(libVLC, streamMedia);
+            mediaPlayer.Play(video);
+            video.Dispose();
+        }
+        #endregion
+
+        #region 控件事件
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            ipfsProcess.TargetProcess.OutputDataReceived += TargetProcess_OutputDataReceived;
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void PN_VideoInfo_SizeChanged(object sender, EventArgs e)
+        {
+            // TB_Data.Text = $"{PN_VideoInfo.Width}:{PN_VideoInfo.Height}";
+            videoInfoPage.PageSizeChanged();
+        }
+
+        private void TM_Play_Tick(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region VLC事件
         private void MediaPlayer_Playing(object? sender, EventArgs e)
         {
             CTB_PlayerTrack.L_Minimum = 0;
@@ -94,52 +160,7 @@ namespace IPFSVideo
         {
             cache?.Dispose();
         }
-
-        private void TM_Play_Tick(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            ipfsProcess.TargetProcess.OutputDataReceived += TargetProcess_OutputDataReceived;
-        }
-
-        private void TargetProcess_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(e.Data))
-                ShowMessage(e.Data);
-        }
-
-        private void ShowMessage(string? message)
-        {
-            if (message != null)
-                TB_Info.Invoke(new Action(() =>
-                    TB_Info.AppendText($"[{DateTime.Now}] {message}\r\n")));
-        }
-
-        public void Report(TransferProgress value)
-        {
-            TB_Info.Invoke(new Action(() =>
-                TB_Info.AppendText($"[{DateTime.Now}] {value.Name} {(float)value.Bytes / value.AllLength * 100}%\r\n")));
-        }
-
-        private static string GetTimeString(int val)
-        {
-            int hour = val / 3600;
-            val %= 3600;
-            int minute = val / 60;
-            int second = val % 60;
-            return string.Format("{0:00}:{1:00}:{2:00}", hour, minute, second);
-        }
-
-        private void Play()
-        {
-            streamMedia = new(cache!);
-            video = new(libVLC, streamMedia);
-            mediaPlayer.Play(video);
-            video.Dispose();
-        }
+        #endregion
 
         #region 按钮
         private async void BTN_Test_ClickAsync(object sender, EventArgs e)
@@ -179,14 +200,12 @@ namespace IPFSVideo
             {
                 if (fileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    AddFileOptions options = new AddFileOptions(this);
                     long fileLength = new FileInfo(fileDialog.FileName).Length;
-
+                    ShowMessage("上传中……");
                     var result = await ipfsApi.
                         AddAsync(FileManager.GetFileStream(fileDialog.FileName),
                         fileDialog.FileName.Split('\\').LastOrDefault("nofile"),
-                        options, fileLength);
-
+                        null, fileLength);
                     ShowMessage(result?.Name);
                     ShowMessage(result?.Cid);
                     ShowMessage(result?.Size.ToString());
@@ -222,19 +241,17 @@ namespace IPFSVideo
             try
             {
                 mediaPlayer.Stop();
-                using (Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text)))
+                using Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
+                cache = streamManager.GetStream();
+                int length;
+                while ((length = stream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    cache = streamManager.GetStream();
-                    int length;
-                    while ((length = stream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        //var pos = cache.Position;
-                        //cache.Position = cache.Length;
-                        await cache.WriteAsync(buffer.AsMemory(0, length));
-                        //cache.Position = pos;
-                    }
-                    await Task.Run(Play);
+                    //var pos = cache.Position;
+                    //cache.Position = cache.Length;
+                    await cache.WriteAsync(buffer.AsMemory(0, length));
+                    //cache.Position = pos;
                 }
+                await Task.Run(Play);
 
             }
             catch (Exception ex)
@@ -249,6 +266,14 @@ namespace IPFSVideo
             uploadForm.ShowDialog();
         }
 
-        
+        private void TSB_Display_Click(object sender, EventArgs e)
+        {
+            foreach (var item in AnimationSource!)
+            {
+                //TB_Data.AppendText(item.GetInfo());
+            }
+        }
+
+
     }
 }

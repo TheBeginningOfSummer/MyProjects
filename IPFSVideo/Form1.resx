@@ -57,13 +57,348 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="TB_Info.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left, Right</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="TB_Info.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 281</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="TB_Info.Multiline" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="TB_Info.ScrollBars" type="System.Windows.Forms.ScrollBars, System.Windows.Forms">
+    <value>Vertical</value>
+  </data>
+  <data name="TB_Info.Size" type="System.Drawing.Size, System.Drawing">
+    <value>767, 115</value>
+  </data>
+  <data name="TB_Info.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;TB_Info.Name" xml:space="preserve">
+    <value>TB_Info</value>
+  </data>
+  <data name="&gt;&gt;TB_Info.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TB_Info.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;TB_Info.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="BTN_Test.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="BTN_Test.Location" type="System.Drawing.Point, System.Drawing">
+    <value>793, 368</value>
+  </data>
+  <data name="BTN_Test.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="BTN_Test.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="BTN_Test.Text" xml:space="preserve">
+    <value>测试</value>
+  </data>
+  <data name="&gt;&gt;BTN_Test.Name" xml:space="preserve">
+    <value>BTN_Test</value>
+  </data>
+  <data name="&gt;&gt;BTN_Test.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;BTN_Test.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;BTN_Test.ZOrder" xml:space="preserve">
+    <value>12</value>
+  </data>
+  <data name="TB_CID.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="TB_CID.Location" type="System.Drawing.Point, System.Drawing">
+    <value>42, 402</value>
+  </data>
+  <data name="TB_CID.Size" type="System.Drawing.Size, System.Drawing">
+    <value>365, 23</value>
+  </data>
+  <data name="TB_CID.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="TB_CID.Text" xml:space="preserve">
+    <value>QmQYpBaAdjmkqAHsXbfawF7PHUKzNf6o5LVYJUVGfaXyJG</value>
+  </data>
+  <data name="&gt;&gt;TB_CID.Name" xml:space="preserve">
+    <value>TB_CID</value>
+  </data>
+  <data name="&gt;&gt;TB_CID.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TB_CID.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;TB_CID.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="BTN_Download.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="BTN_Download.Location" type="System.Drawing.Point, System.Drawing">
+    <value>793, 310</value>
+  </data>
+  <data name="BTN_Download.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="BTN_Download.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="BTN_Download.Text" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="&gt;&gt;BTN_Download.Name" xml:space="preserve">
+    <value>BTN_Download</value>
+  </data>
+  <data name="&gt;&gt;BTN_Download.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;BTN_Download.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;BTN_Download.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="BTN_Upload.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="BTN_Upload.Location" type="System.Drawing.Point, System.Drawing">
+    <value>793, 281</value>
+  </data>
+  <data name="BTN_Upload.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="BTN_Upload.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="BTN_Upload.Text" xml:space="preserve">
+    <value>上传</value>
+  </data>
+  <data name="&gt;&gt;BTN_Upload.Name" xml:space="preserve">
+    <value>BTN_Upload</value>
+  </data>
+  <data name="&gt;&gt;BTN_Upload.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;BTN_Upload.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;BTN_Upload.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="BTN_Play.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
+  <data name="BTN_Play.Location" type="System.Drawing.Point, System.Drawing">
+    <value>793, 339</value>
+  </data>
+  <data name="BTN_Play.Size" type="System.Drawing.Size, System.Drawing">
+    <value>75, 23</value>
+  </data>
+  <data name="BTN_Play.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="BTN_Play.Text" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="&gt;&gt;BTN_Play.Name" xml:space="preserve">
+    <value>BTN_Play</value>
+  </data>
+  <data name="&gt;&gt;BTN_Play.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;BTN_Play.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;BTN_Play.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="LB_CID.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="LB_CID.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="LB_CID.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 405</value>
+  </data>
+  <data name="LB_CID.Size" type="System.Drawing.Size, System.Drawing">
+    <value>32, 17</value>
+  </data>
+  <data name="LB_CID.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="LB_CID.Text" xml:space="preserve">
+    <value>CID:</value>
+  </data>
+  <data name="&gt;&gt;LB_CID.Name" xml:space="preserve">
+    <value>LB_CID</value>
+  </data>
+  <data name="&gt;&gt;LB_CID.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;LB_CID.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;LB_CID.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="TB_Command.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left, Right</value>
+  </data>
+  <data name="TB_Command.Location" type="System.Drawing.Point, System.Drawing">
+    <value>490, 402</value>
+  </data>
+  <data name="TB_Command.Size" type="System.Drawing.Size, System.Drawing">
+    <value>378, 23</value>
+  </data>
+  <data name="TB_Command.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;TB_Command.Name" xml:space="preserve">
+    <value>TB_Command</value>
+  </data>
+  <data name="&gt;&gt;TB_Command.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TB_Command.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;TB_Command.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="LB_Command.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="LB_Command.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="LB_Command.Location" type="System.Drawing.Point, System.Drawing">
+    <value>413, 405</value>
+  </data>
+  <data name="LB_Command.Size" type="System.Drawing.Size, System.Drawing">
+    <value>71, 17</value>
+  </data>
+  <data name="LB_Command.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="LB_Command.Text" xml:space="preserve">
+    <value>Command:</value>
+  </data>
+  <data name="&gt;&gt;LB_Command.Name" xml:space="preserve">
+    <value>LB_Command</value>
+  </data>
+  <data name="&gt;&gt;LB_Command.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;LB_Command.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;LB_Command.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="VV_Screen.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="VV_Screen.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 6</value>
+  </data>
+  <data name="VV_Screen.Size" type="System.Drawing.Size, System.Drawing">
+    <value>658, 253</value>
+  </data>
+  <data name="VV_Screen.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="VV_Screen.Text" xml:space="preserve">
+    <value>videoView1</value>
+  </data>
+  <data name="&gt;&gt;VV_Screen.Name" xml:space="preserve">
+    <value>VV_Screen</value>
+  </data>
+  <data name="&gt;&gt;VV_Screen.Type" xml:space="preserve">
+    <value>LibVLCSharp.WinForms.VideoView, LibVLCSharp.WinForms, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;VV_Screen.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;VV_Screen.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
   <metadata name="TM_Play.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="CTB_PlayerTrack.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left, Right</value>
+  </data>
+  <data name="CTB_PlayerTrack.Location" type="System.Drawing.Point, System.Drawing">
+    <value>116, 265</value>
+  </data>
+  <data name="CTB_PlayerTrack.Size" type="System.Drawing.Size, System.Drawing">
+    <value>549, 10</value>
+  </data>
+  <data name="CTB_PlayerTrack.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="CTB_PlayerTrack.Text" xml:space="preserve">
+    <value>customTrackBar1</value>
+  </data>
+  <data name="&gt;&gt;CTB_PlayerTrack.Name" xml:space="preserve">
+    <value>CTB_PlayerTrack</value>
+  </data>
+  <data name="&gt;&gt;CTB_PlayerTrack.Type" xml:space="preserve">
+    <value>WinFormsLibrary.CustomTrackBar, WinFormsLibrary, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;CTB_PlayerTrack.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;CTB_PlayerTrack.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="LB_Duration.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="LB_Duration.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="LB_Duration.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 262</value>
+  </data>
+  <data name="LB_Duration.Size" type="System.Drawing.Size, System.Drawing">
+    <value>109, 17</value>
+  </data>
+  <data name="LB_Duration.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
+  </data>
+  <data name="LB_Duration.Text" xml:space="preserve">
+    <value>00:00:00/00:00:00</value>
+  </data>
+  <data name="&gt;&gt;LB_Duration.Name" xml:space="preserve">
+    <value>LB_Duration</value>
+  </data>
+  <data name="&gt;&gt;LB_Duration.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;LB_Duration.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;LB_Duration.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>117, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="TSB_UploadSet.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -72,5 +407,231 @@
         CIoBOg0rMTTDMLIhIHbriZeYBmDTiIxBGkEYxge5liQDsGGQqykyAISpZwAlmIEywMAAAAc1/Jwvt6sN
         AAAAAElFTkSuQmCC
 </value>
+  </data>
+  <data name="TSB_UploadSet.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
+    <value>Magenta</value>
+  </data>
+  <data name="TSB_UploadSet.Size" type="System.Drawing.Size, System.Drawing">
+    <value>60, 22</value>
+  </data>
+  <data name="TSB_UploadSet.Text" xml:space="preserve">
+    <value>上传设置</value>
+  </data>
+  <data name="TSB_Display.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACRSURBVDhPY/j27dt/SjDYACcnJ7IwigEf3n8kCZNswPNb
+        J/+f6DYF0yA+yQac6Db5f6hWCmwIiE+mC0wIu2DS2Vf/F1x6DefjwlgNyNr34r/0wkdgTMgQDAOQNRNj
+        CIoBOg0rMTTDMLIhIHbriZeYBmDTiIxBGkEYxge5liQDsGGQqykyAISpZwAlmIEywMAAAAc1/Jwvt6sN
+        AAAAAElFTkSuQmCC
+</value>
+  </data>
+  <data name="TSB_Display.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
+    <value>Magenta</value>
+  </data>
+  <data name="TSB_Display.Size" type="System.Drawing.Size, System.Drawing">
+    <value>36, 22</value>
+  </data>
+  <data name="TSB_Display.Text" xml:space="preserve">
+    <value>显示</value>
+  </data>
+  <data name="toolStrip1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="toolStrip1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>884, 25</value>
+  </data>
+  <data name="toolStrip1.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="toolStrip1.Text" xml:space="preserve">
+    <value>toolStrip1</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.Name" xml:space="preserve">
+    <value>toolStrip1</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;toolStrip1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="TC_Main.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="PB_Screen.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="PB_Screen.Location" type="System.Drawing.Point, System.Drawing">
+    <value>673, 6</value>
+  </data>
+  <data name="PB_Screen.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 269</value>
+  </data>
+  <data name="PB_Screen.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
+    <value>Zoom</value>
+  </data>
+  <data name="PB_Screen.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="&gt;&gt;PB_Screen.Name" xml:space="preserve">
+    <value>PB_Screen</value>
+  </data>
+  <data name="&gt;&gt;PB_Screen.Type" xml:space="preserve">
+    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;PB_Screen.Parent" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;PB_Screen.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="TP_Video.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 26</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="TP_Video.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 3, 3, 3</value>
+  </data>
+  <data name="TP_Video.Size" type="System.Drawing.Size, System.Drawing">
+    <value>876, 502</value>
+  </data>
+  <data name="TP_Video.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="TP_Video.Text" xml:space="preserve">
+    <value>视频</value>
+  </data>
+  <data name="&gt;&gt;TP_Video.Name" xml:space="preserve">
+    <value>TP_Video</value>
+  </data>
+  <data name="&gt;&gt;TP_Video.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TP_Video.Parent" xml:space="preserve">
+    <value>TC_Main</value>
+  </data>
+  <data name="&gt;&gt;TP_Video.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="PN_VideoInfo.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="PN_VideoInfo.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="PN_VideoInfo.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
+  </data>
+  <data name="PN_VideoInfo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>870, 492</value>
+  </data>
+  <data name="PN_VideoInfo.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;PN_VideoInfo.Name" xml:space="preserve">
+    <value>PN_VideoInfo</value>
+  </data>
+  <data name="&gt;&gt;PN_VideoInfo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;PN_VideoInfo.Parent" xml:space="preserve">
+    <value>TP_Data</value>
+  </data>
+  <data name="&gt;&gt;PN_VideoInfo.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="TP_Data.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 26</value>
+  </data>
+  <data name="TP_Data.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>3, 3, 3, 3</value>
+  </data>
+  <data name="TP_Data.Size" type="System.Drawing.Size, System.Drawing">
+    <value>876, 502</value>
+  </data>
+  <data name="TP_Data.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="TP_Data.Text" xml:space="preserve">
+    <value>数据</value>
+  </data>
+  <data name="&gt;&gt;TP_Data.Name" xml:space="preserve">
+    <value>TP_Data</value>
+  </data>
+  <data name="&gt;&gt;TP_Data.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TP_Data.Parent" xml:space="preserve">
+    <value>TC_Main</value>
+  </data>
+  <data name="&gt;&gt;TP_Data.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="TC_Main.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 28</value>
+  </data>
+  <data name="TC_Main.Size" type="System.Drawing.Size, System.Drawing">
+    <value>884, 532</value>
+  </data>
+  <data name="TC_Main.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="&gt;&gt;TC_Main.Name" xml:space="preserve">
+    <value>TC_Main</value>
+  </data>
+  <data name="&gt;&gt;TC_Main.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabControl, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TC_Main.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;TC_Main.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>7, 17</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>884, 561</value>
+  </data>
+  <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
+    <value>800, 500</value>
+  </data>
+  <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
+    <value>CenterScreen</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>IPFS</value>
+  </data>
+  <data name="&gt;&gt;TM_Play.Name" xml:space="preserve">
+    <value>TM_Play</value>
+  </data>
+  <data name="&gt;&gt;TM_Play.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Timer, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TSB_UploadSet.Name" xml:space="preserve">
+    <value>TSB_UploadSet</value>
+  </data>
+  <data name="&gt;&gt;TSB_UploadSet.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TSB_Display.Name" xml:space="preserve">
+    <value>TSB_Display</value>
+  </data>
+  <data name="&gt;&gt;TSB_Display.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>Form1</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
