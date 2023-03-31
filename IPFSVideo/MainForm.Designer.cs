@@ -1,6 +1,6 @@
 ﻿namespace IPFSVideo
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             TB_Info = new TextBox();
             BTN_Test = new Button();
             TB_CID = new TextBox();
@@ -210,13 +210,13 @@
             PN_VideoInfo.Name = "PN_VideoInfo";
             PN_VideoInfo.SizeChanged += PN_VideoInfo_SizeChanged;
             // 
-            // Form1
+            // MainForm
             // 
             resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(toolStrip1);
             Controls.Add(TC_Main);
-            Name = "Form1";
+            Name = "MainForm";
             Load += Form1_Load;
             SizeChanged += Form1_SizeChanged;
             ((System.ComponentModel.ISupportInitialize)VV_Screen).EndInit();

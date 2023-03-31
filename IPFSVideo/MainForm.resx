@@ -63,7 +63,7 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="TB_Info.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 281</value>
+    <value>6, 352</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="TB_Info.Multiline" type="System.Boolean, mscorlib">
@@ -73,7 +73,7 @@
     <value>Vertical</value>
   </data>
   <data name="TB_Info.Size" type="System.Drawing.Size, System.Drawing">
-    <value>767, 115</value>
+    <value>756, 115</value>
   </data>
   <data name="TB_Info.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -94,7 +94,7 @@
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Test.Location" type="System.Drawing.Point, System.Drawing">
-    <value>793, 368</value>
+    <value>768, 439</value>
   </data>
   <data name="BTN_Test.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -121,7 +121,7 @@
     <value>Bottom, Left</value>
   </data>
   <data name="TB_CID.Location" type="System.Drawing.Point, System.Drawing">
-    <value>42, 402</value>
+    <value>42, 473</value>
   </data>
   <data name="TB_CID.Size" type="System.Drawing.Size, System.Drawing">
     <value>365, 23</value>
@@ -148,7 +148,7 @@
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Download.Location" type="System.Drawing.Point, System.Drawing">
-    <value>793, 310</value>
+    <value>768, 381</value>
   </data>
   <data name="BTN_Download.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -175,7 +175,7 @@
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Upload.Location" type="System.Drawing.Point, System.Drawing">
-    <value>793, 281</value>
+    <value>768, 352</value>
   </data>
   <data name="BTN_Upload.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -202,7 +202,7 @@
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Play.Location" type="System.Drawing.Point, System.Drawing">
-    <value>793, 339</value>
+    <value>768, 410</value>
   </data>
   <data name="BTN_Play.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -232,7 +232,7 @@
     <value>True</value>
   </data>
   <data name="LB_CID.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 405</value>
+    <value>6, 476</value>
   </data>
   <data name="LB_CID.Size" type="System.Drawing.Size, System.Drawing">
     <value>32, 17</value>
@@ -259,10 +259,10 @@
     <value>Bottom, Left, Right</value>
   </data>
   <data name="TB_Command.Location" type="System.Drawing.Point, System.Drawing">
-    <value>490, 402</value>
+    <value>490, 473</value>
   </data>
   <data name="TB_Command.Size" type="System.Drawing.Size, System.Drawing">
-    <value>378, 23</value>
+    <value>367, 23</value>
   </data>
   <data name="TB_Command.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -286,7 +286,7 @@
     <value>True</value>
   </data>
   <data name="LB_Command.Location" type="System.Drawing.Point, System.Drawing">
-    <value>413, 405</value>
+    <value>413, 476</value>
   </data>
   <data name="LB_Command.Size" type="System.Drawing.Size, System.Drawing">
     <value>71, 17</value>
@@ -316,7 +316,7 @@
     <value>6, 6</value>
   </data>
   <data name="VV_Screen.Size" type="System.Drawing.Size, System.Drawing">
-    <value>658, 253</value>
+    <value>647, 323</value>
   </data>
   <data name="VV_Screen.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -343,10 +343,10 @@
     <value>Bottom, Left, Right</value>
   </data>
   <data name="CTB_PlayerTrack.Location" type="System.Drawing.Point, System.Drawing">
-    <value>116, 265</value>
+    <value>116, 335</value>
   </data>
   <data name="CTB_PlayerTrack.Size" type="System.Drawing.Size, System.Drawing">
-    <value>549, 10</value>
+    <value>538, 10</value>
   </data>
   <data name="CTB_PlayerTrack.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -373,7 +373,7 @@
     <value>True</value>
   </data>
   <data name="LB_Duration.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 262</value>
+    <value>6, 332</value>
   </data>
   <data name="LB_Duration.Size" type="System.Drawing.Size, System.Drawing">
     <value>109, 17</value>
@@ -466,10 +466,10 @@
     <value>Top, Right</value>
   </data>
   <data name="PB_Screen.Location" type="System.Drawing.Point, System.Drawing">
-    <value>673, 6</value>
+    <value>662, 6</value>
   </data>
   <data name="PB_Screen.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 269</value>
+    <value>195, 323</value>
   </data>
   <data name="PB_Screen.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
     <value>Zoom</value>
@@ -497,7 +497,7 @@
     <value>3, 3, 3, 3</value>
   </data>
   <data name="TP_Video.Size" type="System.Drawing.Size, System.Drawing">
-    <value>876, 502</value>
+    <value>865, 496</value>
   </data>
   <data name="TP_Video.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -517,17 +517,17 @@
   <data name="&gt;&gt;TP_Video.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="PN_VideoInfo.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
   <data name="PN_VideoInfo.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
+  </data>
+  <data name="PN_VideoInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
   </data>
   <data name="PN_VideoInfo.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 3</value>
   </data>
   <data name="PN_VideoInfo.Size" type="System.Drawing.Size, System.Drawing">
-    <value>870, 492</value>
+    <value>859, 490</value>
   </data>
   <data name="PN_VideoInfo.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -551,7 +551,7 @@
     <value>3, 3, 3, 3</value>
   </data>
   <data name="TP_Data.Size" type="System.Drawing.Size, System.Drawing">
-    <value>876, 502</value>
+    <value>865, 496</value>
   </data>
   <data name="TP_Data.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -572,10 +572,10 @@
     <value>1</value>
   </data>
   <data name="TC_Main.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 28</value>
+    <value>4, 28</value>
   </data>
   <data name="TC_Main.Size" type="System.Drawing.Size, System.Drawing">
-    <value>884, 532</value>
+    <value>873, 526</value>
   </data>
   <data name="TC_Main.TabIndex" type="System.Int32, mscorlib">
     <value>15</value>
@@ -594,6 +594,9 @@
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </metadata>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>47</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>7, 17</value>
@@ -629,7 +632,7 @@
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>Form1</value>
+    <value>MainForm</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
     <value>System.Windows.Forms.Form, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

@@ -7,7 +7,7 @@ using IPFSVideo.Service;
 
 namespace IPFSVideo
 {
-    public partial class Form1 : Form, IProgress<TransferProgress>
+    public partial class MainForm : Form, IProgress<TransferProgress>
     {
         readonly ProcessToolkit ipfsProcess = new("ipfs");
         readonly HttpClientAPI ipfsApi = new();
@@ -34,7 +34,7 @@ namespace IPFSVideo
         readonly UploadForm uploadForm = new();
         readonly VideoInfoPageService videoInfoPage;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             Core.Initialize();

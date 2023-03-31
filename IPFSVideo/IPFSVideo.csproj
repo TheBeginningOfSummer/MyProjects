@@ -18,12 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyToolkit\MyToolkit.csproj" />
-    <ProjectReference Include="..\WinFormsLibrary\WinFormsLibrary.csproj" />
+    <Folder Include="libs\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="libs\" />
+    <ProjectReference Include="..\MyToolkit\MyToolkit.csproj" />
+    <ProjectReference Include="..\WinFormsLibrary\WinFormsLibrary.csproj" />
   </ItemGroup>
 
 </Project>

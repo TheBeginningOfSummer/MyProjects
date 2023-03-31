@@ -1,10 +1,5 @@
 ﻿using IPFSVideo.Models;
 using MyToolkit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WinFormsLibrary;
 
 namespace IPFSVideo.Service
@@ -17,13 +12,14 @@ namespace IPFSVideo.Service
 
         private readonly Control _canvas;
         private List<Point> _InfoLocation;
-
+        private MemoryStream _defaultImage;
 
         public VideoInfoPageService(Control canvas, int maxAmount, int pictureWidth, int pictureHeight)
         {
-            _canvas = canvas;
             MaxAmount = maxAmount;
-            _InfoLocation = ControlLayout.SetLocation(10, 10, MaxAmount, 7, 123, 200);
+            _canvas = canvas;
+            _defaultImage = new MemoryStream(FileManager.GetFileBinary("autumn.jpg"));
+            _InfoLocation = ControlLayout.SetLocation(10, 10, MaxAmount, 7, 125, 180);
             for (int i = 0; i < MaxAmount; i++)
             {
                 PictureBox picture = new()
@@ -32,32 +28,33 @@ namespace IPFSVideo.Service
                     Width = pictureWidth,
                     Height = pictureHeight,
                     SizeMode = PictureBoxSizeMode.Zoom,
-                    Image = Image.FromStream(new MemoryStream(FileManager.GetFileBinary("autumn.jpg"))),
+                    Image = Image.FromStream(_defaultImage),
                     Location = _InfoLocation[i],
                     BackColor = Color.Silver
                 };
                 picture.MouseClick += Picture_MouseClick;
                 Covers.Add(picture);
             }
-        }
-
-        private void Picture_MouseClick(object? sender, MouseEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdatePage()
-        {
             for (int i = 0; i < Covers.Count; i++)
             {
                 _canvas.Controls.Add(Covers[i]);
             }
         }
 
+        private void Picture_MouseClick(object? sender, MouseEventArgs e)
+        {
+            
+        }
+
+        public void UpdatePage()
+        {
+            
+        }
+
         public void PageSizeChanged()
         {
             int length = _canvas.Width / 123;
-            _InfoLocation = ControlLayout.SetLocation(10, 10, MaxAmount, length, 123, 200);
+            _InfoLocation = ControlLayout.SetLocation(10, 10, MaxAmount, length, 120, 180);
             for (int i = 0; i < Covers.Count; i++)
             {
                 Covers[i].Location = _InfoLocation[i];
