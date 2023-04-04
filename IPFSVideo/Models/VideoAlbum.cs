@@ -84,6 +84,15 @@ namespace IPFSVideo.Models
             VideosData = GetVideosData(VideosJson!);
         }
 
+        public Animation(VideoAlbum videoAlbum, Dictionary<string, FileData>? videosData)
+        {
+            AlbumName = videoAlbum.AlbumName;
+            PublishDate = videoAlbum.PublishDate;
+            CoverHash = videoAlbum.CoverHash;
+            VideosJson = GetVideosDataJson(videosData!);
+            VideosData = videosData;
+        }
+
         public Animation(VideoAlbum videoAlbum)
         {
             Id = videoAlbum.Id;

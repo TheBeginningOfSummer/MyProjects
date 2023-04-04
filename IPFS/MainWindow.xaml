@@ -6,7 +6,20 @@
         xmlns:local="clr-namespace:IPFS"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+
     <Grid>
+        <TabControl>
+            <TabItem Header="视频">
+                <Grid Background="#FFE5E5E5">
+                    <MediaElement HorizontalAlignment="Left" Height="194" Margin="107,62,0,0" VerticalAlignment="Top" Width="318"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="数据">
+                <Grid Background="#FFE5E5E5">
+                    <DataGrid d:ItemsSource="{d:SampleData ItemCount=5}"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
 
     </Grid>
 </Window>

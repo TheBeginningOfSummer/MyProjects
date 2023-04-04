@@ -181,27 +181,25 @@ namespace IPFSVideo
             FileData? fileData = null;
             if(response != null)
             {
-                using (var sr = new StreamReader(response))
-                using (var jr = new JsonTextReader(sr) { SupportMultipleContent = true })
+                using var sr = new StreamReader(response);
+                using var jr = new JsonTextReader(sr) { SupportMultipleContent = true };
+                while (jr.Read())
                 {
-                    while (jr.Read())
+                    JObject r = await JObject.LoadAsync(jr);
+                    // If a progress report.
+                    if (r.ContainsKey("Bytes"))
                     {
-                        JObject r = await JObject.LoadAsync(jr);
-                        // If a progress report.
-                        if (r.ContainsKey("Bytes"))
+                        options.Progress?.Report(new TransferProgress
                         {
-                            options.Progress?.Report(new TransferProgress
-                            {
-                                Name = (string)r["Name"]!,
-                                Bytes = (ulong)r["Bytes"]!,
-                                AllLength = fileLength
-                            });
-                        }
-                        // Else must be an added file.
-                        else
-                        {
-                            fileData = new FileData(name, (string)r["Hash"]!, long.Parse((string)r["Size"]!));
-                        }
+                            Name = (string)r["Name"]!,
+                            Bytes = (ulong)r["Bytes"]!,
+                            AllLength = fileLength
+                        });
+                    }
+                    // Else must be an added file.
+                    else
+                    {
+                        fileData = new FileData(name, (string)r["Hash"]!, long.Parse((string)r["Size"]!));
                     }
                 }
             }

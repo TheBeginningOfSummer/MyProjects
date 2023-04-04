@@ -209,7 +209,8 @@ namespace IPFSVideo
                     ShowMessage(result?.Name);
                     ShowMessage(result?.Cid);
                     ShowMessage(result?.Size.ToString());
-
+                    //Animation animation = new Animation("testAlbum","2023-04-04",);
+                    //SQLConnection.InsertAsync
                     //var resultDic = VideoAlbum.GetObject(result);
                     //var data = new Animation("animation", "2022-03-22", "112233",
                     //VideoAlbum.GetJson("video5", "value5"),
