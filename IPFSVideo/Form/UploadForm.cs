@@ -96,12 +96,13 @@ namespace IPFSVideo
                             AddAsync(FileManager.GetFileStream(path), fileName, null, fileLength);
                         if (result != null)
                         {
-                            videoDic.Add(fileName, result);
+                            if (!videoDic.ContainsKey(fileName))
+                                videoDic.Add(fileName, result);
                         }
                     }
                     ShowMessage("上传完成");
                     Animation animation = new Animation(album, videoDic);
-                    await SQLConnection.InsertOrReplaceAsync(animation);
+                    await SQLConnection.InsertAsync(animation);
                 }
             }
             catch (Exception ex)

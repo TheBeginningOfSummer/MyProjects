@@ -32,6 +32,7 @@ namespace IPFSVideo.Models
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
+        [Unique]
         public string? AlbumName { get; set; }
         public string? PublishDate { get; set; }
         public string? CoverHash { get; set; }

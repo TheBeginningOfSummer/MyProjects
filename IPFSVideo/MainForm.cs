@@ -45,15 +45,11 @@ namespace IPFSVideo
             mediaPlayer.Stopped += MediaPlayer_Stopped;
             mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             mediaPlayer.Playing += MediaPlayer_Playing;
-            var test = new Dictionary<string, FileData>();
-            test.Add("key", new FileData("×ªÌ¨ÊÓÆµ.mp4", "QmQYpBaAdjmkqAHsXbfawF7PHUKzNf6o5LVYJUVGfaXyJG", 500));
-            Animation animation = new Animation("animation", "2022-09-11", "Qmb3Ln3gkSthhbNGmSPArwn83wLAfnEQ6pf1JLAq7mv6KJ",
-                Animation.GetVideosDataJson(test));
-            //SQLConnection.InsertAsync(animation);
+            
             InitializeDatabase();
-            PB_Screen.Image = Image.FromStream(new MemoryStream(FileManager.GetFileBinary("autumn.jpg")));
+            //PB_Screen.Image = Image.FromStream(new MemoryStream(FileManager.GetFileBinary("autumn.jpg")));
             videoInfoPage = new VideoInfoPageService(PN_VideoInfo, 20, 100, 140);
-            videoInfoPage.UpdatePage();
+            
         }
 
         private void TargetProcess_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
@@ -72,10 +68,10 @@ namespace IPFSVideo
                 foreach (var dataSource in AnimationSource)
                     dataSource.GetVideosData();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                if (e.Message == "no such table: VideoAlbum")
-                    await SQLConnection.CreateTableAsync<VideoAlbum>();
+                //if (e.Message == "no such table: VideoAlbum")
+                await SQLConnection.CreateTableAsync<VideoAlbum>();
                 await SQLConnection.CreateTableAsync<Animation>();
             }
         }
@@ -267,12 +263,9 @@ namespace IPFSVideo
             uploadForm.ShowDialog();
         }
 
-        private void TSB_Display_Click(object sender, EventArgs e)
+        private async void TSB_Display_Click(object sender, EventArgs e)
         {
-            foreach (var item in AnimationSource!)
-            {
-                //TB_Data.AppendText(item.GetInfo());
-            }
+            await videoInfoPage.UpdatePageAsync(AnimationSource);
         }
 
 
