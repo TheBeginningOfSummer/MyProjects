@@ -101,7 +101,7 @@ namespace IPFSVideo
                         }
                     }
                     ShowMessage("上传完成");
-                    Animation animation = new Animation(album, videoDic);
+                    Animation animation = new(album, videoDic);
                     await SQLConnection.InsertAsync(animation);
                 }
             }

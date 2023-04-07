@@ -33,6 +33,7 @@ namespace IPFSVideo
         readonly OpenFileDialog fileDialog = new();
         readonly UploadForm uploadForm = new();
         readonly VideoInfoPageService videoInfoPage;
+        private DetailsForm detailsForm = new();
 
         public MainForm()
         {
@@ -49,7 +50,27 @@ namespace IPFSVideo
             InitializeDatabase();
             //PB_Screen.Image = Image.FromStream(new MemoryStream(FileManager.GetFileBinary("autumn.jpg")));
             videoInfoPage = new VideoInfoPageService(PN_VideoInfo, 20, 100, 140);
-            
+            foreach (var cover in videoInfoPage.Covers)
+            {
+                cover.MouseClick += Cover_MouseClick;
+            }
+        }
+
+        private void Cover_MouseClick(object? sender, MouseEventArgs e)
+        {
+            detailsForm = new();
+            PictureBox? picture = sender as PictureBox;
+
+            if (picture!.Tag is Animation animation)
+            {
+                int i = 0;
+                foreach (var item in animation.VideosData!)
+                {
+                    detailsForm.AddLinks(item.Value.Cid!, new Point(0, i * 20));
+                    i++;
+                }
+                detailsForm.ShowDialog();
+            }
         }
 
         private void TargetProcess_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
@@ -265,7 +286,14 @@ namespace IPFSVideo
 
         private async void TSB_Display_Click(object sender, EventArgs e)
         {
-            await videoInfoPage.UpdatePageAsync(AnimationSource);
+            try
+            {
+                await videoInfoPage.UpdatePageAsync(AnimationSource!);
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message);
+            }
         }
 
 
