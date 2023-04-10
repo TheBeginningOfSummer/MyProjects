@@ -29,25 +29,11 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            linkLabel1 = new LinkLabel();
             CMS_RightClick = new ContextMenuStrip(components);
             复制ToolStripMenuItem = new ToolStripMenuItem();
             PN_DetailsPanel = new Panel();
             CMS_RightClick.SuspendLayout();
-            PN_DetailsPanel.SuspendLayout();
             SuspendLayout();
-            // 
-            // linkLabel1
-            // 
-            linkLabel1.AutoSize = true;
-            linkLabel1.ContextMenuStrip = CMS_RightClick;
-            linkLabel1.Location = new Point(3, 397);
-            linkLabel1.Name = "linkLabel1";
-            linkLabel1.Size = new Size(66, 17);
-            linkLabel1.TabIndex = 1;
-            linkLabel1.TabStop = true;
-            linkLabel1.Text = "linkLabel1";
-            linkLabel1.LinkClicked += LinkLabel_LinkClicked;
             // 
             // CMS_RightClick
             // 
@@ -65,7 +51,6 @@
             // PN_DetailsPanel
             // 
             PN_DetailsPanel.AutoScroll = true;
-            PN_DetailsPanel.Controls.Add(linkLabel1);
             PN_DetailsPanel.Location = new Point(12, 12);
             PN_DetailsPanel.Name = "PN_DetailsPanel";
             PN_DetailsPanel.Size = new Size(776, 426);
@@ -82,13 +67,10 @@
             Text = "DetailsForm";
             FormClosing += DetailsForm_FormClosing;
             CMS_RightClick.ResumeLayout(false);
-            PN_DetailsPanel.ResumeLayout(false);
-            PN_DetailsPanel.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
-        public LinkLabel linkLabel1;
         private ContextMenuStrip CMS_RightClick;
         private ToolStripMenuItem 复制ToolStripMenuItem;
         private Panel PN_DetailsPanel;

@@ -10,6 +10,8 @@ namespace IPFSVideo
         readonly VideoAlbum album = new();
         readonly Dictionary<string, FileData> videoDic = new();
 
+        public Action? Uploaded;
+
         #region 数据
         private static readonly string databasePath = "data.db";
         private SQLiteAsyncConnection? sqlconnection;
@@ -104,6 +106,8 @@ namespace IPFSVideo
                     Animation animation = new(album, videoDic);
                     await SQLConnection.InsertAsync(animation);
                 }
+                //重读数据库并刷新界面
+                Uploaded?.Invoke();
             }
             catch (Exception ex)
             {

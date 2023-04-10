@@ -67,6 +67,7 @@ namespace IPFSVideo.Service
                 if (animation.Count <= i) continue;
                 Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", animation[i].CoverHash));
                 Covers[i].Image = Image.FromStream(stream);
+                animation[i].GetVideosData();
                 Covers[i].Tag = animation[i];
                 Labels[i].Text = $"{animation[i].AlbumName}\n{animation[i].PublishDate}";
             }

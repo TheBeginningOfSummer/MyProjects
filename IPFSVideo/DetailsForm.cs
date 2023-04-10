@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.LinkLabel;
 
 namespace IPFSVideo
 {
@@ -31,6 +32,17 @@ namespace IPFSVideo
             link.LinkClicked += LinkLabel_LinkClicked;
             PN_DetailsPanel.Controls.Add(link);
             Links.Add(link);
+        }
+
+        public void AddLabels(string text, Point point)
+        {
+            var label = new Label()
+            {
+                Text = text,
+                Location = point,
+                Width = 200
+            };
+            PN_DetailsPanel.Controls.Add(label);
         }
 
         public void UpdateControls()

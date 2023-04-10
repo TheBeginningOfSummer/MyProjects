@@ -46,27 +46,31 @@ namespace IPFSVideo
             mediaPlayer.Stopped += MediaPlayer_Stopped;
             mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             mediaPlayer.Playing += MediaPlayer_Playing;
-            
-            InitializeDatabase();
-            //PB_Screen.Image = Image.FromStream(new MemoryStream(FileManager.GetFileBinary("autumn.jpg")));
+
             videoInfoPage = new VideoInfoPageService(PN_VideoInfo, 20, 100, 140);
+            Task.Run(async () =>
+            {
+                await InitializeDatabase();
+                await videoInfoPage.UpdatePageAsync(AnimationSource!);
+            });
             foreach (var cover in videoInfoPage.Covers)
             {
                 cover.MouseClick += Cover_MouseClick;
             }
+            uploadForm.Uploaded += UploadedAsync;
         }
 
         private void Cover_MouseClick(object? sender, MouseEventArgs e)
         {
             detailsForm = new();
             PictureBox? picture = sender as PictureBox;
-
             if (picture!.Tag is Animation animation)
             {
                 int i = 0;
                 foreach (var item in animation.VideosData!)
                 {
-                    detailsForm.AddLinks(item.Value.Cid!, new Point(0, i * 20));
+                    detailsForm.AddLabels(item.Value.Name!, new Point(0, i * 20));
+                    detailsForm.AddLinks(item.Value.Cid!, new Point(200, i * 20));
                     i++;
                 }
                 detailsForm.ShowDialog();
@@ -80,7 +84,7 @@ namespace IPFSVideo
         }
 
         #region ·½·¨
-        public async void InitializeDatabase()
+        public async Task InitializeDatabase()
         {
             try
             {
@@ -139,15 +143,21 @@ namespace IPFSVideo
 
         }
 
+        private void TM_Play_Tick(object sender, EventArgs e)
+        {
+
+        }
+
         private void PN_VideoInfo_SizeChanged(object sender, EventArgs e)
         {
             // TB_Data.Text = $"{PN_VideoInfo.Width}:{PN_VideoInfo.Height}";
             videoInfoPage.PageSizeChanged();
         }
 
-        private void TM_Play_Tick(object sender, EventArgs e)
+        private async void UploadedAsync()
         {
-
+            AnimationSource = await SQLConnection.Table<Animation>().ToListAsync();
+            await videoInfoPage.UpdatePageAsync(AnimationSource!);
         }
         #endregion
 
@@ -277,7 +287,6 @@ namespace IPFSVideo
                 ShowMessage(ex.Message);
             }
         }
-        #endregion
 
         private void TSB_UploadSet_Click(object sender, EventArgs e)
         {
@@ -295,6 +304,9 @@ namespace IPFSVideo
                 ShowMessage(ex.Message);
             }
         }
+        #endregion
+
+
 
 
     }
