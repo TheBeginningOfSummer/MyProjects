@@ -29,7 +29,7 @@ namespace IPFSVideo
         {
             try
             {
-                DataSource = await SQLConnection.Table<VideoAlbum>().ToListAsync();
+                //DataSource = await SQLConnection.Table<VideoAlbum>().ToListAsync();
                 AnimationSource = await SQLConnection.Table<Animation>().ToListAsync();
                 foreach (var dataSource in AnimationSource)
                     dataSource.GetVideosData();
@@ -37,8 +37,7 @@ namespace IPFSVideo
             catch (Exception e)
             {
                 if (e.Message == "no such table: VideoAlbum")
-                    await SQLConnection.CreateTableAsync<VideoAlbum>();
-                await SQLConnection.CreateTableAsync<Animation>();
+                    await SQLConnection.CreateTableAsync<Animation>();
             }
         }
 
@@ -85,13 +84,16 @@ namespace IPFSVideo
                 if (TB_PublishDate.Text == "") return;
                 album.AlbumName = TB_AlbumName.Text;
                 album.PublishDate = TB_PublishDate.Text;
-                videoDic.Clear();
                 OFD_OpenFile.Filter = "mp4视频|*.mp4";
+                videoDic.Clear();
+
                 if (OFD_OpenFile.ShowDialog() == DialogResult.OK)
                 {
                     foreach (var path in OFD_OpenFile.FileNames)
                     {
+                        //文件名
                         string fileName = path.Split('\\').LastOrDefault("nofile");
+                        //文件长度
                         long fileLength = new FileInfo(path).Length;
                         ShowMessage($"{fileName}上传中……");
                         var result = await ipfsApi.

@@ -1,6 +1,5 @@
 ﻿using SQLite;
 using System.Text.Json;
-using System.Windows.Forms;
 
 namespace IPFSVideo.Models
 {
@@ -26,6 +25,7 @@ namespace IPFSVideo.Models
         {
             return $"{Name} {Cid} {Size}";
         }
+
     }
 
     public class VideoAlbum
@@ -51,28 +51,6 @@ namespace IPFSVideo.Models
 
         }
 
-        public static string GetJson(string key, string value)
-        {
-            return $"\"{key}\":\"{value}\"";
-        }
-
-        public static string[] GetJson(Dictionary<string, string> keyValueInfo)
-        {
-            List<string> infolist = new();
-            foreach (var info in keyValueInfo)
-                infolist.Add($"\"{info.Key}\":\"{info.Value}\"");
-            return infolist.ToArray();
-        }
-
-        public static Dictionary<string, string>? GetObject(string jsonString)
-        {
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonString);
-        }
-
-        public static async Task<Dictionary<string, string>?> GetObjectAsync(Stream jsonStream)
-        {
-            return await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(jsonStream);
-        }
     }
 
     public class Animation : VideoAlbum
@@ -84,7 +62,11 @@ namespace IPFSVideo.Models
         {
             VideosData = GetVideosData(VideosJson!);
         }
-
+        /// <summary>
+        /// 用于存储，得到可存储的VideoAlbum数据
+        /// </summary>
+        /// <param name="videoAlbum">专辑数据</param>
+        /// <param name="videosData">视频链接数据</param>
         public Animation(VideoAlbum videoAlbum, Dictionary<string, FileData>? videosData)
         {
             AlbumName = videoAlbum.AlbumName;
@@ -93,7 +75,10 @@ namespace IPFSVideo.Models
             VideosJson = GetVideosDataJson(videosData!);
             VideosData = videosData;
         }
-
+        /// <summary>
+        /// 用于读取，得到Animation数据
+        /// </summary>
+        /// <param name="videoAlbum">专辑数据</param>
         public Animation(VideoAlbum videoAlbum)
         {
             Id = videoAlbum.Id;
@@ -109,19 +94,30 @@ namespace IPFSVideo.Models
 
         }
 
-        public void GetVideosData()
-        {
-            VideosData = GetVideosData(VideosJson!);
-        }
-
+        /// <summary>
+        /// 字典转为Json数据数据
+        /// </summary>
+        /// <param name="videosData">视频字典列表</param>
+        /// <returns></returns>
         public static string GetVideosDataJson(Dictionary<string, FileData> videosData)
         {
             return JsonSerializer.Serialize(videosData);
         }
-
+        /// <summary>
+        /// Json转为字典数据
+        /// </summary>
+        /// <param name="videosJson">Json数据</param>
+        /// <returns></returns>
         public static Dictionary<string, FileData>? GetVideosData(string videosJson)
         {
             return JsonSerializer.Deserialize<Dictionary<string, FileData>>(videosJson);
+        }
+        /// <summary>
+        /// Json转为字典数据
+        /// </summary>
+        public void GetVideosData()
+        {
+            VideosData = GetVideosData(VideosJson!);
         }
 
         public string GetInfo()
@@ -130,9 +126,7 @@ namespace IPFSVideo.Models
             if (VideosData != null)
             {
                 foreach (var video in VideosData)
-                {
                     info += video.Value.GetInfo() + Environment.NewLine;
-                }
             }
             return info;
         }

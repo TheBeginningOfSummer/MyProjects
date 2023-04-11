@@ -30,9 +30,17 @@ namespace IPFSVideo
         public List<Animation>? AnimationSource;
         #endregion
 
-        readonly OpenFileDialog fileDialog = new();
+        /// <summary>
+        /// 上传页面
+        /// </summary>
         readonly UploadForm uploadForm = new();
-        readonly VideoInfoPageService videoInfoPage;
+        /// <summary>
+        /// 专辑信息页管理
+        /// </summary>
+        readonly AlbumInfoPageService albumInfoPage;
+        /// <summary>
+        /// 详情页面
+        /// </summary>
         private DetailsForm detailsForm = new();
 
         public MainForm()
@@ -47,34 +55,17 @@ namespace IPFSVideo
             mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             mediaPlayer.Playing += MediaPlayer_Playing;
 
-            videoInfoPage = new VideoInfoPageService(PN_VideoInfo, 20, 100, 140);
+            albumInfoPage = new AlbumInfoPageService(PN_VideoInfo, 20, 100, 140);
             Task.Run(async () =>
             {
                 await InitializeDatabase();
-                await videoInfoPage.UpdatePageAsync(AnimationSource!);
+                await albumInfoPage.UpdatePageAsync(AnimationSource!);
             });
-            foreach (var cover in videoInfoPage.Covers)
+            foreach (var cover in albumInfoPage.Covers)
             {
                 cover.MouseClick += Cover_MouseClick;
             }
             uploadForm.Uploaded += UploadedAsync;
-        }
-
-        private void Cover_MouseClick(object? sender, MouseEventArgs e)
-        {
-            detailsForm = new();
-            PictureBox? picture = sender as PictureBox;
-            if (picture!.Tag is Animation animation)
-            {
-                int i = 0;
-                foreach (var item in animation.VideosData!)
-                {
-                    detailsForm.AddLabels(item.Value.Name!, new Point(0, i * 20));
-                    detailsForm.AddLinks(item.Value.Cid!, new Point(200, i * 20));
-                    i++;
-                }
-                detailsForm.ShowDialog();
-            }
         }
 
         private void TargetProcess_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
@@ -150,14 +141,31 @@ namespace IPFSVideo
 
         private void PN_VideoInfo_SizeChanged(object sender, EventArgs e)
         {
-            // TB_Data.Text = $"{PN_VideoInfo.Width}:{PN_VideoInfo.Height}";
-            videoInfoPage.PageSizeChanged();
+            albumInfoPage.PageSizeChanged();
         }
-
+        //图片点击
+        private void Cover_MouseClick(object? sender, MouseEventArgs e)
+        {
+            PictureBox? picture = sender as PictureBox;
+            //如果PictureBox的Tag为Animation且不为空
+            if (picture!.Tag is Animation animation)
+            {
+                detailsForm = new();
+                int i = 0;
+                foreach (var item in animation.VideosData!)
+                {
+                    detailsForm.AddLabels(item.Value.Name!, new Point(0, i * 20));
+                    detailsForm.AddLinks(item.Value.Cid!, new Point(200, i * 20));
+                    i++;
+                }
+                detailsForm.ShowDialog();
+            }
+        }
+        //上传完成
         private async void UploadedAsync()
         {
             AnimationSource = await SQLConnection.Table<Animation>().ToListAsync();
-            await videoInfoPage.UpdatePageAsync(AnimationSource!);
+            await albumInfoPage.UpdatePageAsync(AnimationSource!);
         }
         #endregion
 
@@ -221,29 +229,11 @@ namespace IPFSVideo
             }
         }
 
-        private async void BTN_Upload_ClickAsync(object sender, EventArgs e)
+        private void BTN_Upload_ClickAsync(object sender, EventArgs e)
         {
             try
             {
-                if (fileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    long fileLength = new FileInfo(fileDialog.FileName).Length;
-                    ShowMessage("上传中……");
-                    var result = await ipfsApi.
-                        AddAsync(FileManager.GetFileStream(fileDialog.FileName),
-                        fileDialog.FileName.Split('\\').LastOrDefault("nofile"),
-                        null, fileLength);
-                    ShowMessage(result?.Name);
-                    ShowMessage(result?.Cid);
-                    ShowMessage(result?.Size.ToString());
-                    //Animation animation = new Animation("testAlbum","2023-04-04",);
-                    //SQLConnection.InsertAsync
-                    //var resultDic = VideoAlbum.GetObject(result);
-                    //var data = new Animation("animation", "2022-03-22", "112233",
-                    //VideoAlbum.GetJson("video5", "value5"),
-                    //"\"vidoe4\":\"hash4\"");
-                    //await SQLConnection.InsertAsync(data);
-                }
+
             }
             catch (Exception ex)
             {
@@ -293,11 +283,11 @@ namespace IPFSVideo
             uploadForm.ShowDialog();
         }
 
-        private async void TSB_Display_Click(object sender, EventArgs e)
+        private async void TSB_AlbumUpdate_Click(object sender, EventArgs e)
         {
             try
             {
-                await videoInfoPage.UpdatePageAsync(AnimationSource!);
+                await albumInfoPage.UpdatePageAsync(AnimationSource!);
             }
             catch (Exception ex)
             {

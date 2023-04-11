@@ -43,16 +43,16 @@
             TM_Play = new System.Windows.Forms.Timer(components);
             CTB_PlayerTrack = new WinFormsLibrary.CustomTrackBar();
             LB_Duration = new Label();
-            toolStrip1 = new ToolStrip();
+            TSP_菜单 = new ToolStrip();
             TSB_UploadSet = new ToolStripButton();
-            TSB_Display = new ToolStripButton();
+            TSB_AlbumUpdate = new ToolStripButton();
             TC_Main = new TabControl();
             TP_Video = new TabPage();
             PB_Screen = new PictureBox();
             TP_Data = new TabPage();
             PN_VideoInfo = new Panel();
             ((System.ComponentModel.ISupportInitialize)VV_Screen).BeginInit();
-            toolStrip1.SuspendLayout();
+            TSP_菜单.SuspendLayout();
             TC_Main.SuspendLayout();
             TP_Video.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
@@ -142,12 +142,12 @@
             resources.ApplyResources(LB_Duration, "LB_Duration");
             LB_Duration.Name = "LB_Duration";
             // 
-            // toolStrip1
+            // TSP_菜单
             // 
-            toolStrip1.GripStyle = ToolStripGripStyle.Hidden;
-            toolStrip1.Items.AddRange(new ToolStripItem[] { TSB_UploadSet, TSB_Display });
-            resources.ApplyResources(toolStrip1, "toolStrip1");
-            toolStrip1.Name = "toolStrip1";
+            TSP_菜单.GripStyle = ToolStripGripStyle.Hidden;
+            TSP_菜单.Items.AddRange(new ToolStripItem[] { TSB_UploadSet, TSB_AlbumUpdate });
+            resources.ApplyResources(TSP_菜单, "TSP_菜单");
+            TSP_菜单.Name = "TSP_菜单";
             // 
             // TSB_UploadSet
             // 
@@ -156,12 +156,12 @@
             TSB_UploadSet.Name = "TSB_UploadSet";
             TSB_UploadSet.Click += TSB_UploadSet_Click;
             // 
-            // TSB_Display
+            // TSB_AlbumUpdate
             // 
-            TSB_Display.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            resources.ApplyResources(TSB_Display, "TSB_Display");
-            TSB_Display.Name = "TSB_Display";
-            TSB_Display.Click += TSB_Display_Click;
+            TSB_AlbumUpdate.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            resources.ApplyResources(TSB_AlbumUpdate, "TSB_AlbumUpdate");
+            TSB_AlbumUpdate.Name = "TSB_AlbumUpdate";
+            TSB_AlbumUpdate.Click += TSB_AlbumUpdate_Click;
             // 
             // TC_Main
             // 
@@ -214,14 +214,14 @@
             // 
             resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(toolStrip1);
+            Controls.Add(TSP_菜单);
             Controls.Add(TC_Main);
             Name = "MainForm";
             Load += Form1_Load;
             SizeChanged += Form1_SizeChanged;
             ((System.ComponentModel.ISupportInitialize)VV_Screen).EndInit();
-            toolStrip1.ResumeLayout(false);
-            toolStrip1.PerformLayout();
+            TSP_菜单.ResumeLayout(false);
+            TSP_菜单.PerformLayout();
             TC_Main.ResumeLayout(false);
             TP_Video.ResumeLayout(false);
             TP_Video.PerformLayout();
@@ -246,12 +246,12 @@
         private System.Windows.Forms.Timer TM_Play;
         private WinFormsLibrary.CustomTrackBar CTB_PlayerTrack;
         private Label LB_Duration;
-        private ToolStrip toolStrip1;
+        private ToolStrip TSP_菜单;
         private ToolStripButton TSB_UploadSet;
         private TabControl TC_Main;
         private TabPage TP_Video;
         private TabPage TP_Data;
-        private ToolStripButton TSB_Display;
+        private ToolStripButton TSB_AlbumUpdate;
         private Panel PN_VideoInfo;
         private PictureBox PB_Screen;
     }
