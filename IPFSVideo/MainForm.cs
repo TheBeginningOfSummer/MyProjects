@@ -202,7 +202,6 @@ namespace IPFSVideo
         {
             try
             {
-                //Media video = new(libVLC, "QmZNA91PGEA2HyqsdNBjmQqKvVkvD97We613apZrWoLvRx.mp4", FromType.FromPath);
                 //video.AddOption($":sout=#rtp{{sdp = rtsp://127.0.0.1:8554/video}} :sout-all :sout-keep");
                 string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text, TB_CID.Text));
                 ShowMessage(result.ToString());
@@ -220,7 +219,6 @@ namespace IPFSVideo
                 //}
 
                 //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", $"http://localhost:8080/ipfs/{TB_CID.Text}");
-
             }
             catch (Exception)
             {
@@ -241,12 +239,12 @@ namespace IPFSVideo
             }
         }
 
-        private async void BTN_Download_ClickAsync(object sender, EventArgs e)
+        private void BTN_Download_ClickAsync(object sender, EventArgs e)
         {
             try
             {
-                Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
-                PB_Screen.Image = Image.FromStream(stream);
+                //Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
+                //PB_Screen.Image = Image.FromStream(stream);
             }
             catch (Exception ex)
             {

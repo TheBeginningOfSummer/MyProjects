@@ -43,16 +43,16 @@
             RB_Rectangle = new RadioButton();
             RB_Circle = new RadioButton();
             TC_Main = new TabControl();
-            TB_CV = new TabPage();
+            TP_CV = new TabPage();
+            BTN_CVStop = new Button();
             BTN_LocalCamera = new Button();
             GB_Test = new GroupBox();
             GB_FigureSelect = new GroupBox();
-            tabPage2 = new TabPage();
-            BTN_CVStop = new Button();
+            TP_设置 = new TabPage();
             ((System.ComponentModel.ISupportInitialize)PB_MyPicture).BeginInit();
             GB_ConsoleTest.SuspendLayout();
             TC_Main.SuspendLayout();
-            TB_CV.SuspendLayout();
+            TP_CV.SuspendLayout();
             GB_Test.SuspendLayout();
             GB_FigureSelect.SuspendLayout();
             SuspendLayout();
@@ -201,8 +201,8 @@
             // 
             // TC_Main
             // 
-            TC_Main.Controls.Add(TB_CV);
-            TC_Main.Controls.Add(tabPage2);
+            TC_Main.Controls.Add(TP_CV);
+            TC_Main.Controls.Add(TP_设置);
             TC_Main.Dock = DockStyle.Fill;
             TC_Main.Location = new Point(0, 0);
             TC_Main.Name = "TC_Main";
@@ -210,24 +210,34 @@
             TC_Main.Size = new Size(884, 481);
             TC_Main.TabIndex = 13;
             // 
-            // TB_CV
+            // TP_CV
             // 
-            TB_CV.Controls.Add(BTN_CVStop);
-            TB_CV.Controls.Add(BTN_LocalCamera);
-            TB_CV.Controls.Add(GB_Test);
-            TB_CV.Controls.Add(GB_FigureSelect);
-            TB_CV.Controls.Add(PB_MyPicture);
-            TB_CV.Controls.Add(TB_Info);
-            TB_CV.Controls.Add(BTN_ReadVideo);
-            TB_CV.Controls.Add(GB_ConsoleTest);
-            TB_CV.Controls.Add(BTN_ReadImage);
-            TB_CV.Location = new Point(4, 26);
-            TB_CV.Name = "TB_CV";
-            TB_CV.Padding = new Padding(3);
-            TB_CV.Size = new Size(876, 451);
-            TB_CV.TabIndex = 0;
-            TB_CV.Text = "CV";
-            TB_CV.UseVisualStyleBackColor = true;
+            TP_CV.Controls.Add(BTN_CVStop);
+            TP_CV.Controls.Add(BTN_LocalCamera);
+            TP_CV.Controls.Add(GB_Test);
+            TP_CV.Controls.Add(GB_FigureSelect);
+            TP_CV.Controls.Add(PB_MyPicture);
+            TP_CV.Controls.Add(TB_Info);
+            TP_CV.Controls.Add(BTN_ReadVideo);
+            TP_CV.Controls.Add(GB_ConsoleTest);
+            TP_CV.Controls.Add(BTN_ReadImage);
+            TP_CV.Location = new Point(4, 26);
+            TP_CV.Name = "TP_CV";
+            TP_CV.Padding = new Padding(3);
+            TP_CV.Size = new Size(876, 451);
+            TP_CV.TabIndex = 0;
+            TP_CV.Text = "CV";
+            TP_CV.UseVisualStyleBackColor = true;
+            // 
+            // BTN_CVStop
+            // 
+            BTN_CVStop.Location = new Point(795, 391);
+            BTN_CVStop.Name = "BTN_CVStop";
+            BTN_CVStop.Size = new Size(75, 23);
+            BTN_CVStop.TabIndex = 16;
+            BTN_CVStop.Text = "停止";
+            BTN_CVStop.UseVisualStyleBackColor = true;
+            BTN_CVStop.Click += BTN_CVStop_Click;
             // 
             // BTN_LocalCamera
             // 
@@ -265,25 +275,15 @@
             GB_FigureSelect.TabStop = false;
             GB_FigureSelect.Text = "图形";
             // 
-            // tabPage2
+            // TP_设置
             // 
-            tabPage2.Location = new Point(4, 26);
-            tabPage2.Name = "tabPage2";
-            tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(876, 451);
-            tabPage2.TabIndex = 1;
-            tabPage2.Text = "tabPage2";
-            tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // BTN_CVStop
-            // 
-            BTN_CVStop.Location = new Point(795, 391);
-            BTN_CVStop.Name = "BTN_CVStop";
-            BTN_CVStop.Size = new Size(75, 23);
-            BTN_CVStop.TabIndex = 16;
-            BTN_CVStop.Text = "停止";
-            BTN_CVStop.UseVisualStyleBackColor = true;
-            BTN_CVStop.Click += BTN_CVStop_Click;
+            TP_设置.Location = new Point(4, 26);
+            TP_设置.Name = "TP_设置";
+            TP_设置.Padding = new Padding(3);
+            TP_设置.Size = new Size(876, 451);
+            TP_设置.TabIndex = 1;
+            TP_设置.Text = "设置";
+            TP_设置.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -299,8 +299,8 @@
             GB_ConsoleTest.ResumeLayout(false);
             GB_ConsoleTest.PerformLayout();
             TC_Main.ResumeLayout(false);
-            TB_CV.ResumeLayout(false);
-            TB_CV.PerformLayout();
+            TP_CV.ResumeLayout(false);
+            TP_CV.PerformLayout();
             GB_Test.ResumeLayout(false);
             GB_FigureSelect.ResumeLayout(false);
             GB_FigureSelect.PerformLayout();
@@ -324,10 +324,10 @@
         private RadioButton RB_Rectangle;
         private RadioButton RB_Circle;
         private TabControl TC_Main;
-        private TabPage TB_CV;
+        private TabPage TP_CV;
         private GroupBox GB_Test;
         private GroupBox GB_FigureSelect;
-        private TabPage tabPage2;
+        private TabPage TP_设置;
         private Button BTN_LocalCamera;
         private Button BTN_CVStop;
     }

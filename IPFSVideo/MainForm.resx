@@ -63,7 +63,7 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="TB_Info.Location" type="System.Drawing.Point, System.Drawing">
-    <value>6, 352</value>
+    <value>6, 357</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="TB_Info.Multiline" type="System.Boolean, mscorlib">
@@ -73,7 +73,7 @@
     <value>Vertical</value>
   </data>
   <data name="TB_Info.Size" type="System.Drawing.Size, System.Drawing">
-    <value>756, 115</value>
+    <value>772, 110</value>
   </data>
   <data name="TB_Info.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -88,13 +88,13 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;TB_Info.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>8</value>
   </data>
   <data name="BTN_Test.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Test.Location" type="System.Drawing.Point, System.Drawing">
-    <value>768, 439</value>
+    <value>784, 444</value>
   </data>
   <data name="BTN_Test.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -115,7 +115,7 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;BTN_Test.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>11</value>
   </data>
   <data name="TB_CID.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -142,13 +142,13 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;TB_CID.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>5</value>
   </data>
   <data name="BTN_Download.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Download.Location" type="System.Drawing.Point, System.Drawing">
-    <value>768, 381</value>
+    <value>784, 386</value>
   </data>
   <data name="BTN_Download.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -169,13 +169,13 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;BTN_Download.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>10</value>
   </data>
   <data name="BTN_Upload.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Upload.Location" type="System.Drawing.Point, System.Drawing">
-    <value>768, 352</value>
+    <value>784, 357</value>
   </data>
   <data name="BTN_Upload.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -196,13 +196,13 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;BTN_Upload.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>9</value>
   </data>
   <data name="BTN_Play.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Right</value>
   </data>
   <data name="BTN_Play.Location" type="System.Drawing.Point, System.Drawing">
-    <value>768, 410</value>
+    <value>784, 415</value>
   </data>
   <data name="BTN_Play.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 23</value>
@@ -223,7 +223,7 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;BTN_Play.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>7</value>
   </data>
   <data name="LB_CID.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -253,7 +253,7 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;LB_CID.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>4</value>
   </data>
   <data name="TB_Command.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
@@ -277,7 +277,7 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;TB_Command.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>2</value>
   </data>
   <data name="LB_Command.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -307,7 +307,7 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;LB_Command.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>0</value>
   </data>
   <data name="VV_Screen.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
@@ -334,7 +334,7 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;VV_Screen.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>3</value>
   </data>
   <metadata name="TM_Play.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
@@ -364,7 +364,7 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;CTB_PlayerTrack.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>6</value>
   </data>
   <data name="LB_Duration.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left</value>
@@ -394,35 +394,11 @@
     <value>TP_Video</value>
   </data>
   <data name="&gt;&gt;LB_Duration.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>1</value>
   </data>
   <metadata name="TSP_菜单.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>117, 17</value>
   </metadata>
-  <data name="TSP_菜单.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="TSP_菜单.Size" type="System.Drawing.Size, System.Drawing">
-    <value>884, 25</value>
-  </data>
-  <data name="TSP_菜单.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="TSP_菜单.Text" xml:space="preserve">
-    <value>toolStrip1</value>
-  </data>
-  <data name="&gt;&gt;TSP_菜单.Name" xml:space="preserve">
-    <value>TSP_菜单</value>
-  </data>
-  <data name="&gt;&gt;TSP_菜单.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;TSP_菜单.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;TSP_菜单.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
   <data name="TSB_UploadSet.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -459,65 +435,32 @@
   <data name="TSB_AlbumUpdate.Text" xml:space="preserve">
     <value>刷新</value>
   </data>
-  <data name="TC_Main.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
+  <data name="TSP_菜单.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
   </data>
-  <data name="&gt;&gt;TP_Video.Name" xml:space="preserve">
-    <value>TP_Video</value>
+  <data name="TSP_菜单.Size" type="System.Drawing.Size, System.Drawing">
+    <value>884, 25</value>
   </data>
-  <data name="&gt;&gt;TP_Video.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="TSP_菜单.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
   </data>
-  <data name="&gt;&gt;TP_Video.Parent" xml:space="preserve">
-    <value>TC_Main</value>
+  <data name="TSP_菜单.Text" xml:space="preserve">
+    <value>toolStrip1</value>
   </data>
-  <data name="&gt;&gt;TP_Video.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="&gt;&gt;TSP_菜单.Name" xml:space="preserve">
+    <value>TSP_菜单</value>
   </data>
-  <data name="&gt;&gt;TP_Data.Name" xml:space="preserve">
-    <value>TP_Data</value>
+  <data name="&gt;&gt;TSP_菜单.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStrip, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;TP_Data.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabPage, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;TP_Data.Parent" xml:space="preserve">
-    <value>TC_Main</value>
-  </data>
-  <data name="&gt;&gt;TP_Data.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="TC_Main.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 28</value>
-  </data>
-  <data name="TC_Main.Size" type="System.Drawing.Size, System.Drawing">
-    <value>873, 526</value>
-  </data>
-  <data name="TC_Main.TabIndex" type="System.Int32, mscorlib">
-    <value>15</value>
-  </data>
-  <data name="&gt;&gt;TC_Main.Name" xml:space="preserve">
-    <value>TC_Main</value>
-  </data>
-  <data name="&gt;&gt;TC_Main.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TabControl, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;TC_Main.Parent" xml:space="preserve">
+  <data name="&gt;&gt;TSP_菜单.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;TC_Main.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.Name" xml:space="preserve">
-    <value>PB_Screen</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.Type" xml:space="preserve">
-    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.Parent" xml:space="preserve">
-    <value>TP_Video</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;TSP_菜单.ZOrder" xml:space="preserve">
     <value>0</value>
+  </data>
+  <data name="TC_Main.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
   </data>
   <data name="TP_Video.Location" type="System.Drawing.Point, System.Drawing">
     <value>4, 26</value>
@@ -547,32 +490,20 @@
   <data name="&gt;&gt;TP_Video.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="PB_Screen.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
+  <data name="PN_VideoInfo.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
   </data>
-  <data name="PB_Screen.Location" type="System.Drawing.Point, System.Drawing">
-    <value>662, 6</value>
+  <data name="PN_VideoInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
   </data>
-  <data name="PB_Screen.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 323</value>
+  <data name="PN_VideoInfo.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
   </data>
-  <data name="PB_Screen.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
-    <value>Zoom</value>
+  <data name="PN_VideoInfo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>859, 490</value>
   </data>
-  <data name="PB_Screen.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.Name" xml:space="preserve">
-    <value>PB_Screen</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.Type" xml:space="preserve">
-    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.Parent" xml:space="preserve">
-    <value>TP_Video</value>
-  </data>
-  <data name="&gt;&gt;PB_Screen.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="PN_VideoInfo.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
   </data>
   <data name="&gt;&gt;PN_VideoInfo.Name" xml:space="preserve">
     <value>PN_VideoInfo</value>
@@ -613,32 +544,26 @@
   <data name="&gt;&gt;TP_Data.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="PN_VideoInfo.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
-    <value>GrowAndShrink</value>
+  <data name="TC_Main.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 28</value>
   </data>
-  <data name="PN_VideoInfo.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
+  <data name="TC_Main.Size" type="System.Drawing.Size, System.Drawing">
+    <value>873, 526</value>
   </data>
-  <data name="PN_VideoInfo.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
+  <data name="TC_Main.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
   </data>
-  <data name="PN_VideoInfo.Size" type="System.Drawing.Size, System.Drawing">
-    <value>859, 490</value>
+  <data name="&gt;&gt;TC_Main.Name" xml:space="preserve">
+    <value>TC_Main</value>
   </data>
-  <data name="PN_VideoInfo.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;TC_Main.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TabControl, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TC_Main.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;TC_Main.ZOrder" xml:space="preserve">
     <value>1</value>
-  </data>
-  <data name="&gt;&gt;PN_VideoInfo.Name" xml:space="preserve">
-    <value>PN_VideoInfo</value>
-  </data>
-  <data name="&gt;&gt;PN_VideoInfo.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;PN_VideoInfo.Parent" xml:space="preserve">
-    <value>TP_Data</value>
-  </data>
-  <data name="&gt;&gt;PN_VideoInfo.ZOrder" xml:space="preserve">
-    <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

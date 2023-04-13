@@ -48,14 +48,12 @@
             TSB_AlbumUpdate = new ToolStripButton();
             TC_Main = new TabControl();
             TP_Video = new TabPage();
-            PB_Screen = new PictureBox();
             TP_Data = new TabPage();
             PN_VideoInfo = new Panel();
             ((System.ComponentModel.ISupportInitialize)VV_Screen).BeginInit();
             TSP_菜单.SuspendLayout();
             TC_Main.SuspendLayout();
             TP_Video.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)PB_Screen).BeginInit();
             TP_Data.SuspendLayout();
             SuspendLayout();
             // 
@@ -173,7 +171,6 @@
             // 
             // TP_Video
             // 
-            TP_Video.Controls.Add(PB_Screen);
             TP_Video.Controls.Add(LB_Command);
             TP_Video.Controls.Add(LB_Duration);
             TP_Video.Controls.Add(TB_Command);
@@ -189,13 +186,6 @@
             resources.ApplyResources(TP_Video, "TP_Video");
             TP_Video.Name = "TP_Video";
             TP_Video.UseVisualStyleBackColor = true;
-            // 
-            // PB_Screen
-            // 
-            resources.ApplyResources(PB_Screen, "PB_Screen");
-            PB_Screen.BackColor = Color.Silver;
-            PB_Screen.Name = "PB_Screen";
-            PB_Screen.TabStop = false;
             // 
             // TP_Data
             // 
@@ -225,7 +215,6 @@
             TC_Main.ResumeLayout(false);
             TP_Video.ResumeLayout(false);
             TP_Video.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)PB_Screen).EndInit();
             TP_Data.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
@@ -253,6 +242,5 @@
         private TabPage TP_Data;
         private ToolStripButton TSB_AlbumUpdate;
         private Panel PN_VideoInfo;
-        private PictureBox PB_Screen;
     }
 }
