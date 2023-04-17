@@ -82,6 +82,7 @@ namespace IPFSVideo
             return new Uri(new Uri(Environment.GetEnvironmentVariable("IpfsHttpApi")
                     ?? "http://localhost:5001"), url);
         }
+
         /// <summary>
         /// 执行指令
         /// </summary>
@@ -92,7 +93,7 @@ namespace IPFSVideo
             return await HttpApi.PostAsync(command, null).Result.Content.ReadAsStringAsync();
         }
         /// <summary>
-        /// 下载
+        /// 下载，返回流信息
         /// </summary>
         /// <param name="command">下载指令</param>
         /// <returns>下载的流</returns>
@@ -103,7 +104,7 @@ namespace IPFSVideo
             return await response.Content.ReadAsStreamAsync();
         }
         /// <summary>
-        /// 上传
+        /// 上传，返回字符串
         /// </summary>
         /// <param name="command">上传指令</param>
         /// <param name="streamContent">上传的流</param>
@@ -122,7 +123,13 @@ namespace IPFSVideo
             //await ThrowOnErrorAsync(response);
             return await response.Content.ReadAsStringAsync();
         }
-
+        /// <summary>
+        /// 上传，返回流信息
+        /// </summary>
+        /// <param name="command">上传指令</param>
+        /// <param name="streamContent">上传的流</param>
+        /// <param name="name">文件名称</param>
+        /// <returns>返回的结果流</returns>
         public async Task<Stream> UploadGetStreamAsync(Uri command, HttpContent streamContent, string? name = null)
         {
             var content = new MultipartFormDataContent();
@@ -136,6 +143,43 @@ namespace IPFSVideo
             //await ThrowOnErrorAsync(response);
             
             return await response.Content.ReadAsStreamAsync();
+        }
+        /// <summary>
+        /// 处理上传结果流
+        /// </summary>
+        /// <param name="response">上传结果</param>
+        /// <param name="options">设置</param>
+        /// <param name="name">文件名</param>
+        /// <param name="fileLength">文件长度</param>
+        /// <returns></returns>
+        public static async Task<FileData?> ReadStreamAsync(Stream response, AddFileOptions options, string name = "", long fileLength = 0)
+        {
+            FileData? fileData = null;
+            if (response != null)
+            {
+                using var sr = new StreamReader(response);
+                using var jr = new JsonTextReader(sr) { SupportMultipleContent = true };
+                while (jr.Read())
+                {
+                    JObject r = await JObject.LoadAsync(jr);
+                    // If a progress report.
+                    if (r.ContainsKey("Bytes"))
+                    {
+                        options.Progress?.Report(new TransferProgress
+                        {
+                            Name = (string)r["Name"]!,
+                            Bytes = (ulong)r["Bytes"]!,
+                            AllLength = fileLength
+                        });
+                    }
+                    // Else must be an added file.
+                    else
+                    {
+                        fileData = new FileData(name, (string)r["Hash"]!, long.Parse((string)r["Size"]!));
+                    }
+                }
+            }
+            return fileData;
         }
         /// <summary>
         /// 上传文件
@@ -176,34 +220,18 @@ namespace IPFSVideo
             return await ReadStreamAsync(response, options, name, fileLength);
         }
 
-        public static async Task<FileData?> ReadStreamAsync(Stream response, AddFileOptions options, string name = "", long fileLength = 0)
+        public async Task<Dictionary<string, string>> GetIPNSAsync()
         {
-            FileData? fileData = null;
-            if(response != null)
+            Uri command = BuildCommand("key/list");
+            string resultString = await DoCommandAsync(command);
+            JObject resultObject = JObject.Parse(resultString);
+            Dictionary<string, string> ipnsDic = new();
+            if (resultObject.ContainsKey("Keys"))
             {
-                using var sr = new StreamReader(response);
-                using var jr = new JsonTextReader(sr) { SupportMultipleContent = true };
-                while (jr.Read())
-                {
-                    JObject r = await JObject.LoadAsync(jr);
-                    // If a progress report.
-                    if (r.ContainsKey("Bytes"))
-                    {
-                        options.Progress?.Report(new TransferProgress
-                        {
-                            Name = (string)r["Name"]!,
-                            Bytes = (ulong)r["Bytes"]!,
-                            AllLength = fileLength
-                        });
-                    }
-                    // Else must be an added file.
-                    else
-                    {
-                        fileData = new FileData(name, (string)r["Hash"]!, long.Parse((string)r["Size"]!));
-                    }
-                }
+                foreach (var ipns in resultObject["Keys"]!)
+                    ipnsDic.Add(ipns["Name"]!.ToString(), ipns["Id"]!.ToString());
             }
-            return fileData;
+            return ipnsDic;
         }
     }
 

@@ -11,10 +11,17 @@ namespace IPFSVideo.Models
         public string? Name { get; set; }
         public string? Id { get; set; }
 
+        public IPNS(string name, string id)
+        {
+            Name = name;
+            Id = id;
+        }
+
         public IPNS()
         {
             //System.Text.Json.JsonSerializer.DeserializeAsync<>
 
         }
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using IPFSVideo.Models;
 using MyToolkit;
 using SQLite;
+using System.IO;
 
 namespace IPFSVideo
 {
@@ -107,6 +108,14 @@ namespace IPFSVideo
                     ShowMessage("上传完成");
                     Animation animation = new(album, videoDic);
                     await SQLConnection.InsertAsync(animation);
+
+                    var databaseInfo = await ipfsApi.
+                            AddAsync(FileManager.GetFileStream("data.db"), "data.db", null, new FileInfo("data.db").Length);
+                    if (databaseInfo != null)
+                    {
+                        var resultPub = await ipfsApi.DoCommandAsync
+                            (HttpClientAPI.BuildCommand("name/publish", databaseInfo.Cid, "key=self"));
+                    }  
                 }
                 //重读数据库并刷新界面
                 Uploaded?.Invoke();

@@ -591,7 +591,7 @@ namespace MyToolkit
 
         public static Stream GetFileStream(string path, int cacheLength = 10240)
         {
-            using var fileStream = new FileStream(path, FileMode.Open);
+            using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             var buffer = new byte[cacheLength];
             int bytesRead;
             Stream stream = new MemoryStream();
@@ -601,6 +601,16 @@ namespace MyToolkit
             }
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
+        }
+
+        public static async Task WriteStreamAsync(string path, string fileName, Stream message, FileMode fileMode = FileMode.OpenOrCreate)
+        {
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            path += "/" + fileName;
+            byte[] buffer = new byte[10240]; int length;
+            using FileStream file = new FileStream(path, fileMode);
+            while ((length = await message.ReadAsync(buffer)) != 0)
+                await file.WriteAsync(buffer, 0, length);
         }
 
         public static void AppendFlieString(string path, string fileName, string message, FileMode fileMode)

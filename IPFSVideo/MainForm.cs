@@ -4,6 +4,7 @@ using Microsoft.IO;
 using SQLite;
 using IPFSVideo.Models;
 using IPFSVideo.Service;
+using Newtonsoft.Json.Linq;
 
 namespace IPFSVideo
 {
@@ -23,7 +24,8 @@ namespace IPFSVideo
         #endregion
 
         #region Êý¾Ý
-        private static readonly string databasePath = "data.db";
+        private static readonly string databasePath = (ConfigurationService.Instance.Config.Load("DatabaseName") == "")
+            ? "data.db" : ConfigurationService.Instance.Config.Load("DatabaseName");
         private SQLiteAsyncConnection? sqlconnection;
         public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(databasePath);
         public List<VideoAlbum>? DataSource;
@@ -203,22 +205,20 @@ namespace IPFSVideo
             try
             {
                 //video.AddOption($":sout=#rtp{{sdp = rtsp://127.0.0.1:8554/video}} :sout-all :sout-keep");
-                string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text, TB_CID.Text));
-                ShowMessage(result.ToString());
 
-                //Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
-                //TB_Info.Clear();
-                //byte[] data = new byte[10240];
-                //int length;
-                //using (FileStream file = new FileStream("test.mp4", FileMode.OpenOrCreate))
-                //{
-                //    while ((length = await stream.ReadAsync(data)) != 0)
-                //    {
-                //        await file.WriteAsync(data, 0, length);
-                //    }
-                //}
+                //string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text, TB_CID.Text));
+                //ShowMessage(result.ToString());
 
                 //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", $"http://localhost:8080/ipfs/{TB_CID.Text}");
+                //var result = await ipfsApi.DoCommandAsync
+                //    (HttpClientAPI.BuildCommand("name/publish", "QmUat6n7w6nXBs2fC7jpubGg1Rgid83z5iXpknL37GcQ85", "key=self"));
+                var ipnsList = await ipfsApi.GetIPNSAsync();
+                var result = await ipfsApi.DoCommandAsync
+                    (HttpClientAPI.BuildCommand("name/resolve", ipnsList["self"]));
+                JObject resultObject = JObject.Parse(result);
+                var flie = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", resultObject["Path"]!.ToString()));
+                await FileManager.WriteStreamAsync("Test", "self.db", flie);
+                ShowMessage(result.ToString());
             }
             catch (Exception)
             {
