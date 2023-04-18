@@ -1,3 +1,4 @@
+using MyMouseAndKeyboard;
 using MyToolkit;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
@@ -152,7 +153,7 @@ namespace MyProjects
                 ShowMessage(e.Data);
         }
 
-        private void BTN_Test_Click(object sender, EventArgs e)
+        private void BTN_Test1_Click(object sender, EventArgs e)
         {
             try
             {
@@ -269,6 +270,25 @@ namespace MyProjects
         private void BTN_CVStop_Click(object sender, EventArgs e)
         {
             cvTool.IsStopRead = true;
+        }
+
+        private void BTN_Test_Click(object sender, EventArgs e)
+        {
+
+            int workWidth = Screen.PrimaryScreen.WorkingArea.Width;
+            int workHeight = Screen.PrimaryScreen.WorkingArea.Height;
+            int width = Screen.PrimaryScreen.Bounds.Width;
+            int height = Screen.PrimaryScreen.Bounds.Height;
+            //ShowMessage($"{workWidth}:{workHeight},{width}:{height}");
+            //MouseAndKeyboard.mouse_event((int)(MouseOperate.Absolute | MouseOperate.Move),
+            //    500 * 65535 / width, 500 * 65535 / height, 0, 0);
+
+            //MouseAndKeyboard.PostMessage(TB_Info.Handle, 256, Keys.A, 2);
+
+            MouseAndKeyboard.PostMessage(TC_Main.Handle, 0x201, 0, 200 + (200 << 16));
+            MouseAndKeyboard.PostMessage(TC_Main.Handle, 0x202, 0, 200 + (200 << 16));
+            //MouseAndKeyboard.PostMessage(this.Handle, 0x0202, 1, 200 * 65535 / width + 200 * 65535 / height * 65536);
+            ShowMessage($"{workWidth}:{workHeight},{width}:{height}");
         }
     }
 }

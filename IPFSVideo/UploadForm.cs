@@ -19,11 +19,14 @@ namespace IPFSVideo
         public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(databasePath);
         public List<VideoAlbum>? DataSource;
         public List<Animation>? AnimationSource;
+        private Dictionary<string, string> ipnsList;
         #endregion
 
         public UploadForm()
         {
             InitializeComponent();
+            
+            ipnsList = ipfsApi.GetIPNSAsync().Result;
         }
 
         public async void InitializeDatabase()
@@ -108,7 +111,7 @@ namespace IPFSVideo
                     ShowMessage("上传完成");
                     Animation animation = new(album, videoDic);
                     await SQLConnection.InsertAsync(animation);
-
+                    //上传数据库
                     var databaseInfo = await ipfsApi.
                             AddAsync(FileManager.GetFileStream("data.db"), "data.db", null, new FileInfo("data.db").Length);
                     if (databaseInfo != null)
@@ -117,6 +120,9 @@ namespace IPFSVideo
                             (HttpClientAPI.BuildCommand("name/publish", databaseInfo.Cid, "key=self"));
                     }  
                 }
+
+
+
                 //重读数据库并刷新界面
                 Uploaded?.Invoke();
             }

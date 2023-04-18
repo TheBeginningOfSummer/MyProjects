@@ -30,6 +30,7 @@ namespace IPFSVideo
         public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(databasePath);
         public List<VideoAlbum>? DataSource;
         public List<Animation>? AnimationSource;
+        private Dictionary<string, string> ipnsList;
         #endregion
 
         /// <summary>
@@ -212,13 +213,19 @@ namespace IPFSVideo
                 //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", $"http://localhost:8080/ipfs/{TB_CID.Text}");
                 //var result = await ipfsApi.DoCommandAsync
                 //    (HttpClientAPI.BuildCommand("name/publish", "QmUat6n7w6nXBs2fC7jpubGg1Rgid83z5iXpknL37GcQ85", "key=self"));
-                var ipnsList = await ipfsApi.GetIPNSAsync();
-                var result = await ipfsApi.DoCommandAsync
-                    (HttpClientAPI.BuildCommand("name/resolve", ipnsList["self"]));
-                JObject resultObject = JObject.Parse(result);
-                var flie = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", resultObject["Path"]!.ToString()));
-                await FileManager.WriteStreamAsync("Test", "self.db", flie);
-                ShowMessage(result.ToString());
+
+                //ipnsList = await ipfsApi.GetIPNSAsync();
+                ////解析IPNS
+                //var result = await ipfsApi.DoCommandAsync
+                //    (HttpClientAPI.BuildCommand("name/resolve", ipnsList["self"]));
+                ////转为Json对象
+                //JObject resultObject = JObject.Parse(result);
+                ////加载流
+                //Stream flie = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", resultObject["Path"]!.ToString()));
+                ////将流写入文件
+                //await FileManager.WriteStreamAsync("Test", "self.db", flie);
+
+                
             }
             catch (Exception)
             {
