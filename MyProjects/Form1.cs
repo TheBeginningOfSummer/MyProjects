@@ -285,23 +285,26 @@ namespace MyProjects
             //    500 * 65535 / width, 500 * 65535 / height, 0, 0);
 
             //MouseAndKeyboard.PostMessage(hWnd, 256, Keys.A, 2);
+            //MouseAndKeyboard.PostMessage(hWnd, 0x100, Keys.I, 2);
+            Thread.Sleep(200);
+            MouseAndKeyboard.PostMessage(hWnd, 0x101, Keys.I, 0);
             //MouseAndKeyboard.PostMessage(hWnd, 0x0201, IntPtr.Zero, new IntPtr(5 + (5 << 16)));
             //MouseAndKeyboard.PostMessage(hWnd, 0x0202, IntPtr.Zero, new IntPtr(5 + (5 << 16)));
             //MouseAndKeyboard.PostMessage(this.Handle, 0x0202, 1, 200 * 65535 / width + 200 * 65535 / height * 65536);
             //ShowMessage($"{workWidth}:{workHeight},{width}:{height}");
             TB_Test.AppendText($"X-{point.X}:Y-{point.Y}\r\n");
 
-            inputs[0].type = (int)InputType.Keyboard;
-            inputs[0].ki.wVk = 0;
-            inputs[0].ki.wScan = 0x11;
-            inputs[0].ki.dwFlags = (int)(KeyCode.KeyDown | KeyCode.Scancode);
-            inputs[0].ki.dwExtraInfo = MouseAndKeyboard.GetMessageExtraInfo();
-            inputs[1].type = (int)InputType.Keyboard;
-            inputs[1].ki.wVk = 0;
-            inputs[1].ki.wScan = 0x11;
-            inputs[1].ki.dwFlags = (int)(KeyCode.KeyDown | KeyCode.Scancode);
-            inputs[1].ki.dwExtraInfo = MouseAndKeyboard.GetMessageExtraInfo();
-            MouseAndKeyboard.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
+            //inputs[0].type = (int)InputType.Keyboard;
+            //inputs[0].ki.wVk = 0;
+            //inputs[0].ki.wScan = 0x11;
+            //inputs[0].ki.dwFlags = (int)(KeyCode.KeyDown | KeyCode.Scancode);
+            //inputs[0].ki.dwExtraInfo = MouseAndKeyboard.GetMessageExtraInfo();
+            //inputs[1].type = (int)InputType.Keyboard;
+            //inputs[1].ki.wVk = 0;
+            //inputs[1].ki.wScan = 0x11;
+            //inputs[1].ki.dwFlags = (int)(KeyCode.KeyDown | KeyCode.Scancode);
+            //inputs[1].ki.dwExtraInfo = MouseAndKeyboard.GetMessageExtraInfo();
+            //MouseAndKeyboard.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
         }
         IntPtr hWnd;
         System.Drawing.Point point = new();

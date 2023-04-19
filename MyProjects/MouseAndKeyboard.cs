@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyMouseAndKeyboard
 {
-    
-
-    #region 输入结构体
+    #region SendInput输入结构体及代码
     [StructLayout(LayoutKind.Explicit)]
     public struct Input
     {
@@ -51,7 +49,6 @@ namespace MyMouseAndKeyboard
         public short wParamL;
         public short wParamH;
     }
-    #endregion
 
     [Flags]
     public enum InputType
@@ -89,6 +86,7 @@ namespace MyMouseAndKeyboard
         XDown = 0x0080,
         XUp = 0x0100
     }
+    #endregion
 
     public class MouseAndKeyboard
     {
