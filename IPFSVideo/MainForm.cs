@@ -30,7 +30,6 @@ namespace IPFSVideo
         public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(databasePath);
         public List<VideoAlbum>? DataSource;
         public List<Animation>? AnimationSource;
-        private Dictionary<string, string> ipnsList;
         #endregion
 
         /// <summary>

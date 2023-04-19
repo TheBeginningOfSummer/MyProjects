@@ -48,7 +48,8 @@
             BTN_LocalCamera = new Button();
             GB_Test = new GroupBox();
             GB_FigureSelect = new GroupBox();
-            TP_设置 = new TabPage();
+            TP_测试 = new TabPage();
+            TB_Test = new TextBox();
             BTN_Test = new Button();
             ((System.ComponentModel.ISupportInitialize)PB_MyPicture).BeginInit();
             GB_ConsoleTest.SuspendLayout();
@@ -56,7 +57,7 @@
             TP_CV.SuspendLayout();
             GB_Test.SuspendLayout();
             GB_FigureSelect.SuspendLayout();
-            TP_设置.SuspendLayout();
+            TP_测试.SuspendLayout();
             SuspendLayout();
             // 
             // PB_MyPicture
@@ -204,7 +205,7 @@
             // TC_Main
             // 
             TC_Main.Controls.Add(TP_CV);
-            TC_Main.Controls.Add(TP_设置);
+            TC_Main.Controls.Add(TP_测试);
             TC_Main.Dock = DockStyle.Fill;
             TC_Main.Location = new Point(0, 0);
             TC_Main.Name = "TC_Main";
@@ -277,22 +278,31 @@
             GB_FigureSelect.TabStop = false;
             GB_FigureSelect.Text = "图形";
             // 
-            // TP_设置
+            // TP_测试
             // 
-            TP_设置.Controls.Add(BTN_Test);
-            TP_设置.Location = new Point(4, 26);
-            TP_设置.Name = "TP_设置";
-            TP_设置.Padding = new Padding(3);
-            TP_设置.Size = new Size(876, 451);
-            TP_设置.TabIndex = 1;
-            TP_设置.Text = "设置";
-            TP_设置.UseVisualStyleBackColor = true;
+            TP_测试.Controls.Add(TB_Test);
+            TP_测试.Controls.Add(BTN_Test);
+            TP_测试.Location = new Point(4, 26);
+            TP_测试.Name = "TP_测试";
+            TP_测试.Padding = new Padding(3);
+            TP_测试.Size = new Size(876, 451);
+            TP_测试.TabIndex = 1;
+            TP_测试.Text = "测试";
+            TP_测试.UseVisualStyleBackColor = true;
+            // 
+            // TB_Test
+            // 
+            TB_Test.Location = new Point(8, 6);
+            TB_Test.Multiline = true;
+            TB_Test.Name = "TB_Test";
+            TB_Test.Size = new Size(693, 437);
+            TB_Test.TabIndex = 1;
             // 
             // BTN_Test
             // 
-            BTN_Test.Location = new Point(47, 37);
+            BTN_Test.Location = new Point(707, 6);
             BTN_Test.Name = "BTN_Test";
-            BTN_Test.Size = new Size(772, 358);
+            BTN_Test.Size = new Size(163, 39);
             BTN_Test.TabIndex = 0;
             BTN_Test.Text = "测试";
             BTN_Test.UseVisualStyleBackColor = true;
@@ -304,10 +314,12 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(884, 481);
             Controls.Add(TC_Main);
+            KeyPreview = true;
             Name = "Form1";
             Text = "Form1";
             FormClosed += Form1_FormClosed;
             Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
             ((System.ComponentModel.ISupportInitialize)PB_MyPicture).EndInit();
             GB_ConsoleTest.ResumeLayout(false);
             GB_ConsoleTest.PerformLayout();
@@ -317,7 +329,8 @@
             GB_Test.ResumeLayout(false);
             GB_FigureSelect.ResumeLayout(false);
             GB_FigureSelect.PerformLayout();
-            TP_设置.ResumeLayout(false);
+            TP_测试.ResumeLayout(false);
+            TP_测试.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -341,9 +354,10 @@
         private TabPage TP_CV;
         private GroupBox GB_Test;
         private GroupBox GB_FigureSelect;
-        private TabPage TP_设置;
+        private TabPage TP_测试;
         private Button BTN_LocalCamera;
         private Button BTN_CVStop;
         private Button BTN_Test;
+        private TextBox TB_Test;
     }
 }

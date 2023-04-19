@@ -5,6 +5,7 @@ using OpenCvSharp.Extensions;
 using STTech.BytesIO.Tcp;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Tesseract;
 
 namespace MyProjects
@@ -283,12 +284,39 @@ namespace MyProjects
             //MouseAndKeyboard.mouse_event((int)(MouseOperate.Absolute | MouseOperate.Move),
             //    500 * 65535 / width, 500 * 65535 / height, 0, 0);
 
-            //MouseAndKeyboard.PostMessage(TB_Info.Handle, 256, Keys.A, 2);
-
-            MouseAndKeyboard.PostMessage(TC_Main.Handle, 0x201, 0, 200 + (200 << 16));
-            MouseAndKeyboard.PostMessage(TC_Main.Handle, 0x202, 0, 200 + (200 << 16));
+            //MouseAndKeyboard.PostMessage(hWnd, 256, Keys.A, 2);
+            //MouseAndKeyboard.PostMessage(hWnd, 0x0201, IntPtr.Zero, new IntPtr(5 + (5 << 16)));
+            //MouseAndKeyboard.PostMessage(hWnd, 0x0202, IntPtr.Zero, new IntPtr(5 + (5 << 16)));
             //MouseAndKeyboard.PostMessage(this.Handle, 0x0202, 1, 200 * 65535 / width + 200 * 65535 / height * 65536);
-            ShowMessage($"{workWidth}:{workHeight},{width}:{height}");
+            //ShowMessage($"{workWidth}:{workHeight},{width}:{height}");
+            TB_Test.AppendText($"X-{point.X}:Y-{point.Y}\r\n");
+
+            inputs[0].type = (int)InputType.Keyboard;
+            inputs[0].ki.wVk = 0;
+            inputs[0].ki.wScan = 0x11;
+            inputs[0].ki.dwFlags = (int)(KeyCode.KeyDown | KeyCode.Scancode);
+            inputs[0].ki.dwExtraInfo = MouseAndKeyboard.GetMessageExtraInfo();
+            inputs[1].type = (int)InputType.Keyboard;
+            inputs[1].ki.wVk = 0;
+            inputs[1].ki.wScan = 0x11;
+            inputs[1].ki.dwFlags = (int)(KeyCode.KeyDown | KeyCode.Scancode);
+            inputs[1].ki.dwExtraInfo = MouseAndKeyboard.GetMessageExtraInfo();
+            MouseAndKeyboard.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
         }
+        IntPtr hWnd;
+        System.Drawing.Point point = new();
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Alt && e.KeyCode == Keys.P)
+            {
+                MouseAndKeyboard.GetCursorPos(ref point);
+                TB_Test.AppendText($"X-{point.X}:Y-{point.Y}\r\n");
+
+                hWnd = MouseAndKeyboard.WindowFromPoint(point);
+                TB_Test.AppendText($"{hWnd}\r\n");
+            }
+        }
+        Input[] inputs = new Input[2];
+        
     }
 }

@@ -25,8 +25,14 @@ namespace IPFSVideo
         public UploadForm()
         {
             InitializeComponent();
-            
-            ipnsList = ipfsApi.GetIPNSAsync().Result;
+            try
+            {
+                ipnsList = ipfsApi.GetIPNSAsync().Result;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("读取IPNS列表失败");
+            }
         }
 
         public async void InitializeDatabase()
@@ -120,9 +126,6 @@ namespace IPFSVideo
                             (HttpClientAPI.BuildCommand("name/publish", databaseInfo.Cid, "key=self"));
                     }  
                 }
-
-
-
                 //重读数据库并刷新界面
                 Uploaded?.Invoke();
             }
