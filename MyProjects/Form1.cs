@@ -285,9 +285,8 @@ namespace MyProjects
             //    500 * 65535 / width, 500 * 65535 / height, 0, 0);
 
             //MouseAndKeyboard.PostMessage(hWnd, 256, Keys.A, 2);
-            //MouseAndKeyboard.PostMessage(hWnd, 0x100, Keys.I, 2);
-            Thread.Sleep(200);
-            MouseAndKeyboard.PostMessage(hWnd, 0x101, Keys.I, 0);
+            MouseAndKeyboard.PostMessage(hWnd, 0x100, Keys.I, 0);
+            //MouseAndKeyboard.PostMessage(hWnd, 0x101, Keys.I, 0);
             //MouseAndKeyboard.PostMessage(hWnd, 0x0201, IntPtr.Zero, new IntPtr(5 + (5 << 16)));
             //MouseAndKeyboard.PostMessage(hWnd, 0x0202, IntPtr.Zero, new IntPtr(5 + (5 << 16)));
             //MouseAndKeyboard.PostMessage(this.Handle, 0x0202, 1, 200 * 65535 / width + 200 * 65535 / height * 65536);
@@ -317,6 +316,8 @@ namespace MyProjects
 
                 hWnd = MouseAndKeyboard.WindowFromPoint(point);
                 TB_Test.AppendText($"{hWnd}\r\n");
+
+                //MouseAndKeyboard.SendMessage(hWnd, 0x0086, 1, 0);
             }
         }
         Input[] inputs = new Input[2];

@@ -116,7 +116,7 @@ namespace MyMouseAndKeyboard
 
 
         [DllImport("user32.dll")]
-        public static extern bool SetForeggroundWindow(IntPtr hWnd);
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
         public static extern bool SetCursorPos(int dx, int dy);
