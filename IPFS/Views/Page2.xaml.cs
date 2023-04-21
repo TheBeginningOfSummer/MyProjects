@@ -13,21 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace IPFS
+namespace IPFS.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Page2.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Page2 : Page
     {
-        public MainWindow()
+        public Page2()
         {
             InitializeComponent();
-        }
-
-        private void Window_MouseMove(object sender, MouseEventArgs e)
-        {
-            //if (e.LeftButton == MouseButtonState.Pressed) this.DragMove();
         }
     }
 }

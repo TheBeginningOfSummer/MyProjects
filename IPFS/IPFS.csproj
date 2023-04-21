@@ -8,9 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Image\autumn.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="ViewModels\" />
-    <Folder Include="Models\" />
-    <Folder Include="Services\" />
     <Folder Include="Converters\" />
     <Folder Include="libs\" />
   </ItemGroup>
@@ -19,6 +21,16 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.8.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyToolkit\MyToolkit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Image\autumn.jpg" />
   </ItemGroup>
 
 </Project>

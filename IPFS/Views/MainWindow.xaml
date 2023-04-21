@@ -3,41 +3,87 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:IPFS"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowVM,Source={StaticResource ServiceLocator}}"
-        Title="MainWindow" Height="720" Width="1024"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        ResizeMode="CanResizeWithGrip">
+        Title="MainWindow" Height="720" Width="1024" WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResize" MouseMove="Window_MouseMove">
 
+    <!--<Window.Style>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <WindowChrome CornerRadius="0" CaptionHeight="30" GlassFrameThickness="-1" UseAeroCaptionButtons="True" NonClientFrameEdges="None"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Style>-->
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome x:Name="WindowChrome" CaptionHeight="30" GlassFrameThickness="0" UseAeroCaptionButtons="False" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+    
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <Grid>
+        <!--<Border Background="White">
+            <Border.Effect>
+                <DropShadowEffect Color="Silver" BlurRadius="30" ShadowDepth="20" Opacity="0.2"/>
+            </Border.Effect>
+        </Border>-->
+
+        <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="80"/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             
             <Grid.Background>
-                <ImageBrush ImageSource="/Resources/Image/autumn.jpg" Stretch="UniformToFill" Opacity="0.2"/>
+                <ImageBrush ImageSource="\Resources\Image\autumn.jpg" Stretch="UniformToFill" Opacity="0.2"/>
             </Grid.Background>
 
-            <TextBlock Text="WPF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22"/>
+            <TextBlock Grid.Row="0" Text="WPF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22"/>
 
             <StackPanel Grid.Row="1">
-                <Button Margin="15 0 15 0" >
+                <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                        HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="Page1.xaml">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock/>
-                        <TextBlock Text="Bing"/>
+                        <TextBlock Text="图标"/>
+                        <TextBlock Text="Bing" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                        HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="Page2.xaml">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="图标"/>
+                        <TextBlock Text="Windows" VerticalAlignment="Center" Margin="10 0 0 0"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
-
         </Grid>
-        
-        
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding ElementName=WindowChrome,Path=CaptionHeight}"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Content="最小化" Margin="0 2 2 2" FontSize="12" Style="{StaticResource ButtonStyle}" 
+                        Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                <Button Content="最大化" Margin="0 2 2 2" FontSize="12" Style="{StaticResource ButtonStyle}"
+                        Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                <Button Content="关闭" Margin="0 2 2 2" FontSize="12" Style="{StaticResource ButtonStyle}"
+                        Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+            </StackPanel>
+
+            <Frame Grid.Row="1" x:Name="DisplayFrame" Source="{Binding PageName}" NavigationUIVisibility="Hidden"/>
+        </Grid>
+
     </Grid>
 </Window>
