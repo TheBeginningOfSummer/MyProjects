@@ -36,14 +36,14 @@ namespace IPFS.Models
         public int Id { get; set; }
         [Unique]
         public string? AlbumName { get; set; }
-        public string? PublishDate { get; set; }
+        public string? Description { get; set; }
         public string? CoverHash { get; set; }
         public string? VideosJson { get; set; }
 
-        public VideoAlbum(string albumName, string publishDate, string coverHash, string videoJson)
+        public VideoAlbum(string albumName, string description, string coverHash, string videoJson)
         {
             AlbumName = albumName;
-            PublishDate = publishDate;
+            Description = description;
             CoverHash = coverHash;
             VideosJson = videoJson;
         }
@@ -52,15 +52,14 @@ namespace IPFS.Models
         {
 
         }
-
     }
 
     public class Animation : VideoAlbum
     {
         public Dictionary<string, FileData>? VideosData;
 
-        public Animation(string albumName, string publishDate, string coverHash, string videoJson)
-            : base(albumName, publishDate, coverHash, videoJson)
+        public Animation(string albumName, string description, string coverHash, string videoJson)
+            : base(albumName, description, coverHash, videoJson)
         {
             VideosData = GetVideosData(VideosJson!);
         }
@@ -72,7 +71,7 @@ namespace IPFS.Models
         public Animation(VideoAlbum videoAlbum, Dictionary<string, FileData>? videosData)
         {
             AlbumName = videoAlbum.AlbumName;
-            PublishDate = videoAlbum.PublishDate;
+            Description = videoAlbum.Description;
             CoverHash = videoAlbum.CoverHash;
             VideosJson = GetVideosDataJson(videosData!);
             VideosData = videosData;
@@ -85,7 +84,7 @@ namespace IPFS.Models
         {
             Id = videoAlbum.Id;
             AlbumName = videoAlbum.AlbumName;
-            PublishDate = videoAlbum.PublishDate;
+            Description = videoAlbum.Description;
             CoverHash = videoAlbum.CoverHash;
             VideosJson = videoAlbum.VideosJson;
             VideosData = GetVideosData(VideosJson!);
@@ -124,7 +123,7 @@ namespace IPFS.Models
 
         public string GetInfo()
         {
-            string info = $"专辑名：{AlbumName} 发布日期：{PublishDate} 封面：{CoverHash}{Environment.NewLine}";
+            string info = $"专辑名：{AlbumName} 描述：{Description} 封面：{CoverHash}{Environment.NewLine}";
             if (VideosData != null)
             {
                 foreach (var video in VideosData)
@@ -134,7 +133,4 @@ namespace IPFS.Models
         }
     }
 
-    
-
-    
 }

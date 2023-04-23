@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using IPFS.Services;
 using System.Windows;
 
 namespace IPFS.ViewModels
@@ -13,13 +14,13 @@ namespace IPFS.ViewModels
             set => SetProperty(ref _pageName, value);
         }
 
-        private RelayCommand? _testCommand;
-        public RelayCommand TestCommand => _testCommand ??= new RelayCommand(() => PageName = "Page1.xaml");
-
         public RelayCommand<object?> LoadPageCommand { get; }
         public RelayCommand<object?> MinimizeCommand { get; }
         public RelayCommand<object?> MaximizeCommand { get; }
         public RelayCommand<object?> CloseCommand { get; }
+
+        private readonly SQLiteService _sqlite = new();
+        private readonly HttpClientAPI _ipfsApi = new();
 
         public MainWindowVM()
         {

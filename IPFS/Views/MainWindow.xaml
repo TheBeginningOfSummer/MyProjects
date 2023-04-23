@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:local="clr-namespace:IPFS"
         mc:Ignorable="d"
         DataContext="{Binding MainWindowVM,Source={StaticResource ServiceLocator}}"
@@ -58,10 +59,10 @@
                 </Button>
 
                 <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
-                        HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="Page2.xaml">
+                        HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="UploadPage.xaml">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="图标"/>
-                        <TextBlock Text="Windows" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                        <TextBlock Text="上传" VerticalAlignment="Center" Margin="10 0 0 0"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -74,11 +75,18 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
-                <Button Content="最小化" Margin="0 2 2 2" FontSize="12" Style="{StaticResource ButtonStyle}" 
+                <Button Content="-" Margin="0 0 2 0" FontSize="12" Height="30" Width="60" 
+                        materialDesign:ButtonAssist.CornerRadius="0"
+                        materialDesign:RippleAssist.IsDisabled="True"
                         Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                <Button Content="最大化" Margin="0 2 2 2" FontSize="12" Style="{StaticResource ButtonStyle}"
+                <Button Content="口" Margin="0 0 2 0" FontSize="12" Height="30" Width="60" 
+                        materialDesign:ButtonAssist.CornerRadius="0"
+                        materialDesign:RippleAssist.IsDisabled="True"
                         Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                <Button Content="关闭" Margin="0 2 2 2" FontSize="12" Style="{StaticResource ButtonStyle}"
+                <Button Content="X" Margin="0 0 10 0" FontSize="12" Height="30" Width="60" 
+                        materialDesign:ButtonAssist.CornerRadius="0"
+                        materialDesign:RippleAssist.IsDisabled="True"
+                        Background="DarkRed" BorderBrush="DarkRed"
                         Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
             </StackPanel>
 

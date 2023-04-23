@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using IPFS.Models;
 using System.Net.Http;
 
-namespace IPFSVideo
+namespace IPFS
 {
     public class HttpClientAPI
     {
