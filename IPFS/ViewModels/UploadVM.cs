@@ -8,20 +8,59 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace IPFS.ViewModels
 {
     public class UploadVM : ObservableObject
     {
-        private string? _pageName;
-        public string? PageName
+        #region 属性
+        private BitmapImage? _coverImage;
+        public BitmapImage? CoverImage
         {
-            get => _pageName;
-            set => SetProperty(ref _pageName, value);
+            get => _coverImage;
+            set => SetProperty(ref _coverImage, value);
         }
 
+        private string? _albumName;
+        public string? AlbumName
+        {
+            get => _albumName;
+            set => SetProperty(ref _albumName, value);
+        }
+
+        private string? _year;
+        public string? Year
+        {
+            get => _year;
+            set => SetProperty(ref _year, value);
+        }
+
+        private string? _month;
+        public string? Month
+        {
+            get => _month;
+            set => SetProperty(ref _month, value);
+        }
+
+        private string? _day;
+        public string? Day
+        {
+            get => _day;
+            set => SetProperty(ref _day, value);
+        }
+
+        private string? _description;
+        public string? Description
+        {
+            get => _description;
+            set => SetProperty(ref _description, value);
+        }
+        #endregion
+
         #region 组件
-        private readonly VideoAlbum _albumInfo = new();
+        private readonly VideoAlbum _album = new();
         private readonly Dictionary<string, FileData> _fileDic = new();
         private readonly OpenFileDialog _openFileDialog = new();
         private readonly SQLiteService _sqlite = new();
@@ -46,19 +85,18 @@ namespace IPFS.ViewModels
                     //ShowMessage("上传中……");
                     FileData? result = await _ipfsApi.AddAsync
                     (stream, _openFileDialog.FileName.Split('\\').LastOrDefault("nofile"), null, fileLength);
-                    //PB_AlbumCover.Image = Image.FromStream(stream);
+                    CoverImage = new BitmapImage(new Uri(_openFileDialog.FileName));
                     //ShowMessage("上传完成");
                     if (result != null)
                     {
-                        _albumInfo.VideosJson = "";
-                        _albumInfo.CoverHash = result.Cid;
+                        _album.VideosJson = "";
+                        _album.CoverHash = result.Cid;
                     }
                 }
             }
             catch (Exception)
             {
 
-                throw;
             }
         });
 
@@ -67,6 +105,12 @@ namespace IPFS.ViewModels
         {
             try
             {
+                if (string.IsNullOrEmpty(AlbumName)) return;
+                if (string.IsNullOrEmpty(Year) || string.IsNullOrEmpty(Month) || string.IsNullOrEmpty(Day) || string.IsNullOrEmpty(Description)) return;
+                string albumInfo = $"{Year}-{Month}-{Day}|{Description}";
+                _album.Name = AlbumName;
+                _album.Information = albumInfo;
+
                 _fileDic.Clear();
                 _openFileDialog.Title = "上传文件";
                 _openFileDialog.Filter = "mp4视频|*.mp4|其他文件|*.*";
@@ -90,7 +134,7 @@ namespace IPFS.ViewModels
                     //文件上传完成
 
                     //数据存储表
-                    Animation animation = new(_albumInfo, _fileDic);
+                    Animation animation = new(_album, _fileDic);
                     //数据插入
                     await _sqlite.SQLConnection.InsertAsync(animation);
                     //上传数据库到IPFS

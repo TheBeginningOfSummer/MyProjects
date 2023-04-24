@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace IPFS.Views
 {
     /// <summary>
-    /// Page1.xaml 的交互逻辑
+    /// DisplayPage.xaml 的交互逻辑
     /// </summary>
-    public partial class Page1 : Page
+    public partial class DisplayPage : Page
     {
-        public Page1()
+        public DisplayPage()
         {
             InitializeComponent();
         }

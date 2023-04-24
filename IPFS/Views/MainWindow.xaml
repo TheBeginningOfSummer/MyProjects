@@ -31,11 +31,11 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <!--<Border Background="White">
+        <Border Background="White">
             <Border.Effect>
                 <DropShadowEffect Color="Silver" BlurRadius="30" ShadowDepth="20" Opacity="0.2"/>
             </Border.Effect>
-        </Border>-->
+        </Border>
 
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
@@ -44,17 +44,17 @@
             </Grid.RowDefinitions>
             
             <Grid.Background>
-                <ImageBrush ImageSource="\Resources\Image\autumn.jpg" Stretch="UniformToFill" Opacity="0.2"/>
+                <ImageBrush ImageSource="/Resources/Image/autumn.jpg" Stretch="UniformToFill" Opacity="0.2"/>
             </Grid.Background>
 
             <TextBlock Grid.Row="0" Text="WPF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22"/>
 
             <StackPanel Grid.Row="1">
                 <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
-                        HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="Page1.xaml">
+                        HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="DisplayPage.xaml">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="图标"/>
-                        <TextBlock Text="Bing" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                        <TextBlock Text="数据" VerticalAlignment="Center" Margin="10 0 0 0"/>
                     </StackPanel>
                 </Button>
 
@@ -83,7 +83,7 @@
                         materialDesign:ButtonAssist.CornerRadius="0"
                         materialDesign:RippleAssist.IsDisabled="True"
                         Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                <Button Content="X" Margin="0 0 10 0" FontSize="12" Height="30" Width="60" 
+                <Button Content="X" Margin="0 0 10 0" FontSize="12" Height="30" Width="60"
                         materialDesign:ButtonAssist.CornerRadius="0"
                         materialDesign:RippleAssist.IsDisabled="True"
                         Background="DarkRed" BorderBrush="DarkRed"

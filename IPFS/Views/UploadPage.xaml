@@ -7,31 +7,55 @@
       xmlns:local="clr-namespace:IPFS.Views"
       mc:Ignorable="d" 
       DataContext="{Binding UploadVM,Source={StaticResource ServiceLocator}}"
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="900"
       Title="UploadPage">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="80"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="1">
-            <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
-                        HorizontalContentAlignment="Left" Command="{Binding UploadFileCommand}" CommandParameter="Page1.xaml">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
+            <TextBlock Text="集合名称：" VerticalAlignment="Center" Margin="10 0 5 0" FontWeight="Bold"/>
+            <TextBox Text="{Binding AlbumName}" VerticalAlignment="Center" Width="80"/>
+
+            <TextBlock Text="日期：" VerticalAlignment="Center" Margin="10 0 5 0" FontWeight="Bold"/>
+            <TextBox Text="{Binding Year}" VerticalAlignment="Center" Width="30"/>
+            <TextBlock Text="年" VerticalAlignment="Center" Margin="5 0 5 0"/>
+            <TextBox Text="{Binding Month}" VerticalAlignment="Center" Width="20"/>
+            <TextBlock Text="月" VerticalAlignment="Center" Margin="5 0 5 0"/>
+            <TextBox Text="{Binding Day}" VerticalAlignment="Center" Width="20"/>
+            <TextBlock Text="日" VerticalAlignment="Center" Margin="5 0 10 0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="10 0 5 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                    VerticalAlignment="Center" 
+                    HorizontalContentAlignment="Left" Command="{Binding UploadFileInfoCommand}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="图标"/>
-                    <TextBlock Text="上传" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                    <TextBlock Text="封面上传" VerticalAlignment="Center" Margin="10 0 0 0"/>
                 </StackPanel>
             </Button>
 
-            <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
-                        HorizontalContentAlignment="Left" Command="{Binding UploadFileCommand}" CommandParameter="UploadPage.xaml">
+            <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Left" Command="{Binding UploadFileCommand}">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="图标"/>
                     <TextBlock Text="上传" VerticalAlignment="Center" Margin="10 0 0 0"/>
                 </StackPanel>
             </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Height="360">
+            <Image Height="300" Width="200" Stretch="UniformToFill" Source="{Binding CoverImage}"
+                   Margin="10 0 10 0"/>
+
+            <TextBox Height="300" Width="200" Style="{StaticResource MaterialDesignOutlinedTextBox}" Text="{Binding Description}"
+                     materialDesign:HintAssist.Hint="描述：" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"
+                     Margin="10 0 10 0"/>
         </StackPanel>
     </Grid>
 </Page>

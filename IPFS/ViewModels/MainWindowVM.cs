@@ -28,7 +28,7 @@ namespace IPFS.ViewModels
             MinimizeCommand = new RelayCommand<object?>(MinimizeWindow);
             MaximizeCommand = new RelayCommand<object?>(MaximizeWindow);
             CloseCommand = new RelayCommand<object?>(CloseWindow);
-            GetPageName("Page1.xaml");
+            GetPageName("DisplayPage.xaml");
         }
 
         public void GetPageName(object? page)
