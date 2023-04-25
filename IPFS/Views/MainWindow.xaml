@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         DataContext="{Binding MainWindowVM,Source={StaticResource ServiceLocator}}"
         Title="MainWindow" Height="720" Width="1024" WindowStartupLocation="CenterScreen"
-        WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResize" MouseMove="Window_MouseMove">
+        WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize" MouseMove="Window_MouseMove">
 
     <!--<Window.Style>
         <Style TargetType="{x:Type Window}">

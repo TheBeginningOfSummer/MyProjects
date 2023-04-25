@@ -1,7 +1,9 @@
 ﻿using SQLite;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
+using System.Windows.Media.Imaging;
 
 namespace IPFS.Models
 {
@@ -56,6 +58,7 @@ namespace IPFS.Models
 
     public class Animation : VideoAlbum
     {
+        public BitmapImage CoverImage = new();
         public Dictionary<string, FileData>? VideosData;
 
         public Animation(string name, string information, string coverHash, string videosJson)
@@ -112,6 +115,15 @@ namespace IPFS.Models
         public static Dictionary<string, FileData>? GetVideosData(string videosJson)
         {
             return JsonSerializer.Deserialize<Dictionary<string, FileData>>(videosJson);
+        }
+
+        /// <summary>
+        /// 数据流转为图片
+        /// </summary>
+        /// <param name="imageStream">图片数据流</param>
+        public void GetImage(Stream imageStream)
+        {
+            CoverImage.StreamSource = imageStream;
         }
         /// <summary>
         /// Json转为字典数据
