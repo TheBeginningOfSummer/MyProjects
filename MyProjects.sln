@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPFSVideo", "IPFSVideo\IPFS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsLibrary", "WinFormsLibrary\WinFormsLibrary.csproj", "{067A7389-C002-4E97-B11D-FCCD655EA19F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPFS", "IPFS\IPFS.csproj", "{7AA50233-3C40-493D-8A26-5CB60DE56F93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPFS", "IPFS\IPFS.csproj", "{7AA50233-3C40-493D-8A26-5CB60DE56F93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{8253CA9D-87A2-4742-86E2-557F0ED73F6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{7AA50233-3C40-493D-8A26-5CB60DE56F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AA50233-3C40-493D-8A26-5CB60DE56F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AA50233-3C40-493D-8A26-5CB60DE56F93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8253CA9D-87A2-4742-86E2-557F0ED73F6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8253CA9D-87A2-4742-86E2-557F0ED73F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8253CA9D-87A2-4742-86E2-557F0ED73F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8253CA9D-87A2-4742-86E2-557F0ED73F6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

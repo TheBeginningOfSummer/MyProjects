@@ -3,6 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:behavior="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:local="clr-namespace:IPFS.Views"
       mc:Ignorable="d" 
       DataContext="{Binding DisplayVM,Source={StaticResource ServiceLocator}}"
@@ -15,7 +17,22 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding Animations}">
+        <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                    VerticalAlignment="Center" HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Left" Command="{Binding RefreshCommand}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="图标"/>
+                <TextBlock Text="刷新" VerticalAlignment="Center" Margin="10 0 0 0"/>
+            </StackPanel>
+        </Button>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding Animations}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}">
+            <behavior:Interaction.Triggers>
+                <behavior:EventTrigger EventName="">
+                    <behavior:InvokeCommandAction Command=""/>
+                    <behavior:CallMethodAction MethodName=""/>
+                </behavior:EventTrigger>
+            </behavior:Interaction.Triggers>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -31,11 +48,11 @@
 
                         <Grid Grid.Column="1">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="20"/>
+                                <RowDefinition Height="30"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Text="{Binding Name}" Margin="10 0 10 0" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="0" Text="{Binding Name}" Margin="10 0 10 0" FontWeight="Bold" FontSize="20"/>
                             <TextBlock Grid.Row="1" Text="{Binding Information}" Margin="10 0 10 0" Width="500" TextWrapping="Wrap"/>
                         </Grid>
                     </Grid>
