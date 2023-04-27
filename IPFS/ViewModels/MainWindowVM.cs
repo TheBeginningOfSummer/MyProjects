@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using IPFS.Services;
 using System.Windows;
 
 namespace IPFS.ViewModels
 {
-    public class MainWindowVM : ObservableObject
+    public class MainWindowVM : ObservableObject, IRecipient<string>
     {
         private string? _pageName;
         public string? PageName
@@ -24,16 +25,23 @@ namespace IPFS.ViewModels
 
         public MainWindowVM()
         {
-            LoadPageCommand = new RelayCommand<object?>(GetPageName);
+            //监听页面切换消息
+            WeakReferenceMessenger.Default.Register(this);
+            LoadPageCommand = new RelayCommand<object?>(ChangePage);
             MinimizeCommand = new RelayCommand<object?>(MinimizeWindow);
             MaximizeCommand = new RelayCommand<object?>(MaximizeWindow);
             CloseCommand = new RelayCommand<object?>(CloseWindow);
-            GetPageName("DisplayPage.xaml");
+            ChangePage("DisplayPage.xaml");
         }
 
-        public void GetPageName(object? page)
+        public void Receive(string message)
         {
-            if (page != null) PageName = page.ToString();
+            if (!string.IsNullOrEmpty(message)) PageName = message;
+        }
+
+        public void ChangePage(object? page)
+        {
+            if (page is string pageName) PageName = pageName;
         }
 
         public static void MinimizeWindow(object? window)
@@ -63,5 +71,7 @@ namespace IPFS.ViewModels
         {
             SystemCommands.CloseWindow(window as Window);
         }
+
+
     }
 }

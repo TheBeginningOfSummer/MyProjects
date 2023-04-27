@@ -28,8 +28,8 @@
 
         <ListView Grid.Row="1" ItemsSource="{Binding Animations}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}">
             <behavior:Interaction.Triggers>
-                <behavior:EventTrigger EventName="">
-                    <behavior:InvokeCommandAction Command=""/>
+                <behavior:EventTrigger EventName="MouseLeftButtonUp">
+                    <behavior:InvokeCommandAction Command="{Binding ItemPaddingCommand}"/>
                     <behavior:CallMethodAction MethodName=""/>
                 </behavior:EventTrigger>
             </behavior:Interaction.Triggers>
@@ -53,7 +53,7 @@
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" Text="{Binding Name}" Margin="10 0 10 0" FontWeight="Bold" FontSize="20"/>
-                            <TextBlock Grid.Row="1" Text="{Binding Information}" Margin="10 0 10 0" Width="500" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Information}" Margin="10 0 10 0" Width="600" TextWrapping="Wrap"/>
                         </Grid>
                     </Grid>
                 </DataTemplate>
