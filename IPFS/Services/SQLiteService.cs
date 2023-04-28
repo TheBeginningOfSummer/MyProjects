@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace IPFS.Services
 {
@@ -20,7 +21,7 @@ namespace IPFS.Services
                 DatabasePath = Path.Combine(databasePath, databaseName);
         }
 
-        public async void InitializeTable<T>() where T : new()
+        public async void InitializeTableAsync<T>() where T : new()
         {
             try
             {
@@ -28,7 +29,7 @@ namespace IPFS.Services
             }
             catch (Exception e)
             {
-                if (e.Message == $"no such table: {typeof(T)}")
+                if (e.Message == $"no such table: {typeof(T).ToString().Split('.').LastOrDefault()}")
                     await SQLConnection.CreateTableAsync<T>();
             }
         }

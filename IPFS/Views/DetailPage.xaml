@@ -22,10 +22,10 @@
             <TextBlock Text="返回" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Button>
 
-        <TextBlock Text="{Binding AnimationInfo.Name}" VerticalAlignment="Center" HorizontalAlignment="Right"
+        <TextBlock Text="{Binding AlbumInfo.Name}" VerticalAlignment="Center" HorizontalAlignment="Right"
                    Margin="0 0 20 0" FontSize="30" FontWeight="Bold"/>
-        
-        <ListView Grid.Row="1" ItemsSource="{Binding FileInfo}">
+
+        <ListView Grid.Row="1" ItemsSource="{Binding FileListInfo}" x:Name="DetailList">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -38,15 +38,21 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" VerticalAlignment="Center">
-                            <Hyperlink Command="{Binding OpenInBrowser}">
-                                <TextBox Text="{Binding Cid}"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Tag="{Binding Source={StaticResource ServiceLocator},Path=DetailVM,Mode=OneWay}">
+                            <Hyperlink Command="{Binding DataContext.OpenInBrowser,ElementName=DetailList}" CommandParameter="{Binding Cid}">
+                                <Hyperlink.ContextMenu>
+                                    <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
+                                        <MenuItem Header="复制" Command="{Binding CopyCommand}" 
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
+                                    </ContextMenu>
+                                </Hyperlink.ContextMenu>
+                                <TextBlock Text="{Binding Cid}"/>
                             </Hyperlink>
                         </TextBlock>
-                        
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        
     </Grid>
 </Page>

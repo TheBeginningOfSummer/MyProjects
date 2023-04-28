@@ -26,7 +26,7 @@
             </StackPanel>
         </Button>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding Animations}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}">
+        <ListView Grid.Row="1" ItemsSource="{Binding Albums}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}">
             <behavior:Interaction.Triggers>
                 <behavior:EventTrigger EventName="MouseLeftButtonUp">
                     <behavior:InvokeCommandAction Command="{Binding ItemPaddingCommand}"/>

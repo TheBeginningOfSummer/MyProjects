@@ -45,10 +45,9 @@ namespace IPFS.ViewModels
             }
         });
 
-        #region 集合
-        public List<Animation> AnimationsSource;
-        public ObservableCollection<Animation> Animations { get; } = new ObservableCollection<Animation>();
-        public ICollectionView AnimationsView { get { return CollectionViewSource.GetDefaultView(Animations); } }
+        #region 专辑列表
+        public ObservableCollection<Animation> Albums { get; } = new ObservableCollection<Animation>();
+        public ICollectionView AlbumsView { get { return CollectionViewSource.GetDefaultView(Albums); } }
         #endregion
 
         private readonly SQLiteService _sqlite = new();
@@ -56,16 +55,22 @@ namespace IPFS.ViewModels
 
         public DisplayVM()
         {
-            _sqlite.InitializeTable<Animation>();
-            AnimationsSource = _sqlite.SQLConnection.Table<Animation>().ToListAsync().Result;
-            foreach (var animation in AnimationsSource)
-            {
-                //读出的json数据解析
-                animation.GetVideosData();
-                Animations.Add(animation);
-            }
+            _sqlite.InitializeTableAsync<Animation>();
+            InitializeAlbumsAsync(_sqlite);
             //初始化详情页面时，监听数据请求
             WeakReferenceMessenger.Default.Register(this);
+        }
+
+        private async void InitializeAlbumsAsync(SQLiteService sqlite)
+        {
+            List<Animation>? AlbumsSource = await sqlite.SQLConnection.Table<Animation>().ToListAsync();
+            if (AlbumsSource != null)
+                foreach (var animation in AlbumsSource)
+                {
+                    //读出的json数据解析
+                    animation.GetVideosData();
+                    Albums.Add(animation);
+                }
         }
 
         public void Receive(RequestMessage<Animation> message)
