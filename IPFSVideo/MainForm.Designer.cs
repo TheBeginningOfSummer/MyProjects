@@ -65,6 +65,7 @@
             // BTN_Test
             // 
             resources.ApplyResources(BTN_Test, "BTN_Test");
+            BTN_Test.Image = Properties.Resources.autumn;
             BTN_Test.Name = "BTN_Test";
             BTN_Test.UseVisualStyleBackColor = true;
             BTN_Test.Click += BTN_Test_ClickAsync;

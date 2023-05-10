@@ -14,6 +14,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
             <RowDefinition/>
+            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
@@ -56,6 +57,11 @@
             <TextBox Height="300" Width="200" Style="{StaticResource MaterialDesignOutlinedTextBox}" Text="{Binding Description}"
                      materialDesign:HintAssist.Hint="描述：" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"
                      Margin="10 0 10 0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <TextBlock Text="上传：" VerticalAlignment="Center" Margin="10 0 5 0" FontWeight="Bold"/>
+            <TextBlock Text="{Binding UploadStatus}" VerticalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Page>

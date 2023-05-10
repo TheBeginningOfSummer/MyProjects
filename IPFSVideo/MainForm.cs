@@ -5,6 +5,7 @@ using SQLite;
 using IPFSVideo.Models;
 using IPFSVideo.Service;
 using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace IPFSVideo
 {
@@ -206,9 +207,17 @@ namespace IPFSVideo
             {
                 //video.AddOption($":sout=#rtp{{sdp = rtsp://127.0.0.1:8554/video}} :sout-all :sout-keep");
 
-                //string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text, TB_CID.Text));
-                //ShowMessage(result.ToString());
-
+                string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text, TB_CID.Text));
+                ShowMessage(result.ToString());
+                PinFile pinFile = JsonSerializer.Deserialize<PinFile>(result)!;
+                if (pinFile.Pins == null)
+                {
+                    ShowMessage("已移除");
+                }
+                else
+                {
+                    ShowMessage("已固定");
+                }
                 //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", $"http://localhost:8080/ipfs/{TB_CID.Text}");
                 //var result = await ipfsApi.DoCommandAsync
                 //    (HttpClientAPI.BuildCommand("name/publish", "QmUat6n7w6nXBs2fC7jpubGg1Rgid83z5iXpknL37GcQ85", "key=self"));
@@ -223,8 +232,6 @@ namespace IPFSVideo
                 //Stream flie = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", resultObject["Path"]!.ToString()));
                 ////将流写入文件
                 //await FileManager.WriteStreamAsync("Test", "self.db", flie);
-
-                
             }
             catch (Exception)
             {

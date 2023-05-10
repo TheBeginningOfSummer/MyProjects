@@ -20,9 +20,6 @@ namespace IPFS.ViewModels
         public RelayCommand<object?> MaximizeCommand { get; }
         public RelayCommand<object?> CloseCommand { get; }
 
-        private readonly SQLiteService _sqlite = new();
-        private readonly HttpClientAPI _ipfsApi = new();
-
         public MainWindowVM()
         {
             //监听页面切换消息
@@ -71,7 +68,6 @@ namespace IPFS.ViewModels
         {
             SystemCommands.CloseWindow(window as Window);
         }
-
 
     }
 }

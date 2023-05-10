@@ -44,6 +44,8 @@
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
                                         <MenuItem Header="复制" Command="{Binding CopyCommand}" 
                                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
+                                        <MenuItem Header="删除" Command="{Binding DeleteCommand}" 
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
                                     </ContextMenu>
                                 </Hyperlink.ContextMenu>
                                 <TextBlock Text="{Binding Cid}"/>
