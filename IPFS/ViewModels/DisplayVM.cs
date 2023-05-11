@@ -4,13 +4,18 @@ using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using IPFS.Models;
 using IPFS.Services;
+using MyToolkit;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace IPFS.ViewModels
 {
@@ -32,8 +37,7 @@ namespace IPFS.ViewModels
         private RelayCommand? _refreshCommand;
         public RelayCommand RefreshCommand => _refreshCommand ??= new RelayCommand(() =>
         {
-            //if (SelectedItem != null)
-            //    MessageBox.Show(SelectedItem.Name);
+            
         });
 
         private RelayCommand? _itemPaddingCommand;
@@ -50,11 +54,25 @@ namespace IPFS.ViewModels
         });
 
         private RelayCommand<Animation>? _DeleteCommand;
-        public RelayCommand<Animation> DeleteCommand => _DeleteCommand ??= new RelayCommand<Animation>((message) =>
+        public RelayCommand<Animation> DeleteCommand => _DeleteCommand ??= new RelayCommand<Animation>(async (message) =>
         {
-            if(message != null)
+            try
             {
-                MessageBox.Show(message.Name);
+                var userResult = MessageBox.Show("是否删除？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (userResult == MessageBoxResult.No) return;
+                if (message != null)
+                {
+                    foreach (var item in message.VideosData!.Values)
+                    {
+                        PinFile? pinFile = await _csl.IPFSApi.RemovePinAsync(item.Cid);
+                    }
+                    Albums.Remove(message);
+                    await _csl.SQLite.SQLConnection.DeleteAsync(message);
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"删除失败。{e.Message}", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         });
 
@@ -82,6 +100,11 @@ namespace IPFS.ViewModels
             if (AlbumsSource != null)
                 foreach (var animation in AlbumsSource)
                 {
+                    var r = await _csl.IPFSApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", animation.CoverHash));
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        //animation.CoverImage.StreamSource = r;
+                    }));
                     //读出的json数据解析
                     animation.GetVideosData();
                     Albums.Add(animation);

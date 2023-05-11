@@ -51,8 +51,7 @@ namespace IPFS.ViewModels
                 if (userResult == MessageBoxResult.No) return;
                 if (AlbumInfo!.VideosData != null && message != null)
                 {
-                    string result = await _csl.IPFSApi.DoCommandAsync(HttpClientAPI.BuildCommand("pin/rm", message.Cid));
-                    PinFile pinFile = JsonSerializer.Deserialize<PinFile>(result)!;
+                    PinFile? pinFile = await _csl.IPFSApi.RemovePinAsync(message.Cid);
 
                     AlbumInfo.VideosData.Remove(message.Name!);
                     AlbumInfo.GetVideosDataJson();
@@ -64,7 +63,6 @@ namespace IPFS.ViewModels
             {
                 MessageBox.Show($"删除失败。{e.Message}", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         });
         #endregion
 

@@ -10,30 +10,6 @@ using System.Windows.Media.Imaging;
 
 namespace IPFS.Models;
 
-public class FileData
-{
-    public string? Name { get; set; }
-    public string? Cid { get; set; }
-    public long? Size { get; set; }
-
-    public FileData(string name, string cid, long size)
-    {
-        Name = name;
-        Cid = cid;
-        Size = size;
-    }
-
-    public FileData()
-    {
-
-    }
-
-    public string GetInfo()
-    {
-        return $"{Name} {Cid} {Size}";
-    }
-}
-
 public class VideoAlbum : ISQLData
 {
     [PrimaryKey, AutoIncrement]

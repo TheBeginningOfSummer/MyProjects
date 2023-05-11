@@ -8,7 +8,7 @@ namespace IPFS.Services;
 
 public class CommonServiceLoader
 {
-    //单例模式
+    #region 单例模式
     private static CommonServiceLoader? _instance;
     private static readonly object _instanceLock = new();
     public static CommonServiceLoader Instance
@@ -23,6 +23,7 @@ public class CommonServiceLoader
             return _instance;
         }
     }
+    #endregion
 
     public readonly SQLiteService SQLite;
     public readonly HttpClientAPI IPFSApi;
@@ -32,7 +33,11 @@ public class CommonServiceLoader
         SQLite = new();
         IPFSApi = new();
     }
-
+    /// <summary>
+    /// 加载上传文件到IPFS
+    /// </summary>
+    /// <param name="path">文件路径</param>
+    /// <returns>结果</returns>
     public async Task<FileData?> LoadAndUploadFileAsync(string path)
     {
         //文件名
@@ -43,7 +48,12 @@ public class CommonServiceLoader
         return await IPFSApi.AddAsync
         (FileManager.GetFileStream(path), fileName, null, fileLength);
     }
-
+    /// <summary>
+    /// 更新animation数据库并上传至IPFS
+    /// </summary>
+    /// <param name="animation">数据（带数据库）</param>
+    /// <param name="changeOrDelete">更改还是删除数据true为更改</param>
+    /// <returns>发布结果</returns>
     public async Task<string> PublishDatabaseAsync(Animation animation, bool changeOrDelete = true)
     {
         if (changeOrDelete)

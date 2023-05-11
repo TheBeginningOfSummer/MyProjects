@@ -107,6 +107,7 @@ public class UploadVM : ObservableObject
                 }
                 //数据存储表
                 Animation animation = new(_album, _fileDic);
+                //更新数据并上传
                 await _csl.PublishDatabaseAsync(animation);
                 //展示页面数据刷新
                 WeakReferenceMessenger.Default.Send(animation, "DisplayVM");
