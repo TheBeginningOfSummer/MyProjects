@@ -252,12 +252,12 @@ namespace IPFSVideo
             }
         }
 
-        private void BTN_Download_ClickAsync(object sender, EventArgs e)
+        private async void BTN_Download_ClickAsync(object sender, EventArgs e)
         {
             try
             {
-                //Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
-                //PB_Screen.Image = Image.FromStream(stream);
+                Stream stream = await ipfsApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", TB_CID.Text));
+                pictureBox1.Image = Image.FromStream(stream);
             }
             catch (Exception ex)
             {

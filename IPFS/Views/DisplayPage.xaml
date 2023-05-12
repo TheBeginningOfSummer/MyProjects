@@ -45,7 +45,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Image Grid.Column="0" Source="/Resources/Image/autumn.jpg"/>
+                        <Image Grid.Column="0" Source="{Binding CoverImage}"/>
 
                         <Grid Grid.Column="1">
                             <Grid.RowDefinitions>

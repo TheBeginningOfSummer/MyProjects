@@ -4,9 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using IPFS.Models;
 using IPFS.Services;
-using MyToolkit;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,8 +12,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 
 namespace IPFS.ViewModels
 {
@@ -35,9 +31,9 @@ namespace IPFS.ViewModels
 
         #region 绑定的命令
         private RelayCommand? _refreshCommand;
-        public RelayCommand RefreshCommand => _refreshCommand ??= new RelayCommand(() =>
+        public RelayCommand RefreshCommand => _refreshCommand ??= new RelayCommand(async () =>
         {
-            
+            await PageUpdateAsync(_csl.SQLite);
         });
 
         private RelayCommand? _itemPaddingCommand;
@@ -93,6 +89,11 @@ namespace IPFS.ViewModels
             if (SelectedItem != null) message.Reply(SelectedItem);
         }
 
+        private async void MessageUpdateAsync(object recipient, Animation message)
+        {
+            await PageUpdateAsync(_csl.SQLite);
+        }
+
         private async Task PageUpdateAsync(SQLiteService sqlite)
         {
             Albums.Clear();
@@ -100,20 +101,14 @@ namespace IPFS.ViewModels
             if (AlbumsSource != null)
                 foreach (var animation in AlbumsSource)
                 {
-                    var r = await _csl.IPFSApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", animation.CoverHash));
-                    Application.Current.Dispatcher.Invoke(new Action(() =>
-                    {
-                        //animation.CoverImage.StreamSource = r;
-                    }));
+                    Stream stream = await _csl.IPFSApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", animation.CoverHash));
+                    //加载图片
+                    animation.GetImage(stream);
                     //读出的json数据解析
                     animation.GetVideosData();
+
                     Albums.Add(animation);
                 }
-        }
-
-        private async void MessageUpdateAsync(object recipient, Animation message)
-        {
-            await PageUpdateAsync(_csl.SQLite);
         }
 
         private async void PageMessengerInitialize()

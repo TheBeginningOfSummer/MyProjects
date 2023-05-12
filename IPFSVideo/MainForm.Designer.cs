@@ -50,11 +50,13 @@
             TP_Video = new TabPage();
             TP_Data = new TabPage();
             PN_VideoInfo = new Panel();
+            pictureBox1 = new PictureBox();
             ((System.ComponentModel.ISupportInitialize)VV_Screen).BeginInit();
             TSP_菜单.SuspendLayout();
             TC_Main.SuspendLayout();
             TP_Video.SuspendLayout();
             TP_Data.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // TB_Info
@@ -172,6 +174,7 @@
             // 
             // TP_Video
             // 
+            TP_Video.Controls.Add(pictureBox1);
             TP_Video.Controls.Add(LB_Command);
             TP_Video.Controls.Add(LB_Duration);
             TP_Video.Controls.Add(TB_Command);
@@ -201,6 +204,12 @@
             PN_VideoInfo.Name = "PN_VideoInfo";
             PN_VideoInfo.SizeChanged += PN_VideoInfo_SizeChanged;
             // 
+            // pictureBox1
+            // 
+            resources.ApplyResources(pictureBox1, "pictureBox1");
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.TabStop = false;
+            // 
             // MainForm
             // 
             resources.ApplyResources(this, "$this");
@@ -217,6 +226,7 @@
             TP_Video.ResumeLayout(false);
             TP_Video.PerformLayout();
             TP_Data.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -243,5 +253,6 @@
         private TabPage TP_Data;
         private ToolStripButton TSB_AlbumUpdate;
         private Panel PN_VideoInfo;
+        private PictureBox pictureBox1;
     }
 }

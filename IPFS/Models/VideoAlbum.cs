@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace IPFS.Models;
@@ -36,13 +37,14 @@ public class VideoAlbum : ISQLData
 
 public class Animation : VideoAlbum
 {
-    public BitmapImage CoverImage = new();
+    [Ignore]
+    public ImageSource? CoverImage { get; set; }//"/Resources/Image/Autumn.jpg"
     public Dictionary<string, FileData>? VideosData;
 
     public Animation(string name, string information, string coverHash, string videosJson)
         : base(name, information, coverHash, videosJson)
     {
-        VideosData = GetVideosData(VideosJson!);
+        GetVideosData();
     }
     /// <summary>
     /// 用于存储，得到可存储的VideoAlbum数据
@@ -70,59 +72,14 @@ public class Animation : VideoAlbum
         VideosJson = videoAlbum.VideosJson;
         GetVideosData();
     }
-
+    /// <summary>
+    /// 用于数据库加载
+    /// </summary>
     public Animation()
     {
 
     }
 
-    /// <summary>
-    /// 数据流转为图片
-    /// </summary>
-    /// <param name="imageStream">图片数据流</param>
-    public void GetImage(Stream imageStream)
-    {
-        CoverImage.StreamSource = imageStream;
-    }
-    /// <summary>
-    /// 字典转为Json数据数据
-    /// </summary>
-    /// <param name="videosData">视频字典列表</param>
-    /// <returns></returns>
-    public static string GetVideosDataJson(Dictionary<string, FileData> videosData)
-    {
-        return JsonSerializer.Serialize(videosData);
-    }
-    /// <summary>
-    /// Json转为字典数据
-    /// </summary>
-    /// <param name="videosJson">Json数据</param>
-    /// <returns></returns>
-    public static Dictionary<string, FileData>? GetVideosData(string videosJson)
-    {
-        return JsonSerializer.Deserialize<Dictionary<string, FileData>>(videosJson);
-    }
-
-    /// <summary>
-    /// 字典转为Json数据数据
-    /// </summary>
-    public void GetVideosDataJson()
-    {
-        if (VideosData == null || VideosData.Count == 0)
-            VideosJson = "";
-        else
-            VideosJson = JsonSerializer.Serialize(VideosData);
-    }
-    /// <summary>
-    /// Json转为字典数据
-    /// </summary>
-    public void GetVideosData()
-    {
-        if (string.IsNullOrEmpty(VideosJson))
-            VideosData = new Dictionary<string, FileData>();
-        else
-            VideosData = JsonSerializer.Deserialize<Dictionary<string, FileData>>(VideosJson!);
-    }
     /// <summary>
     /// 更新或插入类数据
     /// </summary>
@@ -164,7 +121,43 @@ public class Animation : VideoAlbum
             await sqlite.SQLConnection.InsertAsync(this);
         }
     }
-
+    /// <summary>
+    /// 字典转为Json数据数据
+    /// </summary>
+    public void GetVideosDataJson()
+    {
+        if (VideosData == null || VideosData.Count == 0)
+            VideosJson = "";
+        else
+            VideosJson = JsonSerializer.Serialize(VideosData);
+    }
+    /// <summary>
+    /// Json转为字典数据
+    /// </summary>
+    public void GetVideosData()
+    {
+        if (string.IsNullOrEmpty(VideosJson))
+            VideosData = new Dictionary<string, FileData>();
+        else
+            VideosData = JsonSerializer.Deserialize<Dictionary<string, FileData>>(VideosJson!);
+    }
+    /// <summary>
+    /// 得到图片
+    /// </summary>
+    /// <param name="imageStream">图片流</param>
+    public void GetImage(Stream imageStream)
+    {
+        BitmapImage image = new();
+        image.BeginInit();
+        image.CacheOption = BitmapCacheOption.OnLoad;
+        image.StreamSource = imageStream;
+        image.EndInit();
+        CoverImage = image;
+    }
+    /// <summary>
+    /// 用字符串显示类信息
+    /// </summary>
+    /// <returns></returns>
     public string GetInfo()
     {
         string info = $"专辑名：{Name} 描述：{Information} 封面：{CoverHash}{Environment.NewLine}";
