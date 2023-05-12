@@ -35,7 +35,8 @@
                     VerticalAlignment="Center" 
                     HorizontalContentAlignment="Left" Command="{Binding UploadFileInfoCommand}">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="图标"/>
+                    <!--<TextBlock Text="图标"/>-->
+                    <materialDesign:PackIcon Kind="FileImagePlus" VerticalAlignment="Center"/>
                     <TextBlock Text="封面上传" VerticalAlignment="Center" Margin="10 0 0 0"/>
                 </StackPanel>
             </Button>
@@ -44,7 +45,8 @@
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Left" Command="{Binding UploadFileCommand}">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="图标"/>
+                    <!--<TextBlock Text="图标"/>-->
+                    <materialDesign:PackIcon Kind="Publish" VerticalAlignment="Center"/>
                     <TextBlock Text="上传" VerticalAlignment="Center" Margin="10 0 0 0"/>
                 </StackPanel>
             </Button>

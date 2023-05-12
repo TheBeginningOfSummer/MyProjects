@@ -19,9 +19,10 @@
 
         <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
                     VerticalAlignment="Center" HorizontalAlignment="Right"
-                    HorizontalContentAlignment="Left" Command="{Binding RefreshCommand}">
+                    HorizontalContentAlignment="Left" Command="{Binding RefreshCommand}" Cursor="Hand">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="图标"/>
+                <!--<TextBlock Text="图标"/>-->
+                <materialDesign:PackIcon Kind="Reload" VerticalAlignment="Center"/>
                 <TextBlock Text="刷新" VerticalAlignment="Center" Margin="10 0 0 0"/>
             </StackPanel>
         </Button>

@@ -20,11 +20,11 @@
             </Setter>
         </Style>
     </Window.Style>-->
-    
+
     <WindowChrome.WindowChrome>
         <WindowChrome x:Name="WindowChrome" CaptionHeight="30" GlassFrameThickness="0" UseAeroCaptionButtons="False" CornerRadius="0"/>
     </WindowChrome.WindowChrome>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
@@ -42,7 +42,7 @@
                 <RowDefinition Height="80"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            
+
             <Grid.Background>
                 <ImageBrush ImageSource="/Resources/Image/autumn.jpg" Stretch="UniformToFill" Opacity="0.2"/>
             </Grid.Background>
@@ -53,16 +53,16 @@
                 <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
                         HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="DisplayPage.xaml">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="图标"/>
-                        <TextBlock Text="数据" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                        <materialDesign:PackIcon Kind="File" VerticalAlignment="Center" Height="30" Width="20"/>
+                        <TextBlock Text="文件" VerticalAlignment="Center" Margin="10 0 0 0" FontWeight="Bold"/>
                     </StackPanel>
                 </Button>
 
                 <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
                         HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="UploadPage.xaml">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="图标"/>
-                        <TextBlock Text="上传" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                        <materialDesign:PackIcon Kind="FileUpload" VerticalAlignment="Center" Height="30" Width="20"/>
+                        <TextBlock Text="上传" VerticalAlignment="Center" Margin="10 0 0 0" FontWeight="Bold"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -75,19 +75,25 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
-                <Button Content="-" Margin="0 0 2 0" FontSize="12" Height="30" Width="60" 
+                <Button Margin="0 0 2 0" FontSize="12" Height="30" Width="60" 
                         materialDesign:ButtonAssist.CornerRadius="0"
                         materialDesign:RippleAssist.IsDisabled="True"
-                        Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                <Button Content="口" Margin="0 0 2 0" FontSize="12" Height="30" Width="60" 
+                        Command="{Binding MinimizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                    <materialDesign:PackIcon Kind="WindowMinimize" VerticalAlignment="Center"/>
+                </Button>
+                <Button Margin="0 0 2 0" FontSize="12" Height="30" Width="60" 
                         materialDesign:ButtonAssist.CornerRadius="0"
                         materialDesign:RippleAssist.IsDisabled="True"
-                        Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                <Button Content="X" Margin="0 0 10 0" FontSize="12" Height="30" Width="60"
+                        Command="{Binding MaximizeCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                    <materialDesign:PackIcon Kind="WindowMaximize" VerticalAlignment="Center"/>
+                </Button>
+                <Button Margin="0 0 10 0" FontSize="12" Height="30" Width="60"
                         materialDesign:ButtonAssist.CornerRadius="0"
                         materialDesign:RippleAssist.IsDisabled="True"
                         Background="DarkRed" BorderBrush="DarkRed"
-                        Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                    <materialDesign:PackIcon Kind="WindowClose" VerticalAlignment="Center"/>
+                </Button>
             </StackPanel>
 
             <Frame Grid.Row="1" x:Name="DisplayFrame" Source="{Binding PageName}" NavigationUIVisibility="Hidden"/>
