@@ -41,6 +41,7 @@ namespace IPFS.ViewModels
         {
             try
             {
+                if (_selectedItem == null) return;
                 NavigationService.Navigation("DetailPage.xaml", "DetailVM", SelectedItem);
             }
             catch (Exception)
@@ -96,19 +97,26 @@ namespace IPFS.ViewModels
 
         private async Task PageUpdateAsync(SQLiteService sqlite)
         {
-            Albums.Clear();
-            List<Animation>? AlbumsSource = await sqlite.SQLConnection.Table<Animation>().ToListAsync();
-            if (AlbumsSource != null)
-                foreach (var animation in AlbumsSource)
-                {
-                    Stream stream = await _csl.IPFSApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", animation.CoverHash));
-                    //加载图片
-                    animation.GetImage(stream);
-                    //读出的json数据解析
-                    animation.GetVideosData();
+            try
+            {
+                Albums.Clear();
+                List<Animation>? AlbumsSource = await sqlite.SQLConnection.Table<Animation>().ToListAsync();
+                if (AlbumsSource != null)
+                    foreach (var animation in AlbumsSource)
+                    {
+                        Stream stream = await _csl.IPFSApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", animation.CoverHash));
+                        //加载图片
+                        animation.GetImage(stream);
+                        //读出的json数据解析
+                        animation.GetVideosData();
 
-                    Albums.Add(animation);
-                }
+                        Albums.Add(animation);
+                    }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"加载失败。{e.Message}", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void PageMessengerInitialize()

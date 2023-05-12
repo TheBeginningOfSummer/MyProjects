@@ -75,17 +75,17 @@ namespace IPFS.ViewModels
             PageMessengerInitialize();
         }
 
+        private void MessageUpdate(object recipient, Animation message)
+        {
+            if (message != null) AlbumInfo = message;
+            PageUpdate(AlbumInfo);
+        }
+
         private void PageUpdate(Animation? albumInfo)
         {
             if (albumInfo == null) return; FileListInfo.Clear();
             foreach (var item in albumInfo!.VideosData!.Values)
                 FileListInfo.Add(item);
-        }
-
-        private void MessageUpdate(object recipient, Animation message)
-        {
-            if (message != null) AlbumInfo = message;
-            PageUpdate(AlbumInfo);
         }
 
         private void PageMessengerInitialize()
