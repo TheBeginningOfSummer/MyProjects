@@ -27,8 +27,8 @@
             </StackPanel>
         </Button>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding Albums}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListView Grid.Row="1" ItemsSource="{Binding Albums}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" Margin="5 0 5 0"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Name="DisplayList">
             <behavior:Interaction.Triggers>
                 <behavior:EventTrigger EventName="MouseLeftButtonUp">
                     <behavior:InvokeCommandAction Command="{Binding ItemPaddingCommand}"/>
@@ -43,9 +43,18 @@
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-
+                        <Grid.ContextMenu>
+                            <ContextMenu DataContext="{Binding Source={StaticResource ServiceLocator},Path=DisplayVM,Mode=OneWay}">
+                                <MenuItem Header="删除" Command="{Binding DeleteCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=Close}}"
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
+                            </ContextMenu>
+                        </Grid.ContextMenu>
+                        <Grid.Width>
+                            <Binding ElementName="DisplayList" Path="ActualWidth" Mode="OneWay"/>
+                        </Grid.Width>
+                        
                         <Image Grid.Column="0" Source="{Binding CoverImage}"/>
 
                         <Grid Grid.Column="1">
@@ -53,15 +62,6 @@
                                 <RowDefinition Height="30"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.ContextMenu>
-                                <ContextMenu DataContext="{Binding Source={StaticResource ServiceLocator},Path=DisplayVM,Mode=OneWay}">
-                                    <MenuItem Header="删除" Command="{Binding DeleteCommand}" 
-                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
-                                </ContextMenu>
-                            </Grid.ContextMenu>
 
                             <TextBlock Grid.Row="0" Text="{Binding Name}" Margin="10 0 10 0" FontWeight="Bold" FontSize="20"/>
                             <TextBlock Grid.Row="1" Text="{Binding Information}" Margin="10 0 10 0" TextTrimming="CharacterEllipsis" TextWrapping="Wrap"/>

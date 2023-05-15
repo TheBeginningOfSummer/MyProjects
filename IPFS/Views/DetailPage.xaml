@@ -42,9 +42,9 @@
                             <Hyperlink Command="{Binding DataContext.OpenInBrowser,ElementName=DetailList}" CommandParameter="{Binding Cid}">
                                 <Hyperlink.ContextMenu>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
-                                        <MenuItem Header="复制" Command="{Binding CopyCommand}" 
+                                        <MenuItem Header="复制" Command="{Binding CopyCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=FileDocumentBoxMultiple}}"
                                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
-                                        <MenuItem Header="删除" Command="{Binding DeleteCommand}" 
+                                        <MenuItem Header="删除" Command="{Binding DeleteCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=Close}}"
                                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
                                     </ContextMenu>
                                 </Hyperlink.ContextMenu>
