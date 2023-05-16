@@ -65,6 +65,14 @@
                         <TextBlock Text="上传" VerticalAlignment="Center" Margin="10 0 0 0" FontWeight="Bold"/>
                     </StackPanel>
                 </Button>
+
+                <Button Margin="15 15 15 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                        HorizontalContentAlignment="Left" Command="{Binding LoadPageCommand}" CommandParameter="SetPage.xaml">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Cog" VerticalAlignment="Center" Height="30" Width="20"/>
+                        <TextBlock Text="设置" VerticalAlignment="Center" Margin="10 0 0 0" FontWeight="Bold"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Grid>
 

@@ -16,19 +16,19 @@ namespace MyProjects
         public Action<Mat>? VideoUpdateAction;
         public MouseCallback MouseCallbackEvent;
 
-        private Mat sourceImage = new Mat();
+        private Mat sourceImage = new();
         #region 鼠标绘制图形
         public int DrawShape = 0;
-        private readonly Mat drawingImage = new Mat();
-        private readonly Mat drewImage = new Mat();
+        private readonly Mat drawingImage = new();
+        private readonly Mat drewImage = new();
         private Window? window;
         private OpenCvSharp.Point startPoint;
         private OpenCvSharp.Point endPoint;
         #endregion
         #region 测量
         private OpenCvSharp.Size kernalSize = new OpenCvSharp.Size(7, 7);
-        private Mat processedImage = new Mat();
-        private Mat edgeImage = new Mat();
+        private Mat processedImage = new();
+        private Mat edgeImage = new();
         #endregion
 
         public OpenCVTool()
@@ -228,7 +228,6 @@ namespace MyProjects
             OpenCvSharp.Point[][] contours;
             HierarchyIndex[] hierarchies;
             Cv2.FindContours(edgeImage, out contours, out hierarchies, RetrievalModes.External, ContourApproximationModes.ApproxNone);
-            
 
             Cv2.ImShow("edgeImage", edgeImage);
             Cv2.ImShow("processedImage", processedImage);

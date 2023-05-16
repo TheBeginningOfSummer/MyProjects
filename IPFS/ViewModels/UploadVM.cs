@@ -130,7 +130,7 @@ public class UploadVM : ObservableObject
 
     public UploadVM()
     {
-
+        _openFileDialog.Multiselect = true;
     }
 
     private void InitializeAlbum()
