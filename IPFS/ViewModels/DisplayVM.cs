@@ -12,20 +12,21 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace IPFS.ViewModels
 {
-    public class DisplayVM : ObservableObject, IRecipient<RequestMessage<Animation>>
+    public class DisplayVM : ObservableObject, IRecipient<RequestMessage<Album>>
     {
         #region 绑定的属性
-        private Animation? _selectedItem;
-        public Animation? SelectedItem
+        private Album? _selectedItem;
+        public Album? SelectedItem
         {
             get => _selectedItem;
             set => SetProperty(ref _selectedItem, value);
         }
 
-        public ObservableCollection<Animation> Albums { get; } = new ObservableCollection<Animation>();
+        public ObservableCollection<Album> Albums { get; } = new ObservableCollection<Album>();
         public ICollectionView AlbumsView { get { return CollectionViewSource.GetDefaultView(Albums); } }
         #endregion
 
@@ -36,22 +37,14 @@ namespace IPFS.ViewModels
             await PageUpdateAsync(_csl.SQLite);
         });
 
-        private RelayCommand? _itemPaddingCommand;
-        public RelayCommand ItemPaddingCommand => _itemPaddingCommand ??= new RelayCommand(() =>
+        private RelayCommand<Album>? _copyCommand;
+        public RelayCommand<Album> CopyCommand => _copyCommand ??= new RelayCommand<Album>((message) =>
         {
-            try
-            {
-                if (_selectedItem == null) return;
-                NavigationService.Navigation("DetailPage.xaml", "DetailVM", SelectedItem);
-            }
-            catch (Exception)
-            {
-
-            }
+            if (message != null) Clipboard.SetText(message.Name);
         });
 
-        private RelayCommand<Animation>? _DeleteCommand;
-        public RelayCommand<Animation> DeleteCommand => _DeleteCommand ??= new RelayCommand<Animation>(async (message) =>
+        private RelayCommand<Album>? _DeleteCommand;
+        public RelayCommand<Album> DeleteCommand => _DeleteCommand ??= new RelayCommand<Album>(async (message) =>
         {
             try
             {
@@ -59,7 +52,7 @@ namespace IPFS.ViewModels
                 if (userResult == MessageBoxResult.No) return;
                 if (message != null)
                 {
-                    foreach (var item in message.VideosData!.Values)
+                    foreach (var item in message.FilesData!.Values)
                     {
                         PinFile? pinFile = await _csl.IPFSApi.RemovePinAsync(item.Cid);
                     }
@@ -73,6 +66,43 @@ namespace IPFS.ViewModels
             }
         });
 
+        private RelayCommand? _downloadCommand;
+        public RelayCommand DownloadCommand => _downloadCommand ??= new RelayCommand(async () =>
+        {
+            try
+            {
+                if (SelectedItem == null) return;
+                var targetAlbum = SelectedItem;
+                targetAlbum.Status = "下载中……";
+                foreach (var item in targetAlbum.FilesData!.Values)
+                    await _csl.IPFSApi.DownloadFileAsync(item, $"{_csl.Config.Load("DownloadPath")}\\{targetAlbum.Name}");
+                targetAlbum.Status = "下载完成";
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"下载出错。{e.Message}", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        });
+
+        private RelayCommand? _itemPaddingCommand;
+        public RelayCommand ItemPaddingCommand => _itemPaddingCommand ??= new RelayCommand(() =>
+        {
+
+        });
+
+        public void ItemDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (SelectedItem == null) return;
+                if (e.LeftButton == MouseButtonState.Pressed)
+                    NavigationService.Navigation("DetailPage.xaml", "DetailVM", SelectedItem);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
         #endregion
 
         #region 组件
@@ -81,16 +111,16 @@ namespace IPFS.ViewModels
 
         public DisplayVM()
         {
-            _csl.SQLite.InitializeTableAsync<Animation>();
+            _csl.SQLite.InitializeTableAsync<Album>();
             PageMessengerInitialize();
         }
 
-        public void Receive(RequestMessage<Animation> message)
+        public void Receive(RequestMessage<Album> message)
         {
             if (SelectedItem != null) message.Reply(SelectedItem);
         }
 
-        private async void MessageUpdateAsync(object recipient, Animation message)
+        private async void MessageUpdateAsync(object recipient, Album message)
         {
             await PageUpdateAsync(_csl.SQLite);
         }
@@ -100,7 +130,7 @@ namespace IPFS.ViewModels
             try
             {
                 Albums.Clear();
-                List<Animation>? AlbumsSource = await sqlite.SQLConnection.Table<Animation>().ToListAsync();
+                List<Album>? AlbumsSource = await sqlite.SQLConnection.Table<Album>().ToListAsync();
                 if (AlbumsSource != null)
                     foreach (var animation in AlbumsSource)
                     {
@@ -108,7 +138,7 @@ namespace IPFS.ViewModels
                         //加载图片
                         animation.GetImage(stream);
                         //读出的json数据解析
-                        animation.GetVideosData();
+                        animation.GetFilesData();
 
                         Albums.Add(animation);
                     }
@@ -125,7 +155,7 @@ namespace IPFS.ViewModels
             //初始化详情页面时，监听数据请求
             WeakReferenceMessenger.Default.Register(this, "InitializeDetailVM");
             //上传数据更改时，刷新界面
-            WeakReferenceMessenger.Default.Register<Animation, string>(this, "DisplayVM", MessageUpdateAsync);
+            WeakReferenceMessenger.Default.Register<Album, string>(this, "DisplayVM", MessageUpdateAsync);
         }
 
     }

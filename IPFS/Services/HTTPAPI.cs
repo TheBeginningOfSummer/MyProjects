@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Net.Http;
+using System.ComponentModel;
 
 namespace IPFS;
 
@@ -240,6 +241,28 @@ public class HttpClientAPI
         PinFile? pinFile = JsonConvert.DeserializeObject<PinFile>(result);
         return pinFile;
     }
+    /// <summary>
+    /// 从IPFS下载到本地文件
+    /// </summary>
+    /// <param name="fileData">IPFS文件信息</param>
+    /// <param name="path">下载路径</param>
+    /// <returns></returns>
+    public async Task DownloadFileAsync(FileData fileData, string path)
+    {
+        fileData.CurrentSize = 0;
+        using Stream stream = await DownloadAsync(BuildCommand("cat", fileData.Cid));
+
+        if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+        path += "/" + fileData.Name!;
+        byte[] buffer = new byte[10240]; int length;
+        using FileStream file = new(path, FileMode.OpenOrCreate);
+        while ((length = await stream.ReadAsync(buffer)) != 0)
+        {
+            fileData.CurrentSize += length + 2;
+            await file.WriteAsync(buffer.AsMemory(0, length));
+            //await file.WriteAsync(buffer, 0, length);
+        }
+    }
     #endregion
 }
 
@@ -335,11 +358,32 @@ public class AddFileOptions
     }
 }
 
-public class FileData
+public class FileData : INotifyPropertyChanged
 {
     public string? Name { get; set; }
     public string? Cid { get; set; }
     public long? Size { get; set; }
+    private long? _currentSize = 0;
+    public long? CurrentSize
+    {
+        get { return _currentSize; }
+        set
+        {
+            _currentSize = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentSize)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
+        }
+    }
+    private string? _progress = "";
+    public string? Progress
+    {
+        get { if (CurrentSize != 0) return $"{CurrentSize * 100 / Size}%"; else return _progress; }
+        set
+        {
+            _progress = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
+        }
+    }
 
     public FileData(string name, string cid, long size)
     {
@@ -352,6 +396,8 @@ public class FileData
     {
 
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public string GetInfo()
     {

@@ -27,11 +27,13 @@ public class CommonServiceLoader
 
     public readonly SQLiteService SQLite;
     public readonly HttpClientAPI IPFSApi;
+    public readonly KeyValueLoader Config;
 
     private CommonServiceLoader()
     {
         SQLite = new();
         IPFSApi = new();
+        Config = new("Configuration.json", "Config");
     }
     /// <summary>
     /// 加载上传文件到IPFS
@@ -49,16 +51,16 @@ public class CommonServiceLoader
         (FileManager.GetFileStream(path), fileName, null, fileLength);
     }
     /// <summary>
-    /// 更新animation数据库并上传至IPFS
+    /// 更新数据库上传至IPFS，并发布至IPNS
     /// </summary>
     /// <param name="animation">数据（带数据库）</param>
     /// <param name="changeOrDelete">更改还是删除数据true为更改</param>
     /// <returns>发布结果</returns>
-    public async Task<string> PublishDatabaseAsync(Animation animation, bool changeOrDelete = true)
+    public async Task<string> PublishDatabaseAsync(Album animation, bool changeOrDelete = true)
     {
         if (changeOrDelete)
-            //数据插入或更新（先读取判断此条数据是否存在）
-            await animation.DatabaseUpdateAsync(SQLite);
+            //数据插入或更新（先读取判断此条数据是否存在，不删除原有文件列表）
+            await animation.DatabaseUpdateAsync(SQLite, 1);
         else
             await SQLite.SQLConnection.DeleteAsync(animation);
         //上传数据库到IPFS

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -611,6 +612,20 @@ namespace MyToolkit
             using FileStream file = new FileStream(path, fileMode);
             while ((length = await message.ReadAsync(buffer)) != 0)
                 await file.WriteAsync(buffer, 0, length);
+        }
+
+        public static async Task WriteStreamProgressAsync(string path, string fileName, int fileSize, Stream message, IProgress<string> progress, FileMode fileMode = FileMode.OpenOrCreate)
+        {
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            path += "/" + fileName;
+            byte[] buffer = new byte[10240]; int length; int progressLength = 0;
+            using FileStream file = new FileStream(path, fileMode);
+            while ((length = await message.ReadAsync(buffer)) != 0)
+            {
+                await file.WriteAsync(buffer, 0, length);
+                progressLength += length;
+                progress.Report($"{length * 100 / fileSize}%");
+            }
         }
 
         public static void AppendFlieString(string path, string fileName, string message, FileMode fileMode)

@@ -25,20 +25,24 @@
         <TextBlock Text="{Binding AlbumInfo.Name}" VerticalAlignment="Center" HorizontalAlignment="Right"
                    Margin="0 0 20 0" FontSize="30" FontWeight="Bold"/>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding FileListInfo}" x:Name="DetailList">
+        <ListView Grid.Row="1" ItemsSource="{Binding FileListInfo}" x:Name="DetailList" SelectionMode="Single" SelectedItem="{Binding SelectedFileData}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="300"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="100"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
+                        <Grid.Width>
+                            <Binding ElementName="DetailList" Path="ActualWidth" Mode="OneWay"/>
+                        </Grid.Width>
 
-                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Tag="{Binding Source={StaticResource ServiceLocator},Path=DetailVM,Mode=OneWay}">
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="Wrap"/>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Tag="{Binding Source={StaticResource ServiceLocator},Path=DetailVM,Mode=OneWay}">
                             <Hyperlink Command="{Binding DataContext.OpenInBrowser,ElementName=DetailList}" CommandParameter="{Binding Cid}">
                                 <Hyperlink.ContextMenu>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
@@ -46,11 +50,14 @@
                                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
                                         <MenuItem Header="删除" Command="{Binding DeleteCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=Close}}"
                                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
+                                        <MenuItem Header="下载" Command="{Binding DownloadCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=ArrowDownBold}}"
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
                                     </ContextMenu>
                                 </Hyperlink.ContextMenu>
                                 <TextBlock Text="{Binding Cid}"/>
                             </Hyperlink>
                         </TextBlock>
+                        <TextBlock Grid.Column="2" Text="{Binding Progress}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

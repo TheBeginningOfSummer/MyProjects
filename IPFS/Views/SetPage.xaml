@@ -13,7 +13,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
         <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
@@ -29,9 +30,22 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <TextBlock Text="下载路径：" Margin="10 0 0 0" VerticalAlignment="Center" FontWeight="Bold"/>
             <TextBox Text="{Binding DownloadPath}" Width="500" VerticalAlignment="Center"/>
-            <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
-                    VerticalAlignment="Center" HorizontalAlignment="Right" 
-                    HorizontalContentAlignment="Left" Command="{Binding GetPathCommand}" Cursor="Hand">
+            <Button Margin="5 0 10 0" Height="25" Style="{DynamicResource MaterialDesignRaisedButton}"
+                    VerticalAlignment="Center" HorizontalAlignment="Right" HorizontalContentAlignment="Left" 
+                    Command="{Binding GetFolderPathCommand}" CommandParameter="DownloadPath" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <!--<TextBlock Text="图标"/>-->
+                    <materialDesign:PackIcon Kind="Contain" VerticalAlignment="Center"/>
+                    <TextBlock Text="浏览" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <TextBlock Text="浏览器路径：" Margin="10 0 0 0" VerticalAlignment="Center" FontWeight="Bold"/>
+            <TextBox Text="{Binding BrowserPath}" Width="500" VerticalAlignment="Center"/>
+            <Button Margin="5 0 10 0" Height="25" Style="{DynamicResource MaterialDesignRaisedButton}"
+                    VerticalAlignment="Center" HorizontalAlignment="Right" HorizontalContentAlignment="Left" 
+                    Command="{Binding GetFilePathCommand}" CommandParameter="BrowserPath" Cursor="Hand">
                 <StackPanel Orientation="Horizontal">
                     <!--<TextBlock Text="图标"/>-->
                     <materialDesign:PackIcon Kind="Contain" VerticalAlignment="Center"/>

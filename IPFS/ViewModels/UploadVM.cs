@@ -4,12 +4,8 @@ using CommunityToolkit.Mvvm.Messaging;
 using IPFS.Models;
 using IPFS.Services;
 using Microsoft.Win32;
-using MyToolkit;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
 namespace IPFS.ViewModels;
@@ -106,7 +102,7 @@ public class UploadVM : ObservableObject
                     AddAlbumData(result);
                 }
                 //数据存储表
-                Animation animation = new(_album, _fileDic);
+                Album animation = new(_album, _fileDic);
                 //更新数据并上传
                 await _csl.PublishDatabaseAsync(animation);
                 //展示页面数据刷新
@@ -122,7 +118,7 @@ public class UploadVM : ObservableObject
     #endregion
 
     #region 组件
-    private readonly VideoAlbum _album = new();//上传专辑信息
+    private readonly AlbumData _album = new();//上传专辑信息
     private readonly Dictionary<string, FileData> _fileDic = new();//专辑数据信息
     private readonly OpenFileDialog _openFileDialog = new();
     private readonly CommonServiceLoader _csl = CommonServiceLoader.Instance;
