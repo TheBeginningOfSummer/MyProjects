@@ -12,6 +12,7 @@ public class ServiceLocator
     public UploadVM? UploadVM => _serviceProvider.GetService<UploadVM>();
     public DisplayVM? DisplayVM => _serviceProvider.GetService<DisplayVM>();
     public DetailVM? DetailVM => _serviceProvider.GetService<DetailVM>();
+    public RemoteVM? RemoteVM => _serviceProvider.GetService<RemoteVM>();
     public SetVM? SetVM => _serviceProvider.GetService<SetVM>();
 
     public ServiceLocator()
@@ -21,6 +22,7 @@ public class ServiceLocator
         serviceCollection.AddSingleton<UploadVM>();
         serviceCollection.AddSingleton<DisplayVM>();
         serviceCollection.AddSingleton<DetailVM>();
+        serviceCollection.AddSingleton<RemoteVM>();
         serviceCollection.AddSingleton<SetVM>();
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }

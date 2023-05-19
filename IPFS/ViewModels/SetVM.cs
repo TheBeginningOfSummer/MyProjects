@@ -2,8 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using IPFS.Services;
 using Microsoft.Win32;
-using MyToolkit;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace IPFS.ViewModels;
@@ -24,13 +24,24 @@ public class SetVM : ObservableObject
         set => SetProperty(ref _browserPath, value);
     }
 
+    private KeyValuePair<string,string> _selectedIPNS;
+    public KeyValuePair<string,string> SelectedIPNS
+    {
+        get => _selectedIPNS;
+        set => SetProperty(ref _selectedIPNS, value);
+    }
+
+    public Dictionary<string,string> IPNS { get; set; }
+
     private RelayCommand? _saveCommand;
     public RelayCommand SaveCommand => _saveCommand ??= new RelayCommand(() =>
     {
         try
         {
-            _config.Change("DownloadPath", string.IsNullOrEmpty(DownloadPath) ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) : DownloadPath);
-            _config.Change("BrowserPath", string.IsNullOrEmpty(BrowserPath) ? "" : BrowserPath);
+            _csl.Config.Change("DownloadPath", string.IsNullOrEmpty(DownloadPath) ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) : DownloadPath);
+            _csl.Config.Change("BrowserPath", string.IsNullOrEmpty(BrowserPath) ? "" : BrowserPath);
+            _csl.Config.Change("IPNSName", string.IsNullOrEmpty(SelectedIPNS.Key) ? "self" : SelectedIPNS.Key);
+            _csl.Config.Change("IPNSId", string.IsNullOrEmpty(SelectedIPNS.Value) ? IPNS["self"] : SelectedIPNS.Value);
             MessageBox.Show("保存成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (System.Exception)
@@ -67,13 +78,21 @@ public class SetVM : ObservableObject
         }
     });
 
+    private RelayCommand? _ipnsCopyCommand;
+    public RelayCommand IPNSCopyCommand => _ipnsCopyCommand ??= new RelayCommand(() =>
+    {
+        Clipboard.SetText($"{SelectedIPNS.Key}:{SelectedIPNS.Value}");
+    });
+
     readonly System.Windows.Forms.FolderBrowserDialog _folderBrowserDialog = new();
     readonly OpenFileDialog _openFileDialog = new();
-    readonly KeyValueLoader _config = CommonServiceLoader.Instance.Config;
+    readonly CommonServiceLoader _csl = CommonServiceLoader.Instance;
 
     public SetVM()
     {
-        DownloadPath = _config.Load("DownloadPath");
-        BrowserPath = _config.Load("BrowserPath");
+        DownloadPath = _csl.Config.Load("DownloadPath");
+        BrowserPath = _csl.Config.Load("BrowserPath");
+        SelectedIPNS = new(_csl.Config.Load("IPNSName"), _csl.Config.Load("IPNSId"));
+        IPNS = _csl.LocalIPNSDic;
     }
 }

@@ -192,6 +192,14 @@ public class HttpClientAPI
         }
         return ipnsDic;
     }
+
+    public async Task<string> ResolveIPNSAsync(string ipns)
+    {
+        Uri command = BuildCommand("name/resolve", ipns);
+        string resultString = await DoCommandAsync(command);
+        var ipnsPath = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(resultString);
+        return ipnsPath == null ? "" : ipnsPath["Path"];
+    }
     /// <summary>
     /// 上传文件
     /// </summary>

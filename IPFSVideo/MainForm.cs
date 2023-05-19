@@ -206,19 +206,20 @@ namespace IPFSVideo
             try
             {
                 //video.AddOption($":sout=#rtp{{sdp = rtsp://127.0.0.1:8554/video}} :sout-all :sout-keep");
-
+                /// ipfs / QmYPyUj1jmmABmWc3ZUyGBx6N3p7MB6MkLb3PxpBqz2FC2
                 string result = await ipfsApi.DoCommandAsync(HttpClientAPI.BuildCommand(TB_Command.Text, TB_CID.Text));
                 ShowMessage(result.ToString());
-                PinFile pinFile = JsonSerializer.Deserialize<PinFile>(result)!;
-                if (pinFile.Pins == null)
-                {
-                    ShowMessage("已移除");
-                }
-                else
-                {
-                    ShowMessage("已固定");
-                }
-                //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", $"http://localhost:8080/ipfs/{TB_CID.Text}");
+                //PinFile pinFile = JsonSerializer.Deserialize<PinFile>(result)!;
+                //if (pinFile.Pins == null)
+                //{
+                //    ShowMessage("已移除");
+                //}
+                //else
+                //{
+                //    ShowMessage("已固定");
+                //}
+                
+                //System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", $"http://localhost:8080/ipfs/QmYPyUj1jmmABmWc3ZUyGBx6N3p7MB6MkLb3PxpBqz2FC2");
                 //var result = await ipfsApi.DoCommandAsync
                 //    (HttpClientAPI.BuildCommand("name/publish", "QmUat6n7w6nXBs2fC7jpubGg1Rgid83z5iXpknL37GcQ85", "key=self"));
 

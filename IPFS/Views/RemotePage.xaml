@@ -1,0 +1,35 @@
+﻿<Page x:Class="IPFS.Views.RemotePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:local="clr-namespace:IPFS.Views" 
+      mc:Ignorable="d" 
+      DataContext="{Binding RemoteVM,Source={StaticResource ServiceLocator}}"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="RemotePage">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                    VerticalAlignment="Center" HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Left" Command="{Binding RefreshCommand}" Cursor="Hand">
+            <StackPanel Orientation="Horizontal">
+                <!--<TextBlock Text="图标"/>-->
+                <materialDesign:PackIcon Kind="Reload" VerticalAlignment="Center"/>
+                <TextBlock Text="刷新" VerticalAlignment="Center" Margin="10 0 0 0"/>
+            </StackPanel>
+        </Button>
+        <ComboBox VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 0 0 0" ItemsSource="{Binding IPNS}" SelectedItem="{Binding SelectedIPNS}"
+                  IsEditable="True" materialDesign:HintAssist.Hint="IPNS">
+            
+        </ComboBox>
+
+
+    </Grid>
+</Page>

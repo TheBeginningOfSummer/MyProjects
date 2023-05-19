@@ -15,6 +15,7 @@
             <RowDefinition Height="80"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
         <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
@@ -50,6 +51,29 @@
                     <!--<TextBlock Text="图标"/>-->
                     <materialDesign:PackIcon Kind="Contain" VerticalAlignment="Center"/>
                     <TextBlock Text="浏览" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <TextBlock Text="本地IPNS：" Margin="10 0 0 0" VerticalAlignment="Center" FontWeight="Bold"/>
+            <ComboBox x:Name="IPNSComboBox" ItemsSource="{Binding IPNS}" SelectedItem="{Binding SelectedIPNS}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Key}"/>
+                            <TextBlock Text="   "/>
+                            <TextBlock Text="{Binding Value}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Margin="5 0 10 0" Height="25" Style="{DynamicResource MaterialDesignRaisedButton}"
+                    VerticalAlignment="Center" HorizontalAlignment="Right" HorizontalContentAlignment="Left" 
+                    Command="{Binding IPNSCopyCommand}" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <!--<TextBlock Text="图标"/>-->
+                    <materialDesign:PackIcon Kind="FileDocumentBoxMultiple" VerticalAlignment="Center"/>
+                    <TextBlock Text="复制" VerticalAlignment="Center" Margin="10 0 0 0"/>
                 </StackPanel>
             </Button>
         </StackPanel>

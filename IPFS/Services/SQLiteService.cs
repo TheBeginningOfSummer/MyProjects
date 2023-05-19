@@ -14,7 +14,7 @@ namespace IPFS.Services
         private SQLiteAsyncConnection? sqlconnection;
         public SQLiteAsyncConnection SQLConnection => sqlconnection ??= new SQLiteAsyncConnection(DatabasePath);
 
-        public SQLiteService(string databaseName = "data.db", string databasePath = "")
+        public SQLiteService(string databaseName = "Data.db", string databasePath = "")
         {
             this.DatabaseName = databaseName;
             if (databasePath == "")

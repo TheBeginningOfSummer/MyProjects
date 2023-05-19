@@ -104,7 +104,7 @@ public class UploadVM : ObservableObject
                 //数据存储表
                 Album animation = new(_album, _fileDic);
                 //更新数据并上传
-                await _csl.PublishDatabaseAsync(animation);
+                await _csl.PublishDatabaseAsync(animation, _csl.Config.Load("IPNSName"));
                 //展示页面数据刷新
                 WeakReferenceMessenger.Default.Send(animation, "DisplayVM");
             }

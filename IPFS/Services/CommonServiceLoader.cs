@@ -1,5 +1,6 @@
 ﻿using IPFS.Models;
 using MyToolkit;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,12 +29,21 @@ public class CommonServiceLoader
     public readonly SQLiteService SQLite;
     public readonly HttpClientAPI IPFSApi;
     public readonly KeyValueLoader Config;
+    public Dictionary<string, string> LocalIPNSDic;
+    public KeyValueLoader RemoteIPNS;
 
     private CommonServiceLoader()
     {
         SQLite = new();
         IPFSApi = new();
         Config = new("Configuration.json", "Config");
+        LocalIPNSDic = IPFSApi.GetIPNSAsync().Result;
+        RemoteIPNS = new("IPNSList.json", "Config");
+    }
+
+    public async Task IPNSUpdate()
+    {
+        LocalIPNSDic = await IPFSApi.GetIPNSAsync();
     }
     /// <summary>
     /// 加载上传文件到IPFS
@@ -56,7 +66,7 @@ public class CommonServiceLoader
     /// <param name="animation">数据（带数据库）</param>
     /// <param name="changeOrDelete">更改还是删除数据true为更改</param>
     /// <returns>发布结果</returns>
-    public async Task<string> PublishDatabaseAsync(Album animation, bool changeOrDelete = true)
+    public async Task<string> PublishDatabaseAsync(Album animation, string ipnsName = "self", bool changeOrDelete = true)
     {
         if (changeOrDelete)
             //数据插入或更新（先读取判断此条数据是否存在，不删除原有文件列表）
@@ -69,7 +79,7 @@ public class CommonServiceLoader
         //发布到IPNS
         if (databaseInfo != null)
             return await IPFSApi.DoCommandAsync
-                    (HttpClientAPI.BuildCommand("name/publish", databaseInfo.Cid, "key=self"));
+                    (HttpClientAPI.BuildCommand("name/publish", databaseInfo.Cid, $"key={ipnsName}"));
         return "Failed";
     }
 }
