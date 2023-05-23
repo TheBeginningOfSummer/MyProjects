@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:behavior="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:local="clr-namespace:IPFS.Views" 
       mc:Ignorable="d" 
       DataContext="{Binding RemoteVM,Source={StaticResource ServiceLocator}}"
@@ -18,18 +19,90 @@
 
         <Button Margin="5 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
                     VerticalAlignment="Center" HorizontalAlignment="Right"
-                    HorizontalContentAlignment="Left" Command="{Binding RefreshCommand}" Cursor="Hand">
+                    HorizontalContentAlignment="Center" Command="{Binding RefreshCommand}" Cursor="Hand">
             <StackPanel Orientation="Horizontal">
                 <!--<TextBlock Text="图标"/>-->
                 <materialDesign:PackIcon Kind="Reload" VerticalAlignment="Center"/>
                 <TextBlock Text="刷新" VerticalAlignment="Center" Margin="10 0 0 0"/>
             </StackPanel>
         </Button>
-        <ComboBox VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 0 0 0" ItemsSource="{Binding IPNS}" SelectedItem="{Binding SelectedIPNS}"
-                  IsEditable="True" materialDesign:HintAssist.Hint="IPNS">
-            
-        </ComboBox>
 
+        <StackPanel Orientation="Horizontal">
+            <ComboBox VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10 0 0 0" ItemsSource="{Binding IPNS}" SelectedItem="{Binding SelectedIPNS}"
+                  IsEditable="True" materialDesign:HintAssist.Hint="IPNS" MaxWidth="500" Text="{Binding IPNSText}">
 
+            </ComboBox>
+
+            <Button Margin="10 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                    VerticalAlignment="Center" HorizontalAlignment="Left"
+                    HorizontalContentAlignment="Center" Command="{Binding SaveCommand}" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <!--<TextBlock Text="图标"/>-->
+                    <materialDesign:PackIcon Kind="ContentSave" VerticalAlignment="Center"/>
+                    <TextBlock Text="保存" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+            </Button>
+
+            <Button Margin="0 0 10 0" Height="30" Style="{DynamicResource MaterialDesignRaisedButton}" materialDesign:ElevationAssist.Elevation="Dp7"
+                    VerticalAlignment="Center" HorizontalAlignment="Left"
+                    HorizontalContentAlignment="Center" Command="{Binding DeleteCommand}" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <!--<TextBlock Text="图标"/>-->
+                    <materialDesign:PackIcon Kind="Close" VerticalAlignment="Center"/>
+                    <TextBlock Text="删除" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding Albums}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" Margin="5 0 5 0"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" Name="DisplayList">
+            <behavior:Interaction.Triggers>
+                <behavior:EventTrigger EventName="MouseDoubleClick">
+                    <behavior:InvokeCommandAction Command=""/>
+                    <behavior:CallMethodAction MethodName="ItemDoubleClick" TargetObject="{Binding}"/>
+                </behavior:EventTrigger>
+            </behavior:Interaction.Triggers>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="80"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="100"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.ContextMenu>
+                            <ContextMenu DataContext="{Binding Source={StaticResource ServiceLocator},Path=DisplayVM,Mode=OneWay}">
+                                <MenuItem Header="复制" Command="{Binding CopyCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=FileDocumentBoxMultiple}}"
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
+                                <MenuItem Header="删除" Command="{Binding DeleteCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=Close}}"
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
+                                <MenuItem Header="下载" Command="{Binding DownloadCommand}" Icon="{Binding Source={materialDesign:PackIcon Kind=ArrowDownBold}}"
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu,Mode=FindAncestor},Path=PlacementTarget.DataContext}"/>
+                            </ContextMenu>
+                        </Grid.ContextMenu>
+                        <Grid.Width>
+                            <Binding ElementName="DisplayList" Path="ActualWidth" Mode="OneWay"/>
+                        </Grid.Width>
+
+                        <Image Grid.Column="0" Source="{Binding CoverImage}"/>
+
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="{Binding Name}" Margin="10 0 10 0" FontWeight="Bold" FontSize="20"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Information}" Margin="10 0 10 0" TextTrimming="CharacterEllipsis" TextWrapping="Wrap"/>
+                        </Grid>
+
+                        <TextBlock Grid.Column="2" Text="{Binding Status}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Page>

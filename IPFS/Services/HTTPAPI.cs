@@ -271,6 +271,27 @@ public class HttpClientAPI
             //await file.WriteAsync(buffer, 0, length);
         }
     }
+    /// <summary>
+    /// 从IPFS下载到本地文件
+    /// </summary>
+    /// <param name="cid">ipfs路径</param>
+    /// <param name="fileName">保存的文件名</param>
+    /// <param name="path">保存的路径</param>
+    /// <returns></returns>
+    public async Task DownloadFileAsync(string cid, string fileName, string path)
+    {
+        using Stream stream = await DownloadAsync(BuildCommand("cat", cid));
+
+        if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+        path += "/" + fileName!;
+        byte[] buffer = new byte[10240]; int length;
+        using FileStream file = new(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+        while ((length = await stream.ReadAsync(buffer)) != 0)
+        {
+            await file.WriteAsync(buffer.AsMemory(0, length));
+            //await file.WriteAsync(buffer, 0, length);
+        }
+    }
     #endregion
 }
 
