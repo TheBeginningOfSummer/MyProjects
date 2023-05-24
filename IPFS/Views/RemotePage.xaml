@@ -54,7 +54,7 @@
             </Button>
         </StackPanel>
 
-        <ListView Grid.Row="1" ItemsSource="{Binding Albums}" SelectionMode="Single" SelectedItem="{Binding SelectedItem}" Margin="5 0 5 0"
+        <ListView Grid.Row="1" ItemsSource="{Binding Albums}" SelectionMode="Single" SelectedItem="{Binding MyAlbum}" Margin="5 0 5 0"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" Name="DisplayList">
             <behavior:Interaction.Triggers>
                 <behavior:EventTrigger EventName="MouseDoubleClick">

@@ -94,7 +94,7 @@ namespace IPFS.ViewModels
         {
             try
             {
-                if (SelectedItem == null) return;
+                if (SelectedItem == null) return; SelectedItem.Page = "DisplayPage.xaml";
                 if (e.LeftButton == MouseButtonState.Pressed)
                     NavigationService.Navigation("DetailPage.xaml", "DetailVM", SelectedItem);
             }
@@ -111,7 +111,7 @@ namespace IPFS.ViewModels
 
         public DisplayVM()
         {
-            _csl.SQLite.InitializeTableAsync<Album>();
+            _csl.SQLite.InitializeTableAsync<Album?>();
             PageMessengerInitialize();
         }
 

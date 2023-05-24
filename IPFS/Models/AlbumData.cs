@@ -54,6 +54,8 @@ public class Album : AlbumData, INotifyPropertyChanged
         }
     }
 
+    public string Page = "";
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public Album(string name, string information, string coverHash, string filesJson)

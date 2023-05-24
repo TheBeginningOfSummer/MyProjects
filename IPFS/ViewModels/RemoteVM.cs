@@ -10,10 +10,13 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Messaging.Messages;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace IPFS.ViewModels;
 
-public class RemoteVM : ObservableObject
+public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
 {
     private string? _selectedIPNS;
     public string? SelectedIPNS
@@ -27,6 +30,13 @@ public class RemoteVM : ObservableObject
     {
         get => _ipnsText;
         set => SetProperty(ref _ipnsText, value);
+    }
+
+    private Album? _album;
+    public Album? MyAlbum
+    {
+        get => _album;
+        set => SetProperty(ref _album, value);
     }
 
     public ObservableCollection<string> IPNS { get; } = new ObservableCollection<string>();
@@ -93,15 +103,49 @@ public class RemoteVM : ObservableObject
         }
     });
 
+    public void ItemDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        try
+        {
+            if (MyAlbum == null) return; MyAlbum.Page = "RemotePage.xaml";
+            if (e.LeftButton == MouseButtonState.Pressed)
+                NavigationService.Navigation("DetailPage.xaml", "DetailVM", MyAlbum);
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
     #region 组件
     private CommonServiceLoader _csl = CommonServiceLoader.Instance;
     private SQLiteService _ipnsSqlite = new();
     #endregion
 
+    private async Task<string> GetIPNSData()
+    {
+        if (string.IsNullOrEmpty(IPNSText)) return "";
+        if (IPNSText.Contains(':'))
+        {
+            string ipnsKey = IPNSText.Split(':')[0];
+            string ipns = IPNSText.Split(":")[1];
+            string cid = await _csl.IPFSApi.ResolveIPNSAsync(ipns);
+            await _csl.IPFSApi.DownloadFileAsync(cid, ipnsKey, "IPNSData");
+            return ipnsKey;
+        }
+        return "";
+    }
+
     public RemoteVM()
     {
         foreach (var item in _csl.RemoteIPNS.KeyValueList)
             IPNS.Add($"{item.Key}:{item.Value}");
+        PageMessengerInitialize();
+    }
+
+    public void Receive(RequestMessage<Album> message)
+    {
+        if (MyAlbum != null) message.Reply(MyAlbum);
     }
 
     private async Task PageUpdateAsync(SQLiteService sqlite)
@@ -128,17 +172,14 @@ public class RemoteVM : ObservableObject
         }
     }
 
-    private async Task<string> GetIPNSData()
+    private async void PageMessengerInitialize()
     {
-        if (string.IsNullOrEmpty(IPNSText)) return"";
-        if (IPNSText.Contains(':'))
-        {
-            string ipnsKey = IPNSText.Split(':')[0];
-            string ipns = IPNSText.Split(":")[1];
-            string cid = await _csl.IPFSApi.ResolveIPNSAsync(ipns);
-            await _csl.IPFSApi.DownloadFileAsync(cid, ipnsKey, "IPNSData");
-            return ipnsKey;
-        }
-        return "";
+        await PageUpdateAsync(_csl.SQLite);
+        //初始化详情页面时，监听数据请求
+        WeakReferenceMessenger.Default.Register(this, "InitializeDetailVM");
+        //上传数据更改时，刷新界面
+        //WeakReferenceMessenger.Default.Register<Album, string>(this, "RemoteVM", MessageUpdateAsync);
     }
+
+
 }

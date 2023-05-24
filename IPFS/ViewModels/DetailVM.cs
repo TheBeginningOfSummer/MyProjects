@@ -29,12 +29,13 @@ namespace IPFS.ViewModels
 
         public ObservableCollection<FileData> FileListInfo { get; } = new ObservableCollection<FileData>();
         #endregion
-
+        private string page = "";
         #region 绑定的命令
         private RelayCommand? _returnCommand;
         public RelayCommand ReturnCommand => _returnCommand ??= new RelayCommand(() =>
         {
-            WeakReferenceMessenger.Default.Send("DisplayPage.xaml");
+            if (!string.IsNullOrEmpty(page))
+                WeakReferenceMessenger.Default.Send(page);
         });
 
         private RelayCommand<string>? _openInBrowser;
@@ -107,6 +108,7 @@ namespace IPFS.ViewModels
         {
             if (message != null) AlbumInfo = message;
             PageUpdate(AlbumInfo);
+            page = AlbumInfo!.Page;
         }
 
         private void PageUpdate(Album? albumInfo)
@@ -119,9 +121,9 @@ namespace IPFS.ViewModels
         private void PageMessengerInitialize()
         {
             //从其他页面请求初始数据
-            var result = WeakReferenceMessenger.Default.Send(new RequestMessage<Album>(), "InitializeDetailVM");
+            var result = WeakReferenceMessenger.Default.Send(new RequestMessage<Album?>(), "InitializeDetailVM");
             //请求到的数据
-            AlbumInfo = result.Response; PageUpdate(AlbumInfo);
+            AlbumInfo = result.Response; PageUpdate(AlbumInfo); page = AlbumInfo!.Page;
             //注册数据接收
             WeakReferenceMessenger.Default.Register<Album, string>(this, "DetailVM", MessageUpdate);
         }
