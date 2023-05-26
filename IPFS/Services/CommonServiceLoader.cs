@@ -29,7 +29,6 @@ public class CommonServiceLoader
     public readonly SQLiteService SQLite;
     public readonly HttpClientAPI IPFSApi;
     public readonly KeyValueLoader Config;
-    public Dictionary<string, string> LocalIPNSDic;
     public KeyValueLoader RemoteIPNS;
 
     private CommonServiceLoader()
@@ -37,14 +36,9 @@ public class CommonServiceLoader
         SQLite = new();
         IPFSApi = new();
         Config = new("Configuration.json", "Config");
-        LocalIPNSDic = IPFSApi.GetIPNSAsync().Result;
         RemoteIPNS = new("IPNSList.json", "Config");
     }
 
-    public async Task IPNSUpdate()
-    {
-        LocalIPNSDic = await IPFSApi.GetIPNSAsync();
-    }
     /// <summary>
     /// 加载上传文件到IPFS
     /// </summary>
