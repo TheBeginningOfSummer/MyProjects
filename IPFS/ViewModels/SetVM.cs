@@ -83,12 +83,12 @@ public class SetVM : ObservableObject
     public RelayCommand IPNSCopyCommand => _ipnsCopyCommand ??= new RelayCommand(() =>
     {
         Clipboard.SetText($"{SelectedIPNS.Key}:{SelectedIPNS.Value}");
-        var ipnsSource = _csl.IPFSApi.GetIPNSAsync().Result;
-        if (ipnsSource != null)
-        {
-            foreach (var ipns in ipnsSource)
-                IPNS.Add(ipns.Key, ipns.Value);
-        }
+        //var ipnsSource = _csl.IPFSApi.GetIPNSAsync().Result;
+        //if (ipnsSource != null)
+        //{
+        //    foreach (var ipns in ipnsSource)
+        //        IPNS.Add(ipns.Key, ipns.Value);
+        //}
     });
 
     readonly System.Windows.Forms.FolderBrowserDialog _folderBrowserDialog = new();

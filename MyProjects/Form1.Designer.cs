@@ -128,7 +128,7 @@
             // BTN_ReadImage
             // 
             BTN_ReadImage.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_ReadImage.Location = new Point(634, 420);
+            BTN_ReadImage.Location = new Point(634, 391);
             BTN_ReadImage.Name = "BTN_ReadImage";
             BTN_ReadImage.Size = new Size(75, 23);
             BTN_ReadImage.TabIndex = 6;
@@ -139,7 +139,7 @@
             // BTN_ReadVideo
             // 
             BTN_ReadVideo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_ReadVideo.Location = new Point(715, 420);
+            BTN_ReadVideo.Location = new Point(634, 420);
             BTN_ReadVideo.Name = "BTN_ReadVideo";
             BTN_ReadVideo.Size = new Size(75, 23);
             BTN_ReadVideo.TabIndex = 7;
@@ -234,7 +234,8 @@
             // 
             // BTN_CVStop
             // 
-            BTN_CVStop.Location = new Point(795, 391);
+            BTN_CVStop.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            BTN_CVStop.Location = new Point(796, 420);
             BTN_CVStop.Name = "BTN_CVStop";
             BTN_CVStop.Size = new Size(75, 23);
             BTN_CVStop.TabIndex = 16;
@@ -244,7 +245,8 @@
             // 
             // BTN_LocalCamera
             // 
-            BTN_LocalCamera.Location = new Point(715, 391);
+            BTN_LocalCamera.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            BTN_LocalCamera.Location = new Point(715, 420);
             BTN_LocalCamera.Name = "BTN_LocalCamera";
             BTN_LocalCamera.Size = new Size(75, 23);
             BTN_LocalCamera.TabIndex = 15;
@@ -292,6 +294,7 @@
             // 
             // TB_Test
             // 
+            TB_Test.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             TB_Test.Location = new Point(8, 6);
             TB_Test.Multiline = true;
             TB_Test.Name = "TB_Test";
@@ -300,6 +303,7 @@
             // 
             // BTN_Test
             // 
+            BTN_Test.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             BTN_Test.Location = new Point(707, 6);
             BTN_Test.Name = "BTN_Test";
             BTN_Test.Size = new Size(163, 39);
