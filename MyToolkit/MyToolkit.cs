@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -54,9 +53,8 @@ namespace MyToolkit
         public class SocketTool
         {
             //基本参数
-            public Socket SocketItem { get; set; }
+            public Socket? SocketItem { get; set; }
             public byte[] DataCache { get; set; }
-            public byte[] SendByte { get; set; }
             //所需参数
             public Dictionary<string, Socket> ClientDic { get; set; }
             public IPAddress? IP { get; set; }
@@ -69,9 +67,8 @@ namespace MyToolkit
 
             public SocketTool(int byteLength = 4096)
             {
-                SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                //SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 DataCache = new byte[byteLength];
-                SendByte = new byte[byteLength];
                 ClientDic = new Dictionary<string, Socket>();
             }
 
@@ -93,6 +90,7 @@ namespace MyToolkit
             {
                 try
                 {
+                    SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     IPAddress.TryParse(IP, out IPAddress iPAddress);
                     IAsyncResult result = SocketItem.BeginConnect(iPAddress, Port, null, null);
                     var isConnect = result.AsyncWaitHandle.WaitOne(5000, true);
@@ -119,8 +117,11 @@ namespace MyToolkit
             {
                 try
                 {
-                    SocketItem.Shutdown(SocketShutdown.Both);
-                    SocketItem.Close();
+                    if (SocketItem != null)
+                    {
+                        SocketItem.Shutdown(SocketShutdown.Both);
+                        SocketItem.Close();
+                    }
                 }
                 catch (Exception)
                 {
@@ -136,7 +137,7 @@ namespace MyToolkit
                     int length = -1;
                     try
                     {
-                        length = SocketItem.Receive(DataCache);
+                        length = SocketItem!.Receive(DataCache);
                     }
                     catch (SocketException e)
                     {
@@ -153,7 +154,7 @@ namespace MyToolkit
                     }
                     else
                     {
-                        SocketItem.Shutdown(SocketShutdown.Both);
+                        SocketItem!.Shutdown(SocketShutdown.Both);
                         SocketItem.Close();
                         return;
                     }
@@ -167,6 +168,7 @@ namespace MyToolkit
             {
                 try
                 {
+                    SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     IPEndPoint = new IPEndPoint(ip, port);
                     SocketItem.Bind(IPEndPoint);
                     SocketItem.Listen(200);
@@ -183,8 +185,11 @@ namespace MyToolkit
             {
                 try
                 {
-                    SocketItem.Close();
-                    ClientDic.Clear();
+                    if(SocketItem != null)
+                    {
+                        SocketItem.Close();
+                        ClientDic.Clear();
+                    }
                 }
                 catch (Exception)
                 {
@@ -248,16 +253,9 @@ namespace MyToolkit
             }
             #endregion
 
-            public void SendUTF8(byte[] data)
+            public void SendUTF8(string data)
             {
-                //float f = 0.1f;
-                //byte[] set1 = BitConverter.GetBytes(f);
-                //SendByte[0] = set1[3];
-                //SendByte[1] = set1[2];
-                //SendByte[2] = set1[1];
-                //SendByte[3] = set1[0];
-                SendByte = Encoding.UTF8.GetBytes(data.ToString());
-                SocketItem.Send(SendByte);//覆盖plc写入区的数据
+                SocketItem!.Send(Encoding.UTF8.GetBytes(data));//覆盖plc写入区的数据
             }
         }
 
