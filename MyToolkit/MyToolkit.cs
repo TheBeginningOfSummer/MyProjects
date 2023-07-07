@@ -675,8 +675,9 @@ namespace MyToolkit
     /// </summary>
     public class MessageRecorder
     {
-        //public static readonly Java.IO.File Storage = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments);
-        public static readonly string DocumentPath = "/storage/emulated/0/Documents";
+        public static bool PCOrAndroid = true;
+        public static string LogPath = "Log";
+        public static readonly string DocumentPath = "/storage/emulated/0/Documents/Log";
         public static readonly string ConfigurationPath = "/storage/emulated/0/Configuration";
 
         public static void RecordError(string error, string solution)
@@ -688,16 +689,34 @@ namespace MyToolkit
                 rowstr = rowstr.Replace("\r\n", " ");
             if (rowstr.IndexOf("\t") > 0)
                 rowstr = rowstr.Replace("\t", " ");
-            FileManager.AppendLog(DocumentPath + "/" + "故障日志", DateTime.Now.ToString("yyy-MM-dd") + "故障日志.xls",
+            if (PCOrAndroid)
+            {
+                FileManager.AppendLog(LogPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
                 "日期\t错误信息\t处理方法" + Environment.NewLine,
                 string.Format("{0}\t{1}", rowstr, solution));
+            }
+            else
+            {
+                FileManager.AppendLog(DocumentPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
+                "日期\t错误信息\t处理方法" + Environment.NewLine,
+                string.Format("{0}\t{1}", rowstr, solution));
+            }
         }
 
-        public static void RecordProduction(string productionMessage)
+        public static void RecordProduction(string message)
         {
-            FileManager.AppendLog(DocumentPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
+            if (PCOrAndroid)
+            {
+                FileManager.AppendLog(LogPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
                 "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
-                productionMessage);
+                message);
+            }
+            else
+            {
+                FileManager.AppendLog(DocumentPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
+                "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
+                message);
+            }
         }
     }
     /// <summary>
@@ -1672,6 +1691,5 @@ namespace MyToolkit
             TargetProcess.Close();
         }
     }
-    
     
 }
