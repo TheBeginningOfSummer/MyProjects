@@ -1,4 +1,4 @@
-﻿using MyToolkit;
+﻿using MyToolkit.FileManagement;
 
 namespace IPFSVideo.Service
 {
@@ -17,11 +17,11 @@ namespace IPFSVideo.Service
             }
         }
 
-        public KeyValueLoader Config;
+        public KeyValueManager Config;
 
         private ConfigurationService()
         {
-            Config = new KeyValueLoader("Config.json", "Config");
+            Config = new KeyValueManager("Config.json", "Config");
         }
 
         

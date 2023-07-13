@@ -1,6 +1,5 @@
 ﻿using IPFS.Models;
-using MyToolkit;
-using System.Collections.Generic;
+using MyToolkit.FileManagement;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,8 +27,8 @@ public class CommonServiceLoader
 
     public readonly SQLiteService SQLite;
     public readonly HttpClientAPI IPFSApi;
-    public readonly KeyValueLoader Config;
-    public KeyValueLoader RemoteIPNS;
+    public readonly KeyValueManager Config;
+    public KeyValueManager RemoteIPNS;
 
     private CommonServiceLoader()
     {

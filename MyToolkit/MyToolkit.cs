@@ -9,13 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LitJson;
+using MyToolkit.DataManagement;
 
 namespace MyToolkit
 {
-    /// <summary>
-    /// 通信管理类
-    /// </summary>
-    public class ConnectionToolkit
+    namespace Communication
     {
         public class GetIPAddress
         {
@@ -185,7 +183,7 @@ namespace MyToolkit
             {
                 try
                 {
-                    if(SocketItem != null)
+                    if (SocketItem != null)
                     {
                         SocketItem.Close();
                         ClientDic.Clear();
@@ -256,6 +254,676 @@ namespace MyToolkit
             public void SendUTF8(string data)
             {
                 SocketItem!.Send(Encoding.UTF8.GetBytes(data));//覆盖plc写入区的数据
+            }
+        }
+
+        public class ModbusTCP
+        {
+            /// <summary>
+            /// 站号
+            /// </summary>
+            public byte StationID { get; private set; }
+            /// <summary>
+            /// 数据连接
+            /// </summary>
+            public SocketTool Connection { get; set; }
+
+            /// <summary>
+            /// 保持寄存器区
+            /// </summary>
+            public byte[] HoldingRegister;
+            /// <summary>
+            /// 输入寄存器区
+            /// </summary>
+            public byte[] InputRegister;
+
+            public ModbusTCP(byte stationID, int holdingRegister, int inputRegister)
+            {
+                StationID = stationID;
+                HoldingRegister = new byte[holdingRegister];
+                InputRegister = new byte[inputRegister];
+                Connection = new SocketTool();
+            }
+
+            public ModbusTCP(byte stationID = 1)
+            {
+                StationID = stationID;
+                HoldingRegister = new byte[20000];
+                InputRegister = new byte[20000];
+                Connection = new SocketTool();
+                Connection.ReceiveFromClient += MessageHandling;
+            }
+
+            #region 发送请求
+            /// <summary>
+            /// 读取的报文
+            /// </summary>
+            /// <param name="stationID">站号</param>
+            /// <param name="address">地址</param>
+            /// <param name="amount">读取地址数</param>
+            /// <param name="isLittleEndian"></param>
+            /// <returns></returns>
+            public static byte[] ReadDataMessage(byte stationID, byte code, ushort address, ushort amount, bool isLittleEndian = false)
+            {
+                byte[] requestMessage = new byte[12];
+                requestMessage[5] = 0x06;
+                requestMessage[6] = stationID;
+                requestMessage[7] = code;
+                if (isLittleEndian)
+                {
+                    BitConverter.GetBytes(address).CopyTo(requestMessage, 8);
+                    BitConverter.GetBytes(amount).CopyTo(requestMessage, 10);
+                    return requestMessage;
+                }
+                else
+                {
+                    byte[] addressBytes = BitConverter.GetBytes(address);
+                    byte[] amountBytes = BitConverter.GetBytes(amount);
+                    Array.Reverse(addressBytes);
+                    Array.Reverse(amountBytes);
+                    addressBytes.CopyTo(requestMessage, 8);
+                    amountBytes.CopyTo(requestMessage, 10);
+                    return requestMessage;
+                }
+            }
+            /// <summary>
+            /// 写入单个寄存器的报文
+            /// </summary>
+            /// <param name="stationID">站号</param>
+            /// <param name="address">写入的地址</param>
+            /// <param name="data">写入的数据</param>
+            /// <param name="isLittleEndian"></param>
+            /// <returns></returns>
+            public static byte[] WriteHoldingRegisterMessage(byte stationID, ushort address, byte[] data, bool isLittleEndian = false)
+            {
+                byte[] requestMessage = new byte[10];
+                ushort dataLength = (ushort)(4 + data.Length);
+                BitConverter.GetBytes(dataLength).CopyTo(requestMessage, 4);
+                requestMessage[6] = stationID;
+                requestMessage[7] = 0x06;
+                if (isLittleEndian)
+                {
+                    BitConverter.GetBytes(address).CopyTo(requestMessage, 8);
+                }
+                else
+                {
+                    byte[] addressBytes = BitConverter.GetBytes(address);
+                    Array.Reverse(addressBytes);
+                    addressBytes.CopyTo(requestMessage, 8);
+                }
+                return ByteArrayToolkit.SpliceBytes(requestMessage, data);
+            }
+            /// <summary>
+            /// 写入多个寄存器的报文
+            /// </summary>
+            /// <param name="stationID">站号</param>
+            /// <param name="address">写入的地址</param>
+            /// <param name="amount">写入的地址数</param>
+            /// <param name="data">写入的数据，两个字节占一个地址</param>
+            /// <param name="isLittleEndian"></param>
+            /// <returns></returns>
+            public static byte[] WriteHoldingRegisterMessage(byte stationID, ushort address, ushort amount, byte[] data, bool isLittleEndian = false)
+            {
+                byte[] requestMessage = new byte[13];
+                ushort dataLength = (ushort)(7 + data.Length);
+                byte[] bytesLength = BitConverter.GetBytes(dataLength);
+                Array.Reverse(bytesLength);
+                bytesLength.CopyTo(requestMessage, 4);
+                requestMessage[6] = stationID;
+                requestMessage[7] = 16;
+                if (isLittleEndian)
+                {
+                    BitConverter.GetBytes(address).CopyTo(requestMessage, 8);
+                    BitConverter.GetBytes(amount).CopyTo(requestMessage, 10);
+                }
+                else
+                {
+                    byte[] addressBytes = BitConverter.GetBytes(address);
+                    byte[] amountBytes = BitConverter.GetBytes(amount);
+                    Array.Reverse(addressBytes);
+                    Array.Reverse(amountBytes);
+                    addressBytes.CopyTo(requestMessage, 8);
+                    amountBytes.CopyTo(requestMessage, 10);
+                }
+                requestMessage[12] = (byte)data.Length;
+                return ByteArrayToolkit.SpliceBytes(requestMessage, data);
+            }
+            /// <summary>
+            /// 解析响应报文
+            /// </summary>
+            /// <returns>响应数据</returns>
+            public static byte[]? ParseResponse(byte[] data, out ushort code)
+            {
+                if (data.Length < 8)
+                {
+                    code = 0;
+                    return default;
+                }
+                switch (data[7])
+                {
+                    case 3://查看保持寄存器的数据
+                        code = 3;
+                        return data.Skip(9).ToArray();
+                    case 4://查看输入寄存器的数据
+                        code = 4;
+                        return data.Skip(9).ToArray();
+                    case 6://写入保持寄存器成功后返回的数据
+                        code = 6;
+                        return data.Skip(10).ToArray();
+                    default:
+                        code = 0;
+                        return default;
+                }
+            }
+            #endregion
+
+            #region 接收请求
+            #region 保持寄存器操作
+            /// <summary>
+            /// 读取寄存器
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="address">地址</param>
+            /// <param name="amount">地址数</param>
+            /// <returns></returns>
+            public byte[]? ReadHoldingRegister(ushort address, ushort amount = 1)
+            {
+                if (address < 0 || address >= 10000) return null;
+                if (10000 - address < amount) return null;
+                return HoldingRegister.Skip(address * 2).Take(amount * 2).ToArray();
+            }
+            /// <summary>
+            /// 设置寄存器值
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="inputData">数据</param>
+            /// <param name="address">地址</param>
+            public void SetHoldingRegister(byte[] inputData, ushort address)
+            {
+                if (inputData.Length < 2) return;
+                inputData.CopyTo(HoldingRegister, address * 2);
+            }
+            /// <summary>
+            /// 设置寄存器值
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="inputData">数据</param>
+            /// <param name="address">地址</param>
+            public void SetHoldingRegister(ushort inputData, ushort address)
+            {
+                byte[] data = BitConverter.GetBytes(inputData);
+                Array.Reverse(data);
+                data.CopyTo(HoldingRegister, address * 2);
+            }
+            #endregion
+
+            #region 输入寄存器操作
+            /// <summary>
+            /// 读取寄存器
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="address">地址</param>
+            /// <param name="amount">地址数</param>
+            /// <returns></returns>
+            public byte[]? ReadInputRegister(ushort address, ushort amount = 1)
+            {
+                return ReadRegister(InputRegister, address, amount);
+            }
+            /// <summary>
+            /// 设置寄存器值
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="inputData">数据</param>
+            /// <param name="address">地址</param>
+            public void SetInputRegister(byte[] inputData, ushort address)
+            {
+                SetRegister(InputRegister, inputData, address);
+            }
+            /// <summary>
+            /// 设置寄存器值
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="inputData">数据</param>
+            /// <param name="address">地址</param>
+            public void SetInputRegister(ushort inputData, ushort address)
+            {
+                SetRegister(InputRegister, inputData, address);
+            }
+            #endregion
+
+            #region 寄存器操作
+            /// <summary>
+            /// 读取寄存器
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="address">地址</param>
+            /// <param name="amount">地址数</param>
+            /// <returns></returns>
+            public static byte[]? ReadRegister(byte[] register, ushort address, ushort amount = 1)
+            {
+                if (address < 0 || address >= 10000) return null;
+                if (10000 - address < amount) return null;
+                return register.Skip(address * 2).Take(amount * 2).ToArray();
+            }
+            /// <summary>
+            /// 设置寄存器值
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="inputData">数据</param>
+            /// <param name="address">地址</param>
+            public static void SetRegister(byte[] register, byte[] inputData, ushort address)
+            {
+                if (inputData.Length < 2) return;
+                inputData.CopyTo(register, address * 2);
+            }
+            /// <summary>
+            /// 设置寄存器值
+            /// </summary>
+            /// <param name="register">指定寄存器</param>
+            /// <param name="inputData">数据</param>
+            /// <param name="address">地址</param>
+            public static void SetRegister(byte[] register, ushort inputData, ushort address)
+            {
+                byte[] data = BitConverter.GetBytes(inputData);
+                Array.Reverse(data);
+                data.CopyTo(register, address * 2);
+            }
+            #endregion
+
+            #region 报文解析
+            /// <summary>
+            /// 解析请求报文头
+            /// </summary>
+            /// <param name="data">报文</param>
+            /// <param name="address">地址</param>
+            /// <param name="amount">地址数量</param>
+            /// <returns>功能码以及之前的报文</returns>
+            public static byte[] ParseRequestHeader(byte[] data, out ushort address, out ushort amount)
+            {
+                byte[] mbap = data.Take(8).ToArray();
+                address = (ushort)DataConverter.TwoBytesToUInt(data.Skip(8).Take(2).ToArray());
+                amount = (ushort)DataConverter.TwoBytesToUInt(data.Skip(10).Take(2).ToArray());
+                return mbap;
+            }
+            /// <summary>
+            /// 读取寄存器的返回报文
+            /// </summary>
+            /// <param name="data">数据</param>
+            /// <param name="register">寄存器</param>
+            /// <returns>响应报文</returns>
+            public static byte[]? ReadResponse(byte[] data, byte[] register)
+            {
+                byte[] mbap = ParseRequestHeader(data, out ushort address, out ushort amount);
+                //截取地址所示的数据范围
+                byte[]? returnData = ReadRegister(register, address, amount);
+                if (returnData == null) return default;
+                byte[] responseData = new byte[returnData.Length + 1];
+                responseData[0] = (byte)returnData.Length;//因为只有一个字节所以可以直接转换
+                returnData.CopyTo(responseData, 1);
+                //计算数据长度
+                ushort dataLength = (ushort)(amount * 2 + 3);
+                byte[] dataLengthBytes = BitConverter.GetBytes(dataLength);
+                Array.Reverse(dataLengthBytes);
+                dataLengthBytes.CopyTo(mbap, 4);
+                //返回读取响应
+                return ByteArrayToolkit.SpliceBytes(mbap, responseData);
+            }
+            /// <summary>
+            /// 写多个寄存器的返回报文
+            /// </summary>
+            /// <param name="data">报文</param>
+            /// <returns>写多个寄存器的返回报文</returns>
+            public static byte[] WriteResponse(byte[] data, byte[] register, bool isMultiple)
+            {
+                _ = ParseRequestHeader(data, out ushort address, out _);
+                if (isMultiple)
+                {
+                    byte[] writeMultipleData = data.Skip(13).ToArray();
+                    writeMultipleData.CopyTo(register, address * 2);
+
+                    byte[] response = data.Take(12).ToArray();
+                    response[4] = 0;
+                    response[5] = 6;
+                    return response;
+                }
+                else
+                {
+                    byte[] writeData = data.Skip(10).ToArray();
+                    writeData.CopyTo(register, address * 2);
+                    return data;
+                }
+            }
+
+            /// <summary>
+            /// 解析报文并返回响应报文
+            /// </summary>
+            /// <param name="data">要解析的报文</param>
+            /// <returns>响应报文</returns>
+            public byte[]? ParseMessage(byte[] data)
+            {
+                if (data.Length < 12) return null;
+                switch (data[7])
+                {
+                    case 3://读保持寄存器
+                        return ReadResponse(data, HoldingRegister);
+                    case 4://读输入寄存器
+                        return ReadResponse(data, InputRegister);
+                    case 6://写单个保持寄存器
+                        return WriteResponse(data, HoldingRegister, false);
+                    case 16://写多个保持寄存器
+                        return WriteResponse(data, HoldingRegister, true);
+                    default:
+                        return default;
+                }
+            }
+            /// <summary>
+            /// 数据接收函数
+            /// </summary>
+            /// <param name="client">客户端</param>
+            /// <param name="data">数据</param>
+            public void MessageHandling(Socket client, byte[] data)
+            {
+                byte[]? response = ParseMessage(data);
+                if (response != null)
+                    client.Send(response);
+            }
+            #endregion
+            #endregion
+        }
+        /// <summary>
+        /// 静态Fins工具类
+        /// </summary>
+        public class FinsTCP
+        {
+            /// <summary>
+            /// Fins协议握手指令
+            /// </summary>
+            /// <param name="localAddress">本地IP最后一段</param>
+            /// <returns>所需16进制字符串握手指令</returns>
+            public static string HandshakeString(string localAddress)
+            {
+                int.TryParse(localAddress, out int address);
+                if (address >= 0 && address <= 255)
+                {
+                    return "46494E53" + "0000000C" + "00000000" + "00000000" + "000000" + address.ToString("X2");
+                }
+                return "";
+            }
+            /// <summary>
+            /// Fins协议握手指令
+            /// </summary>
+            /// <param name="localAddress">本地IP最后一段</param>
+            /// <returns>所需16进制字符串握手指令</returns>
+            public static string HandshakeString(int localAddress)
+            {
+                if (localAddress >= 0 && localAddress <= 255)
+                {
+                    return "46494E53" + "0000000C" + "00000000" + "00000000" + "000000" + localAddress.ToString("X2");
+                }
+                return "";
+            }
+            /// <summary>
+            /// Fins协议读取PLC指定内存的数据
+            /// </summary>
+            /// <param name="remoteAddress">PLCIP最后一段地址，16进制，1字节</param>
+            /// <param name="localAddress">本地IP最后一段地址，16进制，1字节</param>
+            /// <param name="memoryArea">PLC内存地址代码，16进制，1字节</param>
+            /// <param name="startAddress">读取数据起始地址，容量为16进制2字节</param>
+            /// <param name="dataLength">读取数据长度，16进制，2字节</param>
+            /// <returns>所需16进制字符串读取指令</returns>
+            public static string ReadString(string remoteAddress, string localAddress, string memoryArea, int startAddress, string dataLength)
+            {
+                int.TryParse(localAddress, out int local);
+                int.TryParse(remoteAddress, out int remote);
+                if (local >= 0 && local <= 255 && remote >= 0 && remote <= 255)
+                    return "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
+                            "00" + remoteAddress + "00" + "00" + localAddress + "00" +
+                            "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength;
+                return "";
+            }
+
+            public static string ReadString(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength)
+            {
+                if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
+                    return "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
+                            "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
+                            "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
+                return "";
+            }
+
+            public static byte[] ReadBytes(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength)
+            {
+                string readCommand = "";
+                if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
+                    readCommand = "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
+                            "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
+                            "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
+                return DataConverter.HexStringToBytes(readCommand);
+            }
+            /// <summary>
+            /// Fins协议写入PLC指定内存数据
+            /// </summary>
+            /// <param name="remoteAddress">PLCIP最后一段地址，16进制，1字节</param>
+            /// <param name="localAddress">本地IP最后一段地址，16进制，1字节</param>
+            /// <param name="memoryArea">PLC内存地址代码，16进制，1字节</param>
+            /// <param name="startAddress">写入数据起始地址，容量为16进制2字节</param>
+            /// <param name="dataLength">写入数据长度，容量为16进制2字节</param>
+            /// <param name="data">写入的数据，16进制，2字节*dataLength</param>
+            /// <returns>所需16进制字符串写入指令</returns>
+            public static string WriteString(string remoteAddress, string localAddress, string memoryArea, int startAddress, int dataLength, string data)
+            {
+                int codeLength = 0x0000001A + dataLength * 2;
+                int.TryParse(localAddress, out int local);
+                int.TryParse(remoteAddress, out int remote);
+                if (local >= 0 && local <= 255 && remote >= 0 && remote <= 255)
+                    return "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
+                        "00" + remoteAddress + "00" + "00" + localAddress + "00" +
+                        "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4") + data;
+                return "";
+            }
+
+            public static string WriteString(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength, string data)
+            {
+                int codeLength = 0x0000001A + dataLength * 2;
+                if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
+                    return "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
+                        "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
+                        "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4") + data;
+                return "";
+            }
+
+            public static byte[] WriteBytes(int remoteAddress, int localAddress, string memoryArea, int startAddress, byte[] data)
+            {
+                int codeLength = 0x0000001A + data.Length;
+                int dataLength = CalculateDataLength(data);
+                string prefixString = "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
+                        "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
+                        "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
+                return ByteArrayToolkit.SpliceBytes(DataConverter.HexStringToBytes(prefixString), data);
+            }
+
+            public static int CalculateDataLength(byte[] data)
+            {
+                int dataLength;
+                if (data.Length % 2 != 0)
+                    dataLength = data.Length / 2 + 1;
+                else
+                    dataLength = data.Length / 2;
+                return dataLength;
+            }
+            /// <summary>
+            /// 解析FINS协议数据头，读取信息
+            /// </summary>
+            /// <param name="header">FINS协议数据头</param>
+            /// <param name="finsDataLength">FINS协议数据长度（字节）</param>
+            /// <param name="command">FINS协议命令代码</param>
+            /// <returns>是否解析成功</returns>
+            public static bool ParseHeader(byte[] header, out int finsDataLength, out int command)
+            {
+                finsDataLength = -1;
+                command = -1;
+                if (header == null) return false;
+                if (header.Length < 16) return false;
+                if (header[0] != 0x46 || header[1] != 0x49 || header[2] != 0x4E || header[3] != 0x53) return false;
+                finsDataLength = DataConverter.FourBytesToInt(ByteArrayToolkit.CutBytesByLength(header, 4, 4));
+                command = (int)header[11];
+                return true;
+            }
+        }
+        /// <summary>
+        /// 静态CRC16校验类
+        /// </summary>
+        public class CRC16
+        {
+            //High-Order Byte Table
+            /* Table of CRC values for high–order byte */
+            static readonly byte[] auchCRCHi = new byte[256]{
+            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
+            0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
+            0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01,
+            0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
+            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81,
+            0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0,
+            0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01,
+            0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
+            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
+            0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
+            0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01,
+            0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+            0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
+            0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
+            0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01,
+            0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
+            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
+            0x40};
+            //Low-Order Byte Table
+            /* Table of CRC values for low–order byte */
+            static readonly byte[] auchCRCLo = new byte[256]{
+            0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06, 0x07, 0xC7, 0x05, 0xC5, 0xC4,
+            0x04, 0xCC, 0x0C, 0x0D, 0xCD, 0x0F, 0xCF, 0xCE, 0x0E, 0x0A, 0xCA, 0xCB, 0x0B, 0xC9, 0x09,
+            0x08, 0xC8, 0xD8, 0x18, 0x19, 0xD9, 0x1B, 0xDB, 0xDA, 0x1A, 0x1E, 0xDE, 0xDF, 0x1F, 0xDD,
+            0x1D, 0x1C, 0xDC, 0x14, 0xD4, 0xD5, 0x15, 0xD7, 0x17, 0x16, 0xD6, 0xD2, 0x12, 0x13, 0xD3,
+            0x11, 0xD1, 0xD0, 0x10, 0xF0, 0x30, 0x31, 0xF1, 0x33, 0xF3, 0xF2, 0x32, 0x36, 0xF6, 0xF7,
+            0x37, 0xF5, 0x35, 0x34, 0xF4, 0x3C, 0xFC, 0xFD, 0x3D, 0xFF, 0x3F, 0x3E, 0xFE, 0xFA, 0x3A,
+            0x3B, 0xFB, 0x39, 0xF9, 0xF8, 0x38, 0x28, 0xE8, 0xE9, 0x29, 0xEB, 0x2B, 0x2A, 0xEA, 0xEE,
+            0x2E, 0x2F, 0xEF, 0x2D, 0xED, 0xEC, 0x2C, 0xE4, 0x24, 0x25, 0xE5, 0x27, 0xE7, 0xE6, 0x26,
+            0x22, 0xE2, 0xE3, 0x23, 0xE1, 0x21, 0x20, 0xE0, 0xA0, 0x60, 0x61, 0xA1, 0x63, 0xA3, 0xA2,
+            0x62, 0x66, 0xA6, 0xA7, 0x67, 0xA5, 0x65, 0x64, 0xA4, 0x6C, 0xAC, 0xAD, 0x6D, 0xAF, 0x6F,
+            0x6E, 0xAE, 0xAA, 0x6A, 0x6B, 0xAB, 0x69, 0xA9, 0xA8, 0x68, 0x78, 0xB8, 0xB9, 0x79, 0xBB,
+            0x7B, 0x7A, 0xBA, 0xBE, 0x7E, 0x7F, 0xBF, 0x7D, 0xBD, 0xBC, 0x7C, 0xB4, 0x74, 0x75, 0xB5,
+            0x77, 0xB7, 0xB6, 0x76, 0x72, 0xB2, 0xB3, 0x73, 0xB1, 0x71, 0x70, 0xB0, 0x50, 0x90, 0x91,
+            0x51, 0x93, 0x53, 0x52, 0x92, 0x96, 0x56, 0x57, 0x97, 0x55, 0x95, 0x94, 0x54, 0x9C, 0x5C,
+            0x5D, 0x9D, 0x5F, 0x9F, 0x9E, 0x5E, 0x5A, 0x9A, 0x9B, 0x5B, 0x99, 0x59, 0x58, 0x98, 0x88,
+            0x48, 0x49, 0x89, 0x4B, 0x8B, 0x8A, 0x4A, 0x4E, 0x8E, 0x8F, 0x4F, 0x8D, 0x4D, 0x4C, 0x8C,
+            0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83, 0x41, 0x81, 0x80,
+            0x40};
+
+            public static byte[] CRC(byte[] value)
+            {
+                byte uchCRCHi = 0xFF; /* 高CRC字节初始化 */
+                byte uchCRCLo = 0xFF; /* 低CRC字节初始化 */
+                int uIndex; /* CRC循环中的索引 */
+                for (int i = 0; i < value.Length; i++)
+                {
+                    uIndex = uchCRCLo ^ value[i];
+                    uchCRCLo = (byte)int.Parse((uchCRCHi ^ auchCRCHi[uIndex]).ToString("X"), System.Globalization.NumberStyles.HexNumber);
+                    uchCRCHi = auchCRCLo[uIndex];
+                }
+                byte[] crcValue = new byte[value.Length + 2];
+                value.CopyTo(crcValue, 0);
+                crcValue[crcValue.Length - 2] = uchCRCLo;
+                crcValue[crcValue.Length - 1] = uchCRCHi;
+                return crcValue;
+            }
+
+            public static byte[] RFSum(byte[] value)
+            {
+                byte btSum = 0;
+                for (int i = 0; i < value.Length; i++)
+                {
+                    btSum ^= value[i];
+                }
+                btSum ^= 0x14;
+                byte[] btSumValue = new byte[value.Length + 1];
+                value.CopyTo(btSumValue, 0);
+                btSumValue[btSumValue.Length - 1] = btSum;
+                return btSumValue;
+            }
+        }
+        /// <summary>
+        /// 字节工具接收类
+        /// </summary>
+        public class BytesReceiver
+        {
+            public int PackageMarkLength;
+            public byte[] PackageMark;
+            public int PackageLength;
+            public byte[] DataCache;
+            public Action<byte[]>? ReceiveBytes;
+
+            public BytesReceiver()
+            {
+                PackageMarkLength = 2;
+                PackageMark = new byte[2] { 0x7F, 0x7F };
+                PackageLength = 0;
+                DataCache = new byte[2048];
+            }
+
+            public void ClearCache()
+            {
+                PackageLength = 0;
+            }
+            /// <summary>
+            /// 将接收到的字节数组按包头包尾的标记拼包与分包
+            /// </summary>
+            /// <param name="receivedData">接收的字节数据</param>
+            public void DataReceive(byte[] receivedData)
+            {
+                if (receivedData.Length == 0) return;
+                Array.Copy(receivedData, 0, DataCache, PackageLength, receivedData.Length);
+                //下一次接收的起始位置以及现有的数据长度
+                PackageLength += receivedData.Length;
+
+                while (PackageLength > 0)
+                {
+                    //检测包头包尾
+                    ByteArrayToolkit.CheckPackage(DataCache, PackageMark, out int head, out int tail);
+                    //无包尾,返回继续拼接
+                    if (tail == -1) return;
+                    //有包头且在0位置
+                    if (head == 0)
+                    {
+                        //拼接好的数据包要放入的字节数组
+                        byte[] data = new byte[tail + PackageMarkLength];
+                        //将缓存中的数据拷贝到字节数组中
+                        Array.Copy(DataCache, 0, data, 0, tail + PackageMarkLength);
+                        //传出数据
+                        ReceiveBytes?.Invoke(data);
+                        //将提取的数据消除，将后面的数据前置
+                        ClearDataCache(tail + PackageMarkLength);
+                        //重新计算缓存区字节长度
+                        PackageLength -= (tail + PackageMarkLength);
+                    }
+                    else
+                    {
+                        //将提取的数据消除，将后面的数据前置
+                        ClearDataCache(tail + PackageMarkLength);
+                        //重新计算缓存区字节长度
+                        PackageLength -= (tail + PackageMarkLength);
+                    }
+                }
+            }
+            /// <summary>
+            /// 将指定长度的数据清除，并用后面的数据覆盖
+            /// </summary>
+            /// <param name="clearLength">清除数据的长度</param>
+            public void ClearDataCache(int clearLength)
+            {
+                //byte[] tempData = new byte[clearLength];
+                for (int i = 0; i < DataCache.Length - clearLength; i++)
+                {
+                    DataCache[i] = DataCache[clearLength + i];
+                }
             }
         }
 
@@ -383,689 +1051,407 @@ namespace MyToolkit
         //        return true;
         //    }
         //}
+    }
 
+    namespace DataManagement
+    {
         /// <summary>
-        /// 字节工具接收类
+        /// 静态数据转换类
         /// </summary>
-        public class BytesReceiver
+        public class DataConverter
         {
-            public int PackageMarkLength;
-            public byte[] PackageMark;
-            public int PackageLength;
-            public byte[] DataCache;
-            public Action<byte[]>? ReceiveBytes;
-
-            public BytesReceiver()
+            //16进制字符串转字节数组
+            public static byte[] HexStringToBytes(string hexString)
             {
-                PackageMarkLength = 2;
-                PackageMark = new byte[2] { 0x7F, 0x7F };
-                PackageLength = 0;
-                DataCache = new byte[2048];
-            }
-
-            public void ClearCache()
-            {
-                PackageLength = 0;
-            }
-            /// <summary>
-            /// 将接收到的字节数组按包头包尾的标记拼包与分包
-            /// </summary>
-            /// <param name="receivedData">接收的字节数据</param>
-            public void DataReceive(byte[] receivedData)
-            {
-                if (receivedData.Length == 0) return;
-                Array.Copy(receivedData, 0, DataCache, PackageLength, receivedData.Length);
-                //下一次接收的起始位置以及现有的数据长度
-                PackageLength += receivedData.Length;
-
-                while (PackageLength > 0)
+                hexString = hexString.Trim();
+                if ((hexString.Length % 2) != 0)
+                    hexString += " ";
+                byte[] bytes = new byte[hexString.Length / 2];
+                for (int i = 0; i < bytes.Length; i++)
                 {
-                    //检测包头包尾
-                    ByteArrayToolkit.CheckPackage(DataCache, PackageMark, out int head, out int tail);
-                    //无包尾,返回继续拼接
-                    if (tail == -1) return;
-                    //有包头且在0位置
-                    if (head == 0)
+                    bytes[i] = Convert.ToByte(hexString.Substring(2 * i, 2).Trim(), 16);
+                }
+                return bytes;
+            }
+            //字节数组转16进制字符串
+            public static string BytesToHexString(byte[] bytes)
+            {
+                string hexString = "";
+                if (bytes != null)
+                {
+                    for (int i = 0; i < bytes.Length; i++)
                     {
-                        //拼接好的数据包要放入的字节数组
-                        byte[] data = new byte[tail + PackageMarkLength];
-                        //将缓存中的数据拷贝到字节数组中
-                        Array.Copy(DataCache, 0, data, 0, tail + PackageMarkLength);
-                        //传出数据
-                        ReceiveBytes?.Invoke(data);
-                        //将提取的数据消除，将后面的数据前置
-                        ClearDataCache(tail + PackageMarkLength);
-                        //重新计算缓存区字节长度
-                        PackageLength -= (tail + PackageMarkLength);
-                    }
-                    else
-                    {
-                        //将提取的数据消除，将后面的数据前置
-                        ClearDataCache(tail + PackageMarkLength);
-                        //重新计算缓存区字节长度
-                        PackageLength -= (tail + PackageMarkLength);
+                        hexString += bytes[i].ToString("X2");
                     }
                 }
+                return hexString;
             }
-            /// <summary>
-            /// 将指定长度的数据清除，并用后面的数据覆盖
-            /// </summary>
-            /// <param name="clearLength">清除数据的长度</param>
-            public void ClearDataCache(int clearLength)
+            //16进制字符串转整数字符串
+            public static string HexStringToIntString(string hexString)
             {
-                //byte[] tempData = new byte[clearLength];
-                for (int i = 0; i < DataCache.Length - clearLength; i++)
+                if (int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, null, out int result))
                 {
-                    DataCache[i] = DataCache[clearLength + i];
+                    return result.ToString();
                 }
+                return string.Empty;
             }
-        }
-
-    }
-    /// <summary>
-    /// 静态数据转换类
-    /// </summary>
-    public class DataConverter
-    {
-        //16进制字符串转字节数组
-        public static byte[] HexStringToBytes(string hexString)
-        {
-            hexString = hexString.Trim();
-            if ((hexString.Length % 2) != 0)
-                hexString += " ";
-            byte[] bytes = new byte[hexString.Length / 2];
-            for (int i = 0; i < bytes.Length; i++)
+            //16进制字符串转整数
+            public static int HexStringToInt(string hexString)
             {
-                bytes[i] = Convert.ToByte(hexString.Substring(2 * i, 2).Trim(), 16);
-            }
-            return bytes;
-        }
-        //字节数组转16进制字符串
-        public static string BytesToHexString(byte[] bytes)
-        {
-            string hexString = "";
-            if (bytes != null)
-            {
-                for (int i = 0;i < bytes.Length; i++)
+                if (int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, null, out int result))
                 {
-                    hexString += bytes[i].ToString("X2");
+                    return result;
                 }
+                return -1;
             }
-            return hexString;
-        }
-        //16进制字符串转整数字符串
-        public static string HexStringToIntString(string hexString)
-        {
-            if (int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, null, out int result))
-            {
-                return result.ToString();
-            }
-            return string.Empty;
-        }
-        //16进制字符串转整数
-        public static int HexStringToInt(string hexString)
-        {
-            if (int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, null, out int result))
-            {
-                return result;
-            }
-            return -1;
-        }
 
-        public static string IntStringToHexString(string intString, string hexDigits = "X2")
-        {
-            if (int.TryParse(intString, out int result))
+            public static string IntStringToHexString(string intString, string hexDigits = "X2")
             {
-                if (result < 0)
-                    return "";
-                return result.ToString(hexDigits);
-            }
-            return "";
-        }
-
-        public static int TwoBytesToInt(byte[] bytes, bool isLittleEndian = false)
-        {
-            if (isLittleEndian)
-            {
-                return BitConverter.ToInt16(bytes, 0);
-            }
-            else
-            {
-                Array.Reverse(bytes);
-                return BitConverter.ToInt16(bytes, 0);
-            }
-        }
-
-        public static int TwoBytesToUInt(byte[] bytes, bool isLittleEndian = false)
-        {
-            if (isLittleEndian)
-            {
-                return BitConverter.ToUInt16(bytes, 0);
-            }
-            else
-            {
-                Array.Reverse(bytes);
-                return BitConverter.ToUInt16(bytes, 0);
-            }
-        }
-
-        public static int FourBytesToInt(byte[] bytes, bool isLittleEndian = false)
-        {
-            if (isLittleEndian)
-            {
-                return BitConverter.ToInt32(bytes, 0);
-            }
-            else
-            {
-                Array.Reverse(bytes);
-                return BitConverter.ToInt32(bytes, 0);
-            }
-        }
-        //高低位互换
-        public static string ToLowHigh(string hexString)
-        {
-            byte[] bytes = HexStringToBytes(hexString);
-            Array.Reverse(bytes);
-            return BytesToHexString(bytes);
-        }
-    }
-    /// <summary>
-    /// 静态文件管理类
-    /// </summary>
-    public class FileManager
-    {
-        public static string GetLocalAppPath(string fileName)
-        {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
-        }
-
-        public static byte[] GetFileBinary(string path)
-        {
-            FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            byte[] data = new byte[fileStream.Length];
-            fileStream.Read(data, 0, data.Length);
-            fileStream.Close();
-            return data;
-        }
-
-        public static Stream GetFileStream(string path, int cacheLength = 10240)
-        {
-            using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            var buffer = new byte[cacheLength];
-            int bytesRead;
-            Stream stream = new MemoryStream();
-            while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
-            {
-                stream.Write(buffer, 0, bytesRead);
-            }
-            stream.Seek(0, SeekOrigin.Begin);
-            return stream;
-        }
-
-        public static async Task WriteStreamAsync(string path, string fileName, Stream message, FileMode fileMode = FileMode.OpenOrCreate)
-        {
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-            path += "/" + fileName;
-            byte[] buffer = new byte[10240]; int length;
-            using FileStream file = new FileStream(path, fileMode);
-            while ((length = await message.ReadAsync(buffer)) != 0)
-                await file.WriteAsync(buffer, 0, length);
-        }
-
-        public static async Task WriteStreamProgressAsync(string path, string fileName, int fileSize, Stream message, IProgress<string> progress, FileMode fileMode = FileMode.OpenOrCreate)
-        {
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-            path += "/" + fileName;
-            byte[] buffer = new byte[10240]; int length; int progressLength = 0;
-            using FileStream file = new FileStream(path, fileMode);
-            while ((length = await message.ReadAsync(buffer)) != 0)
-            {
-                await file.WriteAsync(buffer, 0, length);
-                progressLength += length;
-                progress.Report($"{length * 100 / fileSize}%");
-            }
-        }
-
-        public static void AppendFlieString(string path, string fileName, string message, FileMode fileMode)
-        {
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-            path += "/" + fileName;
-            byte[] data = Encoding.UTF8.GetBytes(message);
-            FileStream file = new FileStream(path, fileMode);
-            file.Write(data, 0, data.Length);
-            file.Flush();
-            file.Close();
-            file.Dispose();
-        }
-
-        public static void SetTableHeader(string path, string fileName, string tableHeader)
-        {
-            //using FileStream read = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            //using (StreamReader sr = new StreamReader(read))
-            //{
-            //    if (sr.ReadToEnd() == string.Empty)
-            //    {
-
-            //    }
-            //}
-            FileInfo fileInfo = new FileInfo(path + "/" + fileName);
-            if (!fileInfo.Exists || fileInfo.Length == 0)
-            {
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                path += "/" + fileName;
-                byte[] data = Encoding.UTF8.GetBytes(tableHeader);
-                FileStream file = new FileStream(path, FileMode.Append);
-                file.Write(data, 0, data.Length);
-                file.Flush();
-                file.Close();
-                file.Dispose();
-            }
-        }
-
-        public static void AppendLog(string path, string fileName, string tableHeader, string message)
-        {
-            string log = DateTime.Now.ToString("yyy-MM-dd HH:mm:ss") + "\t" + message + Environment.NewLine;
-            SetTableHeader(path, fileName, tableHeader);
-            AppendFlieString(path, fileName, log, FileMode.Append);
-        }
-
-    }
-    /// <summary>
-    /// 静态日志纪录类
-    /// </summary>
-    public class MessageRecorder
-    {
-        public static bool PCOrAndroid = true;
-        public static string LogPath = "Log";
-        public static readonly string DocumentPath = "/storage/emulated/0/Documents/Log";
-        public static readonly string ConfigurationPath = "/storage/emulated/0/Configuration";
-
-        public static void RecordError(string error, string solution)
-        {
-            string rowstr = error;
-            if (rowstr.IndexOf("\n") > 0)
-                rowstr = rowstr.Replace("\n", " ");
-            if (rowstr.IndexOf("\r\n") > 0)
-                rowstr = rowstr.Replace("\r\n", " ");
-            if (rowstr.IndexOf("\t") > 0)
-                rowstr = rowstr.Replace("\t", " ");
-            if (PCOrAndroid)
-            {
-                FileManager.AppendLog(LogPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
-                "日期\t错误信息\t处理方法" + Environment.NewLine,
-                string.Format("{0}\t{1}", rowstr, solution));
-            }
-            else
-            {
-                FileManager.AppendLog(DocumentPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
-                "日期\t错误信息\t处理方法" + Environment.NewLine,
-                string.Format("{0}\t{1}", rowstr, solution));
-            }
-        }
-
-        public static void RecordProduction(string message)
-        {
-            if (PCOrAndroid)
-            {
-                FileManager.AppendLog(LogPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
-                "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
-                message);
-            }
-            else
-            {
-                FileManager.AppendLog(DocumentPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
-                "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
-                message);
-            }
-        }
-    }
-    /// <summary>
-    /// 静态Json管理类
-    /// </summary>
-    public class JsonManager
-    {
-        public static void SaveJsonString(string path, string fileName, object data)
-        {
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            path += "/" + fileName;
-            string jsonString = JsonMapper.ToJson(data);
-            byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
-            FileStream file = new FileStream(path, FileMode.Create);
-            file.Write(jsonBytes, 0, jsonBytes.Length);//整块写入
-            file.Flush();
-            file.Close();
-        }
-
-        public static T ReadJsonString<T>(string path, string fileName)
-        {
-            try
-            {
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-                path += "/" + fileName;
-                if (File.Exists(path))
+                if (int.TryParse(intString, out int result))
                 {
-                    FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    StreamReader stream = new StreamReader(file);
-                    T jsonData = JsonMapper.ToObject<T>(stream.ReadToEnd());
-                    file.Flush();
-                    file.Close();
-                    //T jsonData = JsonMapper.ToObject<T>(File.ReadAllText(path));
-                    return jsonData;
+                    if (result < 0)
+                        return "";
+                    return result.ToString(hexDigits);
                 }
-            }
-            catch (Exception)
-            {
-
-            }
-            return default!;
-        }
-
-        public static JsonData ReadSimpleJsonString(string path)
-        {
-            JsonData jsonData = JsonMapper.ToObject(File.ReadAllText(path));
-            return jsonData;
-        }
-    }
-    /// <summary>
-    /// 文件配置存储类
-    /// </summary>
-    public class KeyValueLoader
-    {
-        public string FileName;
-        public string ConfigurationPath;
-        public Dictionary<string, string> KeyValueList;
-
-        public KeyValueLoader(string fileName, string path, params string[] keyValues)
-        {
-            FileName = fileName;
-            ConfigurationPath = path;
-            KeyValueList = JsonManager.ReadJsonString<Dictionary<string, string>>(ConfigurationPath, FileName);
-            if (KeyValueList == null) KeyValueList = new Dictionary<string, string>();
-            if (keyValues.Length % 2 == 0 && keyValues.Length != 0)
-            {
-                for (int i = 0; i < keyValues.Length; i += 2)
-                {
-                    if (!KeyValueList.ContainsKey(keyValues[i]))
-                    {
-                        KeyValueList.Add(keyValues[i], keyValues[i + 1]);
-                        JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
-                    }
-                }
-            }
-        }
-
-        public void Add(string key, string value)
-        {
-            KeyValueList.Add(key, value);
-            JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
-        }
-
-        public void Remove(string key)
-        {
-            KeyValueList.Remove(key);
-            JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
-        }
-
-        public void Change(string key, string value)
-        {
-            if (KeyValueList.ContainsKey(key))
-            {
-                KeyValueList[key] = value;
-                JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
-            }
-            else
-            {
-                Add(key, value);
-            }
-        }
-
-        public string Load(string key)
-        {
-            try
-            {
-                if (KeyValueList.ContainsKey(key))
-                    return KeyValueList[key];
-                else
-                    return "";
-            }
-            catch (Exception)
-            {
                 return "";
             }
-        }
-    }
-    /// <summary>
-    /// 静态字节工具类
-    /// </summary>
-    public class ByteArrayToolkit
-    {
-        //==========静态函数==========//
-        #region 插入与拼接
-        public static byte[] SpliceBytes(byte[] beginningArray, byte[] endingArray)
-        {
-            byte[] bytes = new byte[beginningArray.Length + endingArray.Length];
-            beginningArray.CopyTo(bytes, 0);
-            endingArray.CopyTo(bytes, beginningArray.Length);
-            return bytes;
-        }
-        /// <summary>
-        /// 在insertIndex处插入一个字节数组
-        /// </summary>
-        /// <param name="sourceBytes">被插入的字节数组</param>
-        /// <param name="insertBytes">要插入的字节数组</param>
-        /// <param name="insertIndex">要插入的数组索引处</param>
-        /// <returns>插入后的字节数组</returns>
-        public static byte[] InsertBytes(byte[] sourceBytes, byte[] insertBytes, int insertIndex)
-        {
-            byte[] bytes = new byte[sourceBytes.Length + insertBytes.Length];
-            if (insertIndex < 0) return sourceBytes;
-            if (insertIndex > sourceBytes.Length) return sourceBytes;
-            Array.ConstrainedCopy(sourceBytes, 0, bytes, 0, insertIndex);
-            Array.ConstrainedCopy(insertBytes, 0, bytes, insertIndex, insertBytes.Length);
-            Array.ConstrainedCopy(sourceBytes, insertIndex, bytes, insertIndex + insertBytes.Length, sourceBytes.Length - insertIndex);
-            return bytes;
-        }
-        /// <summary>
-        /// 在数组中的标记字节后插入一个数组  与插入的数组长度还无关联
-        /// </summary>
-        /// <param name="sourceArray">源数组</param>
-        /// <param name="mark">标记字节</param>
-        /// <param name="insertArray">要插入的数组</param>
-        /// <returns>插入后的字节数组</returns>
-        public static byte[] InsertBytesBackOfMark(byte[] sourceArray, byte mark, byte[] insertArray)
-        {
-            List<int> index = new List<int>();
-            for (int i = 0; i < sourceArray.Length; i++)
+
+            public static int TwoBytesToInt(byte[] bytes, bool isLittleEndian = false)
             {
-                if (sourceArray[i] == mark)
+                if (isLittleEndian)
                 {
-                    index.Add(i);
+                    return BitConverter.ToInt16(bytes, 0);
+                }
+                else
+                {
+                    Array.Reverse(bytes);
+                    return BitConverter.ToInt16(bytes, 0);
                 }
             }
-            if (index.Count == 0) return sourceArray;
-            return LoopInsert(sourceArray, insertArray, index, index.Count);
-        }
 
-        public static byte[] LoopInsert(byte[] sourceArray, byte[] insertArray, List<int> index, int count)
-        {
-            if (count == 1)
+            public static int TwoBytesToUInt(byte[] bytes, bool isLittleEndian = false)
             {
-                return InsertBytes(sourceArray, insertArray, index[count - 1] + count);
-            }
-            else
-            {
-                return InsertBytes(LoopInsert(sourceArray, insertArray, index, count - 1), insertArray, index[count - 1] + count + (insertArray.Length - 1) * (count - 1));
-            }
-        }
-        #endregion
-
-        #region 去除与剪切
-        /// <summary>
-        /// 从源字节数组中剪裁出指定首尾索引中间的字节数组
-        /// </summary>
-        /// <param name="sourceBytes">源字节数组</param>
-        /// <param name="beginningIndex">要开始剪裁的字节索引</param>
-        /// <param name="endingIndex">要结束剪裁的字节索引</param>
-        /// <returns>包括首尾索引字节的字节数组</returns>
-        public static byte[] CutBytes(byte[] sourceBytes, int beginningIndex, int endingIndex)
-        {
-            if (beginningIndex < 0 || endingIndex < 0) return sourceBytes;
-            if (beginningIndex >= endingIndex) return sourceBytes;
-            byte[] bytes = new byte[endingIndex - beginningIndex + 1];
-            Array.ConstrainedCopy(sourceBytes, beginningIndex, bytes, 0, bytes.Length);
-            return bytes;
-        }
-
-        public static byte[] CutBytesByLength(byte[] sourceBytes, int beginningIndex, int dataLength)
-        {
-            if (beginningIndex < 0 || dataLength < 0) return sourceBytes;
-            if (sourceBytes.Length - beginningIndex < dataLength) return sourceBytes;
-            byte[] bytes = new byte[dataLength];
-            Array.ConstrainedCopy(sourceBytes, beginningIndex, bytes, 0, dataLength);
-            return bytes;
-        }
-        /// <summary>
-        /// 去除指定索引处的字节
-        /// </summary>
-        /// <param name="sourceBytes"></param>
-        /// <param name="redundantIndex"></param>
-        /// <returns></returns>
-        public static byte[] RemoveByte(byte[] sourceBytes, int redundantIndex)
-        {
-            if (redundantIndex > sourceBytes.Length - 1) return sourceBytes;
-            byte[] bytes = new byte[sourceBytes.Length - 1];
-            Array.ConstrainedCopy(sourceBytes, 0, bytes, 0, redundantIndex);
-            Array.ConstrainedCopy(sourceBytes, redundantIndex + 1, bytes, redundantIndex, bytes.Length - redundantIndex);
-            return bytes;
-        }
-        /// <summary>
-        /// 移除特殊字节后的标记字节
-        /// </summary>
-        /// <param name="sourceArray">源字节数组</param>
-        /// <param name="specialByte">特殊字节</param>
-        /// <param name="mark">标记字节</param>
-        public static byte[] RemoveMark(byte[] sourceArray, byte specialByte, byte mark)
-        {
-            List<int> index = new List<int>(sourceArray.Length);
-            for (int i = 0; i < sourceArray.Length; i++)
-            {
-                if (sourceArray[i] == specialByte)
+                if (isLittleEndian)
                 {
-                    if (i < sourceArray.Length - 1)
+                    return BitConverter.ToUInt16(bytes, 0);
+                }
+                else
+                {
+                    Array.Reverse(bytes);
+                    return BitConverter.ToUInt16(bytes, 0);
+                }
+            }
+
+            public static int FourBytesToInt(byte[] bytes, bool isLittleEndian = false)
+            {
+                if (isLittleEndian)
+                {
+                    return BitConverter.ToInt32(bytes, 0);
+                }
+                else
+                {
+                    Array.Reverse(bytes);
+                    return BitConverter.ToInt32(bytes, 0);
+                }
+            }
+            //高低位互换
+            public static string ToLowHigh(string hexString)
+            {
+                byte[] bytes = HexStringToBytes(hexString);
+                Array.Reverse(bytes);
+                return BytesToHexString(bytes);
+            }
+        }
+        /// <summary>
+        /// 静态字节工具类
+        /// </summary>
+        public class ByteArrayToolkit
+        {
+            //==========静态函数==========//
+            #region 插入与拼接
+            public static byte[] SpliceBytes(byte[] beginningArray, byte[] endingArray)
+            {
+                byte[] bytes = new byte[beginningArray.Length + endingArray.Length];
+                beginningArray.CopyTo(bytes, 0);
+                endingArray.CopyTo(bytes, beginningArray.Length);
+                return bytes;
+            }
+            /// <summary>
+            /// 在insertIndex处插入一个字节数组
+            /// </summary>
+            /// <param name="sourceBytes">被插入的字节数组</param>
+            /// <param name="insertBytes">要插入的字节数组</param>
+            /// <param name="insertIndex">要插入的数组索引处</param>
+            /// <returns>插入后的字节数组</returns>
+            public static byte[] InsertBytes(byte[] sourceBytes, byte[] insertBytes, int insertIndex)
+            {
+                byte[] bytes = new byte[sourceBytes.Length + insertBytes.Length];
+                if (insertIndex < 0) return sourceBytes;
+                if (insertIndex > sourceBytes.Length) return sourceBytes;
+                Array.ConstrainedCopy(sourceBytes, 0, bytes, 0, insertIndex);
+                Array.ConstrainedCopy(insertBytes, 0, bytes, insertIndex, insertBytes.Length);
+                Array.ConstrainedCopy(sourceBytes, insertIndex, bytes, insertIndex + insertBytes.Length, sourceBytes.Length - insertIndex);
+                return bytes;
+            }
+            /// <summary>
+            /// 在数组中的标记字节后插入一个数组  与插入的数组长度还无关联
+            /// </summary>
+            /// <param name="sourceArray">源数组</param>
+            /// <param name="mark">标记字节</param>
+            /// <param name="insertArray">要插入的数组</param>
+            /// <returns>插入后的字节数组</returns>
+            public static byte[] InsertBytesBackOfMark(byte[] sourceArray, byte mark, byte[] insertArray)
+            {
+                List<int> index = new List<int>();
+                for (int i = 0; i < sourceArray.Length; i++)
+                {
+                    if (sourceArray[i] == mark)
                     {
-                        if (sourceArray[i + 1] == mark)
-                            index.Add(i + 1);
+                        index.Add(i);
                     }
                 }
+                if (index.Count == 0) return sourceArray;
+                return LoopInsert(sourceArray, insertArray, index, index.Count);
             }
-            if (index.Count == 0) return sourceArray;
-            return LoopRemove(sourceArray, index, index.Count);
-        }
 
-        public static byte[] LoopRemove(byte[] sourceArray, List<int> index, int count)
-        {
-            if (count == 1)
+            public static byte[] LoopInsert(byte[] sourceArray, byte[] insertArray, List<int> index, int count)
             {
-                return RemoveByte(sourceArray, index[index.Count - count]);//从后向前减，减少代码复杂度
-            }
-            else
-            {
-                return RemoveByte(LoopRemove(sourceArray, index, count - 1), index[index.Count - count]);
-            }
-        }
-        #endregion
-
-        #region 检测
-        /// <summary>
-        /// 检查字节数组中标记数组的数量
-        /// </summary>
-        /// <param name="sourceArray">源字节数组</param>
-        /// <param name="frameMark">需要检查的标记字节数组</param>
-        /// <returns>标记的数量</returns>
-        public static int CheckFrameMarkCount(byte[] sourceArray, byte[] frameMark)
-        {
-            if (sourceArray.Length == 0) return 0;
-            if (sourceArray.Length < frameMark.Length) return 0;
-            int count = 0;
-            for (int i = 0; i < sourceArray.Length; i++)
-            {
-                if (sourceArray[i] == frameMark[0])
+                if (count == 1)
                 {
-                    //如果剩余长度已经小于标记字节数组的长度，直接返回
-                    if (frameMark.Length > sourceArray.Length - i) return count;
-                    for (int j = 0; j < frameMark.Length; j++)
+                    return InsertBytes(sourceArray, insertArray, index[count - 1] + count);
+                }
+                else
+                {
+                    return InsertBytes(LoopInsert(sourceArray, insertArray, index, count - 1), insertArray, index[count - 1] + count + (insertArray.Length - 1) * (count - 1));
+                }
+            }
+            #endregion
+
+            #region 去除与剪切
+            /// <summary>
+            /// 从源字节数组中剪裁出指定首尾索引中间的字节数组
+            /// </summary>
+            /// <param name="sourceBytes">源字节数组</param>
+            /// <param name="beginningIndex">要开始剪裁的字节索引</param>
+            /// <param name="endingIndex">要结束剪裁的字节索引</param>
+            /// <returns>包括首尾索引字节的字节数组</returns>
+            public static byte[] CutBytes(byte[] sourceBytes, int beginningIndex, int endingIndex)
+            {
+                if (beginningIndex < 0 || endingIndex < 0) return sourceBytes;
+                if (beginningIndex >= endingIndex) return sourceBytes;
+                byte[] bytes = new byte[endingIndex - beginningIndex + 1];
+                Array.ConstrainedCopy(sourceBytes, beginningIndex, bytes, 0, bytes.Length);
+                return bytes;
+            }
+
+            public static byte[] CutBytesByLength(byte[] sourceBytes, int beginningIndex, int dataLength)
+            {
+                if (beginningIndex < 0 || dataLength < 0) return sourceBytes;
+                if (sourceBytes.Length - beginningIndex < dataLength) return sourceBytes;
+                byte[] bytes = new byte[dataLength];
+                Array.ConstrainedCopy(sourceBytes, beginningIndex, bytes, 0, dataLength);
+                return bytes;
+            }
+            /// <summary>
+            /// 去除指定索引处的字节
+            /// </summary>
+            /// <param name="sourceBytes"></param>
+            /// <param name="redundantIndex"></param>
+            /// <returns></returns>
+            public static byte[] RemoveByte(byte[] sourceBytes, int redundantIndex)
+            {
+                if (redundantIndex > sourceBytes.Length - 1) return sourceBytes;
+                byte[] bytes = new byte[sourceBytes.Length - 1];
+                Array.ConstrainedCopy(sourceBytes, 0, bytes, 0, redundantIndex);
+                Array.ConstrainedCopy(sourceBytes, redundantIndex + 1, bytes, redundantIndex, bytes.Length - redundantIndex);
+                return bytes;
+            }
+            /// <summary>
+            /// 移除特殊字节后的标记字节
+            /// </summary>
+            /// <param name="sourceArray">源字节数组</param>
+            /// <param name="specialByte">特殊字节</param>
+            /// <param name="mark">标记字节</param>
+            public static byte[] RemoveMark(byte[] sourceArray, byte specialByte, byte mark)
+            {
+                List<int> index = new List<int>(sourceArray.Length);
+                for (int i = 0; i < sourceArray.Length; i++)
+                {
+                    if (sourceArray[i] == specialByte)
                     {
-                        if (sourceArray[i + j] != frameMark[j])
+                        if (i < sourceArray.Length - 1)
                         {
-                            break;
-                        }
-                        else
-                        {
-                            if (j == frameMark.Length - 1)
-                            {
-                                i += j;
-                                count++;
-                            }
+                            if (sourceArray[i + 1] == mark)
+                                index.Add(i + 1);
                         }
                     }
                 }
+                if (index.Count == 0) return sourceArray;
+                return LoopRemove(sourceArray, index, index.Count);
             }
-            return count;
-        }
-        //得到标记字节数组的第一个位置索引（头尾索引）
-        public static void FindPackage(byte[] sourceArray, byte[] frameMark, out int head, out int tail)
-        {
-            head = -1;
-            tail = -1;
-            for (int i = 0; i < sourceArray.Length; i++)
+
+            public static byte[] LoopRemove(byte[] sourceArray, List<int> index, int count)
             {
-                if (sourceArray[i] == frameMark[0])
+                if (count == 1)
                 {
-                    for (int j = 0; j < frameMark.Length; j++)
+                    return RemoveByte(sourceArray, index[index.Count - count]);//从后向前减，减少代码复杂度
+                }
+                else
+                {
+                    return RemoveByte(LoopRemove(sourceArray, index, count - 1), index[index.Count - count]);
+                }
+            }
+            #endregion
+
+            #region 检测
+            /// <summary>
+            /// 检查字节数组中标记数组的数量
+            /// </summary>
+            /// <param name="sourceArray">源字节数组</param>
+            /// <param name="frameMark">需要检查的标记字节数组</param>
+            /// <returns>标记的数量</returns>
+            public static int CheckFrameMarkCount(byte[] sourceArray, byte[] frameMark)
+            {
+                if (sourceArray.Length == 0) return 0;
+                if (sourceArray.Length < frameMark.Length) return 0;
+                int count = 0;
+                for (int i = 0; i < sourceArray.Length; i++)
+                {
+                    if (sourceArray[i] == frameMark[0])
                     {
-                        if (head == -1)
+                        //如果剩余长度已经小于标记字节数组的长度，直接返回
+                        if (frameMark.Length > sourceArray.Length - i) return count;
+                        for (int j = 0; j < frameMark.Length; j++)
                         {
-                            if (i + j >= sourceArray.Length)
-                            {
-                                head = -1;
-                                break;
-                            }
                             if (sourceArray[i + j] != frameMark[j])
                             {
-                                head = -1;
-                                break;
-                            }
-                            else
-                            {
-                                if (j == frameMark.Length - 1)
-                                    head = i;
-                            }
-                        }
-                        else
-                        {
-                            if (i + j >= sourceArray.Length)
-                            {
-                                tail = -1;
-                                break;
-                            }
-                            if (sourceArray[i + j] != frameMark[j])
-                            {
-                                tail = -1;
                                 break;
                             }
                             else
                             {
                                 if (j == frameMark.Length - 1)
                                 {
-                                    if (i - head < 2)
+                                    i += j;
+                                    count++;
+                                }
+                            }
+                        }
+                    }
+                }
+                return count;
+            }
+            //得到标记字节数组的第一个位置索引（头尾索引）
+            public static void FindPackage(byte[] sourceArray, byte[] frameMark, out int head, out int tail)
+            {
+                head = -1;
+                tail = -1;
+                for (int i = 0; i < sourceArray.Length; i++)
+                {
+                    if (sourceArray[i] == frameMark[0])
+                    {
+                        for (int j = 0; j < frameMark.Length; j++)
+                        {
+                            if (head == -1)
+                            {
+                                if (i + j >= sourceArray.Length)
+                                {
+                                    head = -1;
+                                    break;
+                                }
+                                if (sourceArray[i + j] != frameMark[j])
+                                {
+                                    head = -1;
+                                    break;
+                                }
+                                else
+                                {
+                                    if (j == frameMark.Length - 1)
+                                        head = i;
+                                }
+                            }
+                            else
+                            {
+                                if (i + j >= sourceArray.Length)
+                                {
+                                    tail = -1;
+                                    break;
+                                }
+                                if (sourceArray[i + j] != frameMark[j])
+                                {
+                                    tail = -1;
+                                    break;
+                                }
+                                else
+                                {
+                                    if (j == frameMark.Length - 1)
                                     {
-                                        tail = -1;
+                                        if (i - head < 2)
+                                        {
+                                            tail = -1;
+                                        }
+                                        else
+                                        {
+                                            tail = i;
+                                        }
                                     }
-                                    else
+                                }
+                            }
+                        }
+                    }
+                    if (head != -1 && tail != -1) break;
+                }
+            }
+            //得到数组开头与下一个位置是标记字节的索引位置（头尾索引）
+            public static void CheckPackage(byte[] sourceArray, byte[] packageMark, out int head, out int tail)
+            {
+                head = -1;
+                tail = -1;
+                if (packageMark.Length > sourceArray.Length) return;
+                for (int i = 0; i < sourceArray.Length; i++)
+                {
+                    if (i < packageMark.Length)
+                    {
+                        for (int j = 0; j < packageMark.Length; j++)
+                        {
+                            if (i + j >= sourceArray.Length)
+                            {
+                                head = -1;
+                                break;
+                            }
+                            if (head == -1)
+                            {
+                                if (sourceArray[i + j] != packageMark[j])
+                                {
+                                    head = -1;
+                                    break;
+                                }
+                                else
+                                {
+                                    if (j == packageMark.Length - 1) head = i;
+                                    //if (head != 0) head = -1;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int j = 0; j < packageMark.Length; j++)
+                        {
+                            if (i + j >= sourceArray.Length)
+                            {
+                                tail = -1;
+                                break;
+                            }
+                            if (tail == -1)
+                            {
+                                if (sourceArray[i + j] != packageMark[j])
+                                {
+                                    tail = -1;
+                                    break;
+                                }
+                                else
+                                {
+                                    if (j == packageMark.Length - 1)
                                     {
                                         tail = i;
                                     }
@@ -1073,336 +1459,329 @@ namespace MyToolkit
                             }
                         }
                     }
+                    if (tail != -1) break;
                 }
-                if (head != -1 && tail != -1) break;
             }
-        }
-        //得到数组开头与下一个位置是标记字节的索引位置（头尾索引）
-        public static void CheckPackage(byte[] sourceArray, byte[] packageMark, out int head, out int tail)
-        {
-            head = -1;
-            tail = -1;
-            if (packageMark.Length > sourceArray.Length) return;
-            for (int i = 0; i < sourceArray.Length; i++)
+            //比较两个数组是否相等
+            public static bool CheckEquals(byte[] b1, byte[] b2)
             {
-                if (i < packageMark.Length)
+                if (b1 == null || b2 == null) return false;
+                if (b1.Length != b2.Length) return false;
+                for (int i = 0; i < b1.Length; i++)
                 {
-                    for (int j = 0; j < packageMark.Length; j++)
+                    if (b1[i] != b2[i]) return false;
+                }
+                return true;
+            }
+            #endregion
+
+            /// <summary>
+            /// 字节按每个字颠倒
+            /// </summary>
+            /// <param name="bytes">要调整的字节</param>
+            /// <returns>返回的结果</returns>
+            public static byte[] WordByteReverse(byte[] bytes)
+            {
+                if (bytes == null) return Encoding.ASCII.GetBytes("null:0");
+                if (bytes.Length == 0) return Encoding.ASCII.GetBytes("null:0");
+                List<byte> list = new List<byte>();
+                if ((bytes.Length % 2) == 0)
+                {
+                    for (int i = 0; i < bytes.Length; i += 2)
                     {
-                        if (i + j >= sourceArray.Length)
-                        {
-                            head = -1;
-                            break;
-                        }
-                        if (head == -1)
-                        {
-                            if (sourceArray[i + j] != packageMark[j])
-                            {
-                                head = -1;
-                                break;
-                            }
-                            else
-                            {
-                                if (j == packageMark.Length - 1) head = i;
-                                //if (head != 0) head = -1;
-                            }
-                        }
+                        list.Add(bytes[i + 1]);
+                        list.Add(bytes[i]);
                     }
+                    return list.ToArray();
                 }
                 else
                 {
-                    for (int j = 0; j < packageMark.Length; j++)
+                    for (int i = 0; i < bytes.Length - 1; i += 2)
                     {
-                        if (i + j >= sourceArray.Length)
+                        list.Add(bytes[i + 1]);
+                        list.Add(bytes[i]);
+                    }
+                    list.Add(bytes.Last());
+                    return list.ToArray();
+                }
+            }
+
+        }
+    }
+
+    namespace FileManagement
+    {
+        /// <summary>
+        /// 静态文件管理类
+        /// </summary>
+        public class FileManager
+        {
+            public static string GetLocalAppPath(string fileName)
+            {
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
+            }
+
+            public static byte[] GetFileBinary(string path)
+            {
+                FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                byte[] data = new byte[fileStream.Length];
+                fileStream.Read(data, 0, data.Length);
+                fileStream.Close();
+                return data;
+            }
+
+            public static Stream GetFileStream(string path, int cacheLength = 10240)
+            {
+                using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                var buffer = new byte[cacheLength];
+                int bytesRead;
+                Stream stream = new MemoryStream();
+                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    stream.Write(buffer, 0, bytesRead);
+                }
+                stream.Seek(0, SeekOrigin.Begin);
+                return stream;
+            }
+
+            public static async Task WriteStreamAsync(string path, string fileName, Stream message, FileMode fileMode = FileMode.OpenOrCreate)
+            {
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                path += "/" + fileName;
+                byte[] buffer = new byte[10240]; int length;
+                using FileStream file = new FileStream(path, fileMode);
+                while ((length = await message.ReadAsync(buffer)) != 0)
+                    await file.WriteAsync(buffer, 0, length);
+            }
+
+            public static async Task WriteStreamProgressAsync(string path, string fileName, int fileSize, Stream message, IProgress<string> progress, FileMode fileMode = FileMode.OpenOrCreate)
+            {
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                path += "/" + fileName;
+                byte[] buffer = new byte[10240]; int length; int progressLength = 0;
+                using FileStream file = new FileStream(path, fileMode);
+                while ((length = await message.ReadAsync(buffer)) != 0)
+                {
+                    await file.WriteAsync(buffer, 0, length);
+                    progressLength += length;
+                    progress.Report($"{length * 100 / fileSize}%");
+                }
+            }
+
+            public static void AppendFlieString(string path, string fileName, string message, FileMode fileMode)
+            {
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                path += "/" + fileName;
+                byte[] data = Encoding.UTF8.GetBytes(message);
+                FileStream file = new FileStream(path, fileMode);
+                file.Write(data, 0, data.Length);
+                file.Flush();
+                file.Close();
+                file.Dispose();
+            }
+
+            public static void SetTableHeader(string path, string fileName, string tableHeader)
+            {
+                //using FileStream read = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                //using (StreamReader sr = new StreamReader(read))
+                //{
+                //    if (sr.ReadToEnd() == string.Empty)
+                //    {
+
+                //    }
+                //}
+                FileInfo fileInfo = new FileInfo(path + "/" + fileName);
+                if (!fileInfo.Exists || fileInfo.Length == 0)
+                {
+                    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                    path += "/" + fileName;
+                    byte[] data = Encoding.UTF8.GetBytes(tableHeader);
+                    FileStream file = new FileStream(path, FileMode.Append);
+                    file.Write(data, 0, data.Length);
+                    file.Flush();
+                    file.Close();
+                    file.Dispose();
+                }
+            }
+
+            public static void AppendLog(string path, string fileName, string tableHeader, string message)
+            {
+                string log = DateTime.Now.ToString("yyy-MM-dd HH:mm:ss") + "\t" + message + Environment.NewLine;
+                SetTableHeader(path, fileName, tableHeader);
+                AppendFlieString(path, fileName, log, FileMode.Append);
+            }
+
+        }
+        /// <summary>
+        /// 静态日志纪录类
+        /// </summary>
+        public class MessageRecorder
+        {
+            public static bool PCOrAndroid = true;
+            public static string LogPath = "Log";
+            public static readonly string DocumentPath = "/storage/emulated/0/Documents/Log";
+            public static readonly string ConfigurationPath = "/storage/emulated/0/Configuration";
+
+            public static void RecordError(string error, string solution)
+            {
+                string rowstr = error;
+                if (rowstr.IndexOf("\n") > 0)
+                    rowstr = rowstr.Replace("\n", " ");
+                if (rowstr.IndexOf("\r\n") > 0)
+                    rowstr = rowstr.Replace("\r\n", " ");
+                if (rowstr.IndexOf("\t") > 0)
+                    rowstr = rowstr.Replace("\t", " ");
+                if (PCOrAndroid)
+                {
+                    FileManager.AppendLog(LogPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
+                    "日期\t错误信息\t处理方法" + Environment.NewLine,
+                    string.Format("{0}\t{1}", rowstr, solution));
+                }
+                else
+                {
+                    FileManager.AppendLog(DocumentPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
+                    "日期\t错误信息\t处理方法" + Environment.NewLine,
+                    string.Format("{0}\t{1}", rowstr, solution));
+                }
+            }
+
+            public static void RecordProduction(string message)
+            {
+                if (PCOrAndroid)
+                {
+                    FileManager.AppendLog(LogPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
+                    "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
+                    message);
+                }
+                else
+                {
+                    FileManager.AppendLog(DocumentPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
+                    "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
+                    message);
+                }
+            }
+        }
+        /// <summary>
+        /// 静态Json管理类
+        /// </summary>
+        public class JsonManager
+        {
+            public static void SaveJsonString(string path, string fileName, object data)
+            {
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                path += "/" + fileName;
+                string jsonString = JsonMapper.ToJson(data);
+                byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
+                FileStream file = new FileStream(path, FileMode.Create);
+                file.Write(jsonBytes, 0, jsonBytes.Length);//整块写入
+                file.Flush();
+                file.Close();
+            }
+
+            public static T ReadJsonString<T>(string path, string fileName)
+            {
+                try
+                {
+                    if (!Directory.Exists(path))
+                        Directory.CreateDirectory(path);
+                    path += "/" + fileName;
+                    if (File.Exists(path))
+                    {
+                        FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        StreamReader stream = new StreamReader(file);
+                        T jsonData = JsonMapper.ToObject<T>(stream.ReadToEnd());
+                        file.Flush();
+                        file.Close();
+                        //T jsonData = JsonMapper.ToObject<T>(File.ReadAllText(path));
+                        return jsonData;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+                return default!;
+            }
+
+            public static JsonData ReadSimpleJsonString(string path)
+            {
+                JsonData jsonData = JsonMapper.ToObject(File.ReadAllText(path));
+                return jsonData;
+            }
+        }
+        /// <summary>
+        /// 文件配置存储类
+        /// </summary>
+        public class KeyValueManager
+        {
+            public string FileName;
+            public string ConfigurationPath;
+            public Dictionary<string, string> KeyValueList;
+
+            public KeyValueManager(string fileName, string path, params string[] keyValues)
+            {
+                FileName = fileName;
+                ConfigurationPath = path;
+                KeyValueList = JsonManager.ReadJsonString<Dictionary<string, string>>(ConfigurationPath, FileName);
+                if (KeyValueList == null) KeyValueList = new Dictionary<string, string>();
+                if (keyValues.Length % 2 == 0 && keyValues.Length != 0)
+                {
+                    for (int i = 0; i < keyValues.Length; i += 2)
+                    {
+                        if (!KeyValueList.ContainsKey(keyValues[i]))
                         {
-                            tail = -1;
-                            break;
-                        }
-                        if (tail == -1)
-                        {
-                            if (sourceArray[i + j] != packageMark[j])
-                            {
-                                tail = -1;
-                                break;
-                            }
-                            else
-                            {
-                                if (j == packageMark.Length - 1)
-                                {
-                                    tail = i;
-                                }
-                            }
+                            KeyValueList.Add(keyValues[i], keyValues[i + 1]);
+                            JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
                         }
                     }
                 }
-                if (tail != -1) break;
             }
-        }
-        //比较两个数组是否相等
-        public static bool CheckEquals(byte[]b1,byte[] b2)
-        {
-            if (b1 == null || b2 == null) return false;
-            if (b1.Length != b2.Length) return false;
-            for (int i = 0; i < b1.Length; i++)
-            {
-                if (b1[i] != b2[i]) return false;
-            }
-            return true;
-        }
-        #endregion
 
-        /// <summary>
-        /// 字节按每个字颠倒
-        /// </summary>
-        /// <param name="bytes">要调整的字节</param>
-        /// <returns>返回的结果</returns>
-        public static byte[] WordByteReverse(byte[] bytes)
-        {
-            if (bytes == null) return Encoding.ASCII.GetBytes("null:0");
-            if (bytes.Length == 0) return Encoding.ASCII.GetBytes("null:0");
-            List<byte> list = new List<byte>();
-            if ((bytes.Length % 2) == 0)
+            public void Add(string key, string value)
             {
-                for (int i = 0; i < bytes.Length; i += 2)
+                KeyValueList.Add(key, value);
+                JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
+            }
+
+            public void Remove(string key)
+            {
+                KeyValueList.Remove(key);
+                JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
+            }
+
+            public void Change(string key, string value)
+            {
+                if (KeyValueList.ContainsKey(key))
                 {
-                    list.Add(bytes[i + 1]);
-                    list.Add(bytes[i]);
+                    KeyValueList[key] = value;
+                    JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
                 }
-                return list.ToArray();
-            }
-            else
-            {
-                for (int i = 0; i < bytes.Length - 1; i += 2)
+                else
                 {
-                    list.Add(bytes[i + 1]);
-                    list.Add(bytes[i]);
+                    Add(key, value);
                 }
-                list.Add(bytes.Last());
-                return list.ToArray();
             }
-        }
 
-    }
-    /// <summary>
-    /// 静态Fins工具类
-    /// </summary>
-    public class FinsTCPToolkit
-    {
-        /// <summary>
-        /// Fins协议握手指令
-        /// </summary>
-        /// <param name="localAddress">本地IP最后一段</param>
-        /// <returns>所需16进制字符串握手指令</returns>
-        public static string HandshakeString(string localAddress)
-        {
-            int.TryParse(localAddress, out int address);
-            if (address >= 0 && address <= 255)
+            public string Load(string key)
             {
-                return "46494E53" + "0000000C" + "00000000" + "00000000" + "000000" + address.ToString("X2");
+                try
+                {
+                    if (KeyValueList.ContainsKey(key))
+                        return KeyValueList[key];
+                    else
+                        return "";
+                }
+                catch (Exception)
+                {
+                    return "";
+                }
             }
-            return "";
-        }
-        /// <summary>
-        /// Fins协议握手指令
-        /// </summary>
-        /// <param name="localAddress">本地IP最后一段</param>
-        /// <returns>所需16进制字符串握手指令</returns>
-        public static string HandshakeString(int localAddress)
-        {
-            if (localAddress >= 0 && localAddress <= 255)
-            {
-                return "46494E53" + "0000000C" + "00000000" + "00000000" + "000000" + localAddress.ToString("X2");
-            }
-            return "";
-        }
-        /// <summary>
-        /// Fins协议读取PLC指定内存的数据
-        /// </summary>
-        /// <param name="remoteAddress">PLCIP最后一段地址，16进制，1字节</param>
-        /// <param name="localAddress">本地IP最后一段地址，16进制，1字节</param>
-        /// <param name="memoryArea">PLC内存地址代码，16进制，1字节</param>
-        /// <param name="startAddress">读取数据起始地址，容量为16进制2字节</param>
-        /// <param name="dataLength">读取数据长度，16进制，2字节</param>
-        /// <returns>所需16进制字符串读取指令</returns>
-        public static string ReadString(string remoteAddress, string localAddress, string memoryArea, int startAddress, string dataLength)
-        {
-            int.TryParse(localAddress, out int local);
-            int.TryParse(remoteAddress, out int remote);
-            if (local >= 0 && local <= 255 && remote >= 0 && remote <= 255)
-                return "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
-                        "00" + remoteAddress + "00" + "00" + localAddress + "00" +
-                        "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength;
-            return "";
-        }
-
-        public static string ReadString(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength)
-        {
-            if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
-                return "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
-                        "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
-                        "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
-            return "";
-        }
-
-        public static byte[] ReadBytes(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength)
-        {
-            string readCommand = "";
-            if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
-                readCommand = "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
-                        "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
-                        "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
-            return DataConverter.HexStringToBytes(readCommand);
-        }
-        /// <summary>
-        /// Fins协议写入PLC指定内存数据
-        /// </summary>
-        /// <param name="remoteAddress">PLCIP最后一段地址，16进制，1字节</param>
-        /// <param name="localAddress">本地IP最后一段地址，16进制，1字节</param>
-        /// <param name="memoryArea">PLC内存地址代码，16进制，1字节</param>
-        /// <param name="startAddress">写入数据起始地址，容量为16进制2字节</param>
-        /// <param name="dataLength">写入数据长度，容量为16进制2字节</param>
-        /// <param name="data">写入的数据，16进制，2字节*dataLength</param>
-        /// <returns>所需16进制字符串写入指令</returns>
-        public static string WriteString(string remoteAddress, string localAddress, string memoryArea, int startAddress, int dataLength, string data)
-        {
-            int codeLength = 0x0000001A + dataLength * 2;
-            int.TryParse(localAddress, out int local);
-            int.TryParse(remoteAddress, out int remote);
-            if (local >= 0 && local <= 255 && remote >= 0 && remote <= 255)
-                return "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
-                    "00" + remoteAddress + "00" + "00" + localAddress + "00" +
-                    "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4") + data;
-            return "";
-        }
-
-        public static string WriteString(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength, string data)
-        {
-            int codeLength = 0x0000001A + dataLength * 2;
-            if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
-                return "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
-                    "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
-                    "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4") + data;
-            return "";
-        }
-
-        public static byte[] WriteBytes(int remoteAddress, int localAddress, string memoryArea, int startAddress, byte[] data)
-        {
-            int codeLength = 0x0000001A + data.Length;
-            int dataLength = CalculateDataLength(data);
-            string prefixString = "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
-                    "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
-                    "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
-            return ByteArrayToolkit.SpliceBytes(DataConverter.HexStringToBytes(prefixString), data);
-        }
-
-        public static int CalculateDataLength(byte[] data)
-        {
-            int dataLength;
-            if (data.Length % 2 != 0)
-                dataLength = data.Length / 2 + 1;
-            else
-                dataLength = data.Length / 2;
-            return dataLength;
-        }
-        /// <summary>
-        /// 解析FINS协议数据头，读取信息
-        /// </summary>
-        /// <param name="header">FINS协议数据头</param>
-        /// <param name="finsDataLength">FINS协议数据长度（字节）</param>
-        /// <param name="command">FINS协议命令代码</param>
-        /// <returns>是否解析成功</returns>
-        public static bool ParseHeader(byte[] header, out int finsDataLength, out int command)
-        {
-            finsDataLength = -1;
-            command = -1;
-            if (header == null) return false;
-            if (header.Length < 16) return false;
-            if (header[0] != 0x46 || header[1] != 0x49 || header[2] != 0x4E || header[3] != 0x53) return false;
-            finsDataLength = DataConverter.FourBytesToInt(ByteArrayToolkit.CutBytesByLength(header, 4, 4));
-            command = (int)header[11];
-            return true;
         }
     }
-    /// <summary>
-    /// 静态CRC16校验类
-    /// </summary>
-    public class CRC16
-    {
-        //High-Order Byte Table
-        /* Table of CRC values for high–order byte */
-        static readonly byte[] auchCRCHi = new byte[256]{
-            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
-            0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
-            0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01,
-            0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
-            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81,
-            0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0,
-            0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01,
-            0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
-            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
-            0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
-            0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01,
-            0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
-            0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
-            0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
-            0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01,
-            0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
-            0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
-            0x40};
-        //Low-Order Byte Table
-        /* Table of CRC values for low–order byte */
-        static readonly byte[] auchCRCLo = new byte[256]{
-            0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06, 0x07, 0xC7, 0x05, 0xC5, 0xC4,
-            0x04, 0xCC, 0x0C, 0x0D, 0xCD, 0x0F, 0xCF, 0xCE, 0x0E, 0x0A, 0xCA, 0xCB, 0x0B, 0xC9, 0x09,
-            0x08, 0xC8, 0xD8, 0x18, 0x19, 0xD9, 0x1B, 0xDB, 0xDA, 0x1A, 0x1E, 0xDE, 0xDF, 0x1F, 0xDD,
-            0x1D, 0x1C, 0xDC, 0x14, 0xD4, 0xD5, 0x15, 0xD7, 0x17, 0x16, 0xD6, 0xD2, 0x12, 0x13, 0xD3,
-            0x11, 0xD1, 0xD0, 0x10, 0xF0, 0x30, 0x31, 0xF1, 0x33, 0xF3, 0xF2, 0x32, 0x36, 0xF6, 0xF7,
-            0x37, 0xF5, 0x35, 0x34, 0xF4, 0x3C, 0xFC, 0xFD, 0x3D, 0xFF, 0x3F, 0x3E, 0xFE, 0xFA, 0x3A,
-            0x3B, 0xFB, 0x39, 0xF9, 0xF8, 0x38, 0x28, 0xE8, 0xE9, 0x29, 0xEB, 0x2B, 0x2A, 0xEA, 0xEE,
-            0x2E, 0x2F, 0xEF, 0x2D, 0xED, 0xEC, 0x2C, 0xE4, 0x24, 0x25, 0xE5, 0x27, 0xE7, 0xE6, 0x26,
-            0x22, 0xE2, 0xE3, 0x23, 0xE1, 0x21, 0x20, 0xE0, 0xA0, 0x60, 0x61, 0xA1, 0x63, 0xA3, 0xA2,
-            0x62, 0x66, 0xA6, 0xA7, 0x67, 0xA5, 0x65, 0x64, 0xA4, 0x6C, 0xAC, 0xAD, 0x6D, 0xAF, 0x6F,
-            0x6E, 0xAE, 0xAA, 0x6A, 0x6B, 0xAB, 0x69, 0xA9, 0xA8, 0x68, 0x78, 0xB8, 0xB9, 0x79, 0xBB,
-            0x7B, 0x7A, 0xBA, 0xBE, 0x7E, 0x7F, 0xBF, 0x7D, 0xBD, 0xBC, 0x7C, 0xB4, 0x74, 0x75, 0xB5,
-            0x77, 0xB7, 0xB6, 0x76, 0x72, 0xB2, 0xB3, 0x73, 0xB1, 0x71, 0x70, 0xB0, 0x50, 0x90, 0x91,
-            0x51, 0x93, 0x53, 0x52, 0x92, 0x96, 0x56, 0x57, 0x97, 0x55, 0x95, 0x94, 0x54, 0x9C, 0x5C,
-            0x5D, 0x9D, 0x5F, 0x9F, 0x9E, 0x5E, 0x5A, 0x9A, 0x9B, 0x5B, 0x99, 0x59, 0x58, 0x98, 0x88,
-            0x48, 0x49, 0x89, 0x4B, 0x8B, 0x8A, 0x4A, 0x4E, 0x8E, 0x8F, 0x4F, 0x8D, 0x4D, 0x4C, 0x8C,
-            0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83, 0x41, 0x81, 0x80,
-            0x40};
 
-        public static byte[] CRC(byte[] value)
-        {
-            byte uchCRCHi = 0xFF; /* 高CRC字节初始化 */
-            byte uchCRCLo = 0xFF; /* 低CRC字节初始化 */
-            int uIndex; /* CRC循环中的索引 */
-            for (int i = 0; i < value.Length; i++)
-            {
-                uIndex = uchCRCLo ^ value[i];
-                uchCRCLo = (byte)int.Parse((uchCRCHi ^ auchCRCHi[uIndex]).ToString("X"), System.Globalization.NumberStyles.HexNumber);
-                uchCRCHi = auchCRCLo[uIndex];
-            }
-            byte[] crcValue = new byte[value.Length + 2];
-            value.CopyTo(crcValue, 0);
-            crcValue[crcValue.Length - 2] = uchCRCLo;
-            crcValue[crcValue.Length - 1] = uchCRCHi;
-            return crcValue;
-        }
-
-        public static byte[] RFSum(byte[] value)
-        {
-            byte btSum = 0;
-            for (int i = 0; i < value.Length; i++)
-            {
-                btSum ^= value[i];
-            }
-            btSum ^= 0x14;
-            byte[] btSumValue = new byte[value.Length + 1];
-            value.CopyTo(btSumValue, 0);
-            btSumValue[btSumValue.Length - 1] = btSum;
-            return btSumValue;
-        }
-    }
     /// <summary>
     /// 计时工具类
     /// </summary>
