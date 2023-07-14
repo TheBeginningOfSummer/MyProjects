@@ -1608,11 +1608,10 @@ namespace MyToolkit
         /// </summary>
         public class MessageRecorder
         {
-            public static readonly string LogPath = "Log";
             public static readonly string AndroidPath = "/storage/emulated/0";
             public static readonly string AndroidDocumentPath = $"{AndroidPath}/Documents/Log";
 
-            public static void RecordError(string error, string solution, string path, string fileName = "错误记录.xls")
+            public static void RecordError(string error, string solution, string path = "Log", string fileName = "错误记录.xls")
             {
                 string rowstr = error;
                 if (rowstr.IndexOf("\n") > 0)
@@ -1625,7 +1624,7 @@ namespace MyToolkit
                    $"日期\t错误信息\t处理方法{Environment.NewLine}", $"{rowstr}\t{solution}");
             }
 
-            public static void RecordProduction(string[] tableName, string[] message, string path, string fileName = "生产记录.xls")
+            public static void RecordProduction(string[] tableName, string[] message, string path = "Log", string fileName = "生产记录.xls")
             {
                 if (tableName.Length == 0 || tableName == null) return;
                 if (message.Length == 0 || message == null) return;
