@@ -1606,7 +1606,7 @@ namespace MyToolkit
 
             public static void AppendLog(string path, string fileName, string tableHeader, string message)
             {
-                string log = DateTime.Now.ToString("yyy-MM-dd HH:mm:ss") + "\t" + message + Environment.NewLine;
+                string log = $"{DateTime.Now:yyy-MM-dd HH:mm:ss}\t{message}{Environment.NewLine}";
                 SetTableHeader(path, fileName, tableHeader);
                 AppendFlieString(path, fileName, log, FileMode.Append);
             }
@@ -1617,12 +1617,11 @@ namespace MyToolkit
         /// </summary>
         public class MessageRecorder
         {
-            public static bool PCOrAndroid = true;
-            public static string LogPath = "Log";
-            public static readonly string DocumentPath = "/storage/emulated/0/Documents/Log";
-            public static readonly string ConfigurationPath = "/storage/emulated/0/Configuration";
+            public static readonly string LogPath = "Log";
+            public static readonly string AndroidPath = "/storage/emulated/0";
+            public static readonly string AndroidDocumentPath = $"{AndroidPath}/Documents/Log";
 
-            public static void RecordError(string error, string solution)
+            public static void RecordError(string error, string solution, string path, string fileName = "错误记录.xls")
             {
                 string rowstr = error;
                 if (rowstr.IndexOf("\n") > 0)
@@ -1631,18 +1630,8 @@ namespace MyToolkit
                     rowstr = rowstr.Replace("\r\n", " ");
                 if (rowstr.IndexOf("\t") > 0)
                     rowstr = rowstr.Replace("\t", " ");
-                if (PCOrAndroid)
-                {
-                    FileManager.AppendLog(LogPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
-                    "日期\t错误信息\t处理方法" + Environment.NewLine,
-                    string.Format("{0}\t{1}", rowstr, solution));
-                }
-                else
-                {
-                    FileManager.AppendLog(DocumentPath + "/" + "错误记录", DateTime.Now.ToString("yyy-MM-dd") + "错误记录.xls",
-                    "日期\t错误信息\t处理方法" + Environment.NewLine,
-                    string.Format("{0}\t{1}", rowstr, solution));
-                }
+                FileManager.AppendLog(path, $"{DateTime.Now:yyy-MM-dd}{fileName}",
+                   $"日期\t错误信息\t处理方法{Environment.NewLine}", $"{rowstr}\t{solution}");
             }
 
             public static void RecordProduction(string message)
