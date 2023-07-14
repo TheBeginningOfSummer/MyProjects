@@ -1634,20 +1634,26 @@ namespace MyToolkit
                    $"日期\t错误信息\t处理方法{Environment.NewLine}", $"{rowstr}\t{solution}");
             }
 
-            public static void RecordProduction(string message)
+            public static void RecordProduction(string[] tableName, string[] message, string path, string fileName = "生产记录.xls")
             {
-                if (PCOrAndroid)
+                if (tableName.Length == 0 || tableName == null) return;
+                if (message.Length == 0 || message == null) return;
+                string header = ""; string content = "";
+                for (int i = 0; i < tableName.Length; i++)
                 {
-                    FileManager.AppendLog(LogPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
-                    "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
-                    message);
+                    if (i == tableName.Length - 1)
+                        header += tableName[i] + Environment.NewLine;
+                    else
+                        header += tableName[i] + "\t";
                 }
-                else
+                for (int i = 0; i < message.Length; i++)
                 {
-                    FileManager.AppendLog(DocumentPath + "/" + "生产日志", DateTime.Now.ToString("yyy-MM-dd") + "生产日志.xls",
-                    "日期\t设备ID\t设备名称\t设备编码\t零件ID\t零件代号\t目标数量\t完成数量" + Environment.NewLine,
-                    message);
+                    if (i == message.Length - 1)
+                        content += message[i] + Environment.NewLine;
+                    else
+                        content += message[i] + "\t";
                 }
+                FileManager.AppendLog(path, $"{DateTime.Now:yyy-MM-dd}{fileName}", header, content);
             }
         }
         /// <summary>
