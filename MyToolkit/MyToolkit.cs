@@ -1592,16 +1592,7 @@ namespace MyToolkit
                 //}
                 FileInfo fileInfo = new FileInfo(path + "/" + fileName);
                 if (!fileInfo.Exists || fileInfo.Length == 0)
-                {
-                    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                    path += "/" + fileName;
-                    byte[] data = Encoding.UTF8.GetBytes(tableHeader);
-                    FileStream file = new FileStream(path, FileMode.Append);
-                    file.Write(data, 0, data.Length);
-                    file.Flush();
-                    file.Close();
-                    file.Dispose();
-                }
+                    AppendFlieString(path, fileName, tableHeader, FileMode.Append);
             }
 
             public static void AppendLog(string path, string fileName, string tableHeader, string message)
