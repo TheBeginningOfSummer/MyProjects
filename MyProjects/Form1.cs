@@ -10,12 +10,14 @@ namespace MyProjects;
 
 public partial class Form1 : Form
 {
+    #region 对象
     readonly ProcessToolkit testProcess = new("C:\\Users\\1\\Desktop\\MyProjects\\OpencvTest\\dist\\CVTest\\CVTest.exe");
     //readonly ConnectionToolkit.SocketConnection server = new("127.0.0.1", 5000);
     readonly TcpServer bytesIOServer = new();
     readonly DataTransfer dataTransfer = new();
     readonly TesseractEngine tess;
     readonly OpenCVTool cvTool;
+    #endregion
 
     public Form1()
     {
@@ -192,7 +194,9 @@ public partial class Form1 : Form
         }
         //OpenCVTool.ReadVideo(0, "video");
     }
+    #endregion
 
+    #region 相机
     private void BTN_LocalCamera_Click(object sender, EventArgs e)
     {
         Task.Run(() => { cvTool.IsStopRead = false; cvTool.ReadCamera(0, "video"); });

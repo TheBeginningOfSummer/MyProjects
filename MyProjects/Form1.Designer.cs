@@ -44,8 +44,10 @@
             RB_Circle = new RadioButton();
             TC_Main = new TabControl();
             TP_CV = new TabPage();
-            BTN_CVStop = new Button();
+            GB_相机 = new GroupBox();
             BTN_LocalCamera = new Button();
+            BTN_CVStop = new Button();
+            GB_本地文件 = new GroupBox();
             GB_Test = new GroupBox();
             GB_FigureSelect = new GroupBox();
             TP_测试 = new TabPage();
@@ -55,6 +57,8 @@
             GB_ConsoleTest.SuspendLayout();
             TC_Main.SuspendLayout();
             TP_CV.SuspendLayout();
+            GB_相机.SuspendLayout();
+            GB_本地文件.SuspendLayout();
             GB_Test.SuspendLayout();
             GB_FigureSelect.SuspendLayout();
             TP_测试.SuspendLayout();
@@ -127,8 +131,7 @@
             // 
             // BTN_ReadImage
             // 
-            BTN_ReadImage.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_ReadImage.Location = new Point(634, 391);
+            BTN_ReadImage.Location = new Point(10, 22);
             BTN_ReadImage.Name = "BTN_ReadImage";
             BTN_ReadImage.Size = new Size(75, 23);
             BTN_ReadImage.TabIndex = 6;
@@ -138,8 +141,7 @@
             // 
             // BTN_ReadVideo
             // 
-            BTN_ReadVideo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_ReadVideo.Location = new Point(634, 420);
+            BTN_ReadVideo.Location = new Point(91, 22);
             BTN_ReadVideo.Name = "BTN_ReadVideo";
             BTN_ReadVideo.Size = new Size(75, 23);
             BTN_ReadVideo.TabIndex = 7;
@@ -215,15 +217,13 @@
             // 
             // TP_CV
             // 
-            TP_CV.Controls.Add(BTN_CVStop);
-            TP_CV.Controls.Add(BTN_LocalCamera);
+            TP_CV.Controls.Add(GB_相机);
+            TP_CV.Controls.Add(GB_本地文件);
             TP_CV.Controls.Add(GB_Test);
             TP_CV.Controls.Add(GB_FigureSelect);
             TP_CV.Controls.Add(PB_MyPicture);
             TP_CV.Controls.Add(TB_Info);
-            TP_CV.Controls.Add(BTN_ReadVideo);
             TP_CV.Controls.Add(GB_ConsoleTest);
-            TP_CV.Controls.Add(BTN_ReadImage);
             TP_CV.Location = new Point(4, 26);
             TP_CV.Name = "TP_CV";
             TP_CV.Padding = new Padding(3);
@@ -232,10 +232,31 @@
             TP_CV.Text = "CV";
             TP_CV.UseVisualStyleBackColor = true;
             // 
+            // GB_相机
+            // 
+            GB_相机.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            GB_相机.Controls.Add(BTN_LocalCamera);
+            GB_相机.Controls.Add(BTN_CVStop);
+            GB_相机.Location = new Point(639, 278);
+            GB_相机.Name = "GB_相机";
+            GB_相机.Size = new Size(179, 83);
+            GB_相机.TabIndex = 18;
+            GB_相机.TabStop = false;
+            GB_相机.Text = "相机";
+            // 
+            // BTN_LocalCamera
+            // 
+            BTN_LocalCamera.Location = new Point(10, 22);
+            BTN_LocalCamera.Name = "BTN_LocalCamera";
+            BTN_LocalCamera.Size = new Size(75, 23);
+            BTN_LocalCamera.TabIndex = 15;
+            BTN_LocalCamera.Text = "读取相机";
+            BTN_LocalCamera.UseVisualStyleBackColor = true;
+            BTN_LocalCamera.Click += BTN_LocalCamera_Click;
+            // 
             // BTN_CVStop
             // 
-            BTN_CVStop.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_CVStop.Location = new Point(796, 420);
+            BTN_CVStop.Location = new Point(91, 22);
             BTN_CVStop.Name = "BTN_CVStop";
             BTN_CVStop.Size = new Size(75, 23);
             BTN_CVStop.TabIndex = 16;
@@ -243,16 +264,17 @@
             BTN_CVStop.UseVisualStyleBackColor = true;
             BTN_CVStop.Click += BTN_CVStop_Click;
             // 
-            // BTN_LocalCamera
+            // GB_本地文件
             // 
-            BTN_LocalCamera.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            BTN_LocalCamera.Location = new Point(715, 420);
-            BTN_LocalCamera.Name = "BTN_LocalCamera";
-            BTN_LocalCamera.Size = new Size(75, 23);
-            BTN_LocalCamera.TabIndex = 15;
-            BTN_LocalCamera.Text = "本地相机";
-            BTN_LocalCamera.UseVisualStyleBackColor = true;
-            BTN_LocalCamera.Click += BTN_LocalCamera_Click;
+            GB_本地文件.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            GB_本地文件.Controls.Add(BTN_ReadImage);
+            GB_本地文件.Controls.Add(BTN_ReadVideo);
+            GB_本地文件.Location = new Point(639, 198);
+            GB_本地文件.Name = "GB_本地文件";
+            GB_本地文件.Size = new Size(179, 74);
+            GB_本地文件.TabIndex = 17;
+            GB_本地文件.TabStop = false;
+            GB_本地文件.Text = "本地文件";
             // 
             // GB_Test
             // 
@@ -330,6 +352,8 @@
             TC_Main.ResumeLayout(false);
             TP_CV.ResumeLayout(false);
             TP_CV.PerformLayout();
+            GB_相机.ResumeLayout(false);
+            GB_本地文件.ResumeLayout(false);
             GB_Test.ResumeLayout(false);
             GB_FigureSelect.ResumeLayout(false);
             GB_FigureSelect.PerformLayout();
@@ -363,5 +387,7 @@
         private Button BTN_CVStop;
         private Button BTN_Test;
         private TextBox TB_Test;
+        private GroupBox GB_本地文件;
+        private GroupBox GB_相机;
     }
 }
