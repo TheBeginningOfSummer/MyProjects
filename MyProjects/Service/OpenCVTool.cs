@@ -12,6 +12,7 @@ public class OpenCVTool
 
     private Mat sourceImage = new();
     public VideoCapture? RecordCapture;
+
     #region 鼠标绘制图形
     //要画的形状
     public int DrawShape = 0;

@@ -635,20 +635,20 @@ namespace MyToolkit
         /// </summary>
         public class FinsTCP
         {
-            /// <summary>
-            /// Fins协议握手指令
-            /// </summary>
-            /// <param name="localAddress">本地IP最后一段</param>
-            /// <returns>所需16进制字符串握手指令</returns>
-            public static string HandshakeString(string localAddress)
+            public int PLCNode { get; set; }
+            public int LocalNode { get; set; }
+
+            public FinsTCP(int plcNode, int localNode)
             {
-                int.TryParse(localAddress, out int address);
-                if (address >= 0 && address <= 255)
-                {
-                    return "46494E53" + "0000000C" + "00000000" + "00000000" + "000000" + address.ToString("X2");
-                }
-                return "";
+                PLCNode = plcNode;
+                LocalNode = localNode;
             }
+
+            public FinsTCP()
+            {
+
+            }
+
             /// <summary>
             /// Fins协议握手指令
             /// </summary>
@@ -663,34 +663,28 @@ namespace MyToolkit
                 return "";
             }
             /// <summary>
+            /// 计算数据所占地址长度
+            /// </summary>
+            /// <param name="data"></param>
+            /// <returns></returns>
+            public static int CalculateDataLength(byte[] data)
+            {
+                int dataLength;
+                if (data.Length % 2 != 0)
+                    dataLength = data.Length / 2 + 1;
+                else
+                    dataLength = data.Length / 2;
+                return dataLength;
+            }
+            /// <summary>
             /// Fins协议读取PLC指定内存的数据
             /// </summary>
-            /// <param name="remoteAddress">PLCIP最后一段地址，16进制，1字节</param>
-            /// <param name="localAddress">本地IP最后一段地址，16进制，1字节</param>
-            /// <param name="memoryArea">PLC内存地址代码，16进制，1字节</param>
-            /// <param name="startAddress">读取数据起始地址，容量为16进制2字节</param>
-            /// <param name="dataLength">读取数据长度，16进制，2字节</param>
-            /// <returns>所需16进制字符串读取指令</returns>
-            public static string ReadString(string remoteAddress, string localAddress, string memoryArea, int startAddress, string dataLength)
-            {
-                int.TryParse(localAddress, out int local);
-                int.TryParse(remoteAddress, out int remote);
-                if (local >= 0 && local <= 255 && remote >= 0 && remote <= 255)
-                    return "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
-                            "00" + remoteAddress + "00" + "00" + localAddress + "00" +
-                            "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength;
-                return "";
-            }
-
-            public static string ReadString(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength)
-            {
-                if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
-                    return "46494E53" + "0000001A" + "00000002" + "00000000" + "80" + "0002" +
-                            "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
-                            "FF0101" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
-                return "";
-            }
-
+            /// <param name="remoteAddress">PLCIP最后一段地址，16进制1字节0-255</param>
+            /// <param name="localAddress">本地IP最后一段地址，16进制1字节0-255</param>
+            /// <param name="memoryArea">PLC内存地址代码，16进制1字节</param>
+            /// <param name="startAddress">读取数据起始地址，16进制2字节</param>
+            /// <param name="dataLength">读取数据长度，16进制2字节</param>
+            /// <returns>所需16进制字节读取指令</returns>
             public static byte[] ReadBytes(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength)
             {
                 string readCommand = "";
@@ -701,55 +695,44 @@ namespace MyToolkit
                 return DataConverter.HexStringToBytes(readCommand);
             }
             /// <summary>
+            /// Fins协议读取PLC指定内存的数据
+            /// </summary>
+            /// <param name="memoryArea">PLC内存地址代码，16进制1字节</param>
+            /// <param name="startAddress">读取数据起始地址，16进制2字节</param>
+            /// <param name="dataLength">读取数据长度，16进制2字节</param>
+            /// <returns>所需16进制字节读取指令</returns>
+            public byte[] ReadBytes(string memoryArea, int startAddress, int dataLength)
+            {
+                return ReadBytes(PLCNode, LocalNode, memoryArea, startAddress, dataLength);
+            }
+            /// <summary>
             /// Fins协议写入PLC指定内存数据
             /// </summary>
-            /// <param name="remoteAddress">PLCIP最后一段地址，16进制，1字节</param>
-            /// <param name="localAddress">本地IP最后一段地址，16进制，1字节</param>
-            /// <param name="memoryArea">PLC内存地址代码，16进制，1字节</param>
-            /// <param name="startAddress">写入数据起始地址，容量为16进制2字节</param>
-            /// <param name="dataLength">写入数据长度，容量为16进制2字节</param>
-            /// <param name="data">写入的数据，16进制，2字节*dataLength</param>
-            /// <returns>所需16进制字符串写入指令</returns>
-            public static string WriteString(string remoteAddress, string localAddress, string memoryArea, int startAddress, int dataLength, string data)
-            {
-                int codeLength = 0x0000001A + dataLength * 2;
-                int.TryParse(localAddress, out int local);
-                int.TryParse(remoteAddress, out int remote);
-                if (local >= 0 && local <= 255 && remote >= 0 && remote <= 255)
-                    return "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
-                        "00" + remoteAddress + "00" + "00" + localAddress + "00" +
-                        "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4") + data;
-                return "";
-            }
-
-            public static string WriteString(int remoteAddress, int localAddress, string memoryArea, int startAddress, int dataLength, string data)
-            {
-                int codeLength = 0x0000001A + dataLength * 2;
-                if (localAddress >= 0 && localAddress <= 255 && remoteAddress >= 0 && remoteAddress <= 255)
-                    return "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
-                        "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
-                        "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4") + data;
-                return "";
-            }
-
+            /// <param name="remoteAddress">PLCIP最后一段地址，16进制1字节</param>
+            /// <param name="localAddress">本地IP最后一段地址，16进制1字节</param>
+            /// <param name="memoryArea">PLC内存地址代码，16进制1字节</param>
+            /// <param name="startAddress">写入数据起始地址，16进制2字节</param>
+            /// <param name="data">写入的数据</param>
+            /// <returns>所需的发送字节</returns>
             public static byte[] WriteBytes(int remoteAddress, int localAddress, string memoryArea, int startAddress, byte[] data)
             {
                 int codeLength = 0x0000001A + data.Length;
-                int dataLength = CalculateDataLength(data);
+                int addressLength = CalculateDataLength(data);
                 string prefixString = "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
                         "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
-                        "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + dataLength.ToString("X4");
+                        "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + addressLength.ToString("X4");
                 return ByteArrayToolkit.SpliceBytes(DataConverter.HexStringToBytes(prefixString), data);
             }
-
-            public static int CalculateDataLength(byte[] data)
+            /// <summary>
+            /// Fins协议写入PLC指定内存数据
+            /// </summary>
+            /// <param name="memoryArea">PLC内存地址代码，16进制1字节</param>
+            /// <param name="startAddress">写入数据起始地址，16进制2字节</param>
+            /// <param name="data">写入的数据</param>
+            /// <returns>所需的发送字节</returns>
+            public byte[] WriteBytes(string memoryArea, int startAddress, byte[] data)
             {
-                int dataLength;
-                if (data.Length % 2 != 0)
-                    dataLength = data.Length / 2 + 1;
-                else
-                    dataLength = data.Length / 2;
-                return dataLength;
+                return WriteBytes(PLCNode, LocalNode, memoryArea, startAddress, data);
             }
             /// <summary>
             /// 解析FINS协议数据头，读取信息
