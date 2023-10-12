@@ -1685,8 +1685,8 @@ namespace MyToolkit
         /// </summary>
         public class KeyValueManager
         {
-            public string FileName;
-            public string ConfigurationPath;
+            public string FileName { get; set; }
+            public string ConfigurationPath { get; set; }
             public Dictionary<string, string> KeyValueList;
 
             public KeyValueManager(string fileName, string path, params string[] keyValues)
@@ -1694,7 +1694,7 @@ namespace MyToolkit
                 FileName = fileName;
                 ConfigurationPath = path;
                 KeyValueList = JsonManager.ReadJsonString<Dictionary<string, string>>(ConfigurationPath, FileName);
-                if (KeyValueList == null) KeyValueList = new Dictionary<string, string>();
+                KeyValueList ??= new Dictionary<string, string>();
                 if (keyValues.Length % 2 == 0 && keyValues.Length != 0)
                 {
                     for (int i = 0; i < keyValues.Length; i += 2)
@@ -1746,6 +1746,13 @@ namespace MyToolkit
                 {
                     return "";
                 }
+            }
+
+            public string Load(string key, string defaultValue)
+            {
+                if (!KeyValueList.ContainsKey(key))
+                    Change(key, defaultValue);
+                return KeyValueList[key];
             }
         }
     }
