@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using LitJson;
 using MyToolkit.DataManagement;
@@ -838,29 +839,41 @@ namespace MyToolkit
         /// </summary>
         public class BytesReceiver
         {
-            public int PackageMarkLength;
+            public Channel<byte[]> DataChannel = Channel.CreateUnbounded<byte[]>();
+            public ChannelReader<byte[]> BytesReader { get { return DataChannel.Reader; } }
             public byte[] PackageMark;
-            public int PackageLength;
+            public int PackageMarkLength;
             public byte[] DataCache;
+            public int PackageLength;
             public Action<byte[]>? ReceiveBytes;
 
-            public BytesReceiver()
+            public BytesReceiver(byte[] packageMark, int cacheLength = 2048)
             {
-                PackageMarkLength = 2;
-                PackageMark = new byte[2] { 0x7F, 0x7F };
+                PackageMark = packageMark;
+                PackageMarkLength = PackageMark.Length;
+                DataCache = new byte[cacheLength];
                 PackageLength = 0;
-                DataCache = new byte[2048];
             }
 
-            public void ClearCache()
+            public async Task WriteDataAsync(byte[] data)
             {
-                PackageLength = 0;
+                await DataChannel.Writer.WriteAsync(data);
             }
+
+            public async Task ParseMessageAsync(Action<byte[]> parseAction)
+            {
+                while (await DataChannel.Reader.WaitToReadAsync())
+                {
+                    if (DataChannel.Reader.TryRead(out var message))
+                        parseAction?.Invoke(message);
+                }
+            }
+
             /// <summary>
             /// 将接收到的字节数组按包头包尾的标记拼包与分包
             /// </summary>
             /// <param name="receivedData">接收的字节数据</param>
-            public void DataReceive(byte[] receivedData)
+            public async Task DataReceiveAsync(byte[] receivedData, bool actionOrChannel = true)
             {
                 if (receivedData.Length == 0) return;
                 Array.Copy(receivedData, 0, DataCache, PackageLength, receivedData.Length);
@@ -880,8 +893,11 @@ namespace MyToolkit
                         byte[] data = new byte[tail + PackageMarkLength];
                         //将缓存中的数据拷贝到字节数组中
                         Array.Copy(DataCache, 0, data, 0, tail + PackageMarkLength);
-                        //传出数据
-                        ReceiveBytes?.Invoke(data);
+                        if (actionOrChannel)
+                            //传出数据
+                            ReceiveBytes?.Invoke(data);
+                        else
+                            await DataChannel.Writer.WriteAsync(data);
                         //将提取的数据消除，将后面的数据前置
                         ClearDataCache(tail + PackageMarkLength);
                         //重新计算缓存区字节长度
@@ -907,6 +923,11 @@ namespace MyToolkit
                 {
                     DataCache[i] = DataCache[clearLength + i];
                 }
+            }
+
+            public void ClearCache()
+            {
+                PackageLength = 0;
             }
         }
 
