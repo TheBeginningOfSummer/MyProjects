@@ -43,7 +43,7 @@ namespace IPFS.ViewModels
         {
             try
             {
-                System.Diagnostics.Process.Start(_csl.Config.Load("BrowserPath"), $"http://localhost:8080/ipfs/{cid}");
+                System.Diagnostics.Process.Start(_csl.Configs["Config"].Load("BrowserPath"), $"http://localhost:8080/ipfs/{cid}");
             }
             catch (Exception e)
             {
@@ -70,7 +70,7 @@ namespace IPFS.ViewModels
 
                     AlbumInfo.FilesData.Remove(message.Name!);
                     AlbumInfo.GetFilesDataJson();
-                    await AlbumInfo.DatabaseUpdateAsync(_csl.SQLite);
+                    await AlbumInfo.DatabaseUpdateAsync(_csl.Databases["Local"]);
                     FileListInfo.Remove(message);
                 }
             }
@@ -86,7 +86,7 @@ namespace IPFS.ViewModels
             if (SelectedFileData == null) return;
             try
             {
-                await _csl.IPFSApi.DownloadFileAsync(SelectedFileData, _csl.Config.Load("DownloadPath"));
+                await _csl.IPFSApi.DownloadFileAsync(SelectedFileData, _csl.Configs["Config"].Load("DownloadPath"));
             }
             catch (Exception e)
             {

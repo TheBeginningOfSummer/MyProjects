@@ -39,10 +39,10 @@ public class SetVM : ObservableObject
     {
         try
         {
-            _csl.Config.Change("DownloadPath", string.IsNullOrEmpty(DownloadPath) ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) : DownloadPath);
-            _csl.Config.Change("BrowserPath", string.IsNullOrEmpty(BrowserPath) ? "" : BrowserPath);
-            _csl.Config.Change("IPNSName", string.IsNullOrEmpty(SelectedIPNS.Key) ? "self" : SelectedIPNS.Key);
-            _csl.Config.Change("IPNSId", string.IsNullOrEmpty(SelectedIPNS.Value) ? IPNS["self"]! : SelectedIPNS.Value);
+            _csl.Configs["Config"].Change("DownloadPath", string.IsNullOrEmpty(DownloadPath) ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) : DownloadPath);
+            _csl.Configs["Config"].Change("BrowserPath", string.IsNullOrEmpty(BrowserPath) ? "" : BrowserPath);
+            _csl.Configs["Config"].Change("IPNSName", string.IsNullOrEmpty(SelectedIPNS.Key) ? "self" : SelectedIPNS.Key);
+            _csl.Configs["Config"].Change("IPNSId", string.IsNullOrEmpty(SelectedIPNS.Value) ? IPNS["self"]! : SelectedIPNS.Value);
             MessageBox.Show("保存成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (System.Exception)
@@ -97,9 +97,9 @@ public class SetVM : ObservableObject
 
     public SetVM()
     {
-        DownloadPath = _csl.Config.Load("DownloadPath");
-        BrowserPath = _csl.Config.Load("BrowserPath");
-        SelectedIPNS = new(_csl.Config.Load("IPNSName"), _csl.Config.Load("IPNSId"));
+        DownloadPath = _csl.Configs["Config"].Load("DownloadPath");
+        BrowserPath = _csl.Configs["Config"].Load("BrowserPath");
+        SelectedIPNS = new(_csl.Configs["Config"].Load("IPNSName"), _csl.Configs["Config"].Load("IPNSId"));
         try
         {
             var ipnsSource = _csl.IPFSApi.GetIPNSAsync().Result;

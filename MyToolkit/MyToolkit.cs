@@ -1769,6 +1769,14 @@ namespace MyToolkit
                 }
             }
 
+            public T Load<T>(string key)
+            {
+                string value = Load(key);
+                if (value == "") return default!;
+                T result = (T)Convert.ChangeType(value, typeof(T));
+                return result;
+            }
+
             public string Load(string key, string defaultValue)
             {
                 if (!KeyValueList.ContainsKey(key))

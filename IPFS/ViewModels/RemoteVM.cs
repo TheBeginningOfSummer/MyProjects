@@ -48,15 +48,15 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
 	{
         try
         {
-            string name = await GetIPNSData();
-            await _ipnsSqlite.SQLConnection.CloseAsync();
-            _ipnsSqlite = new SQLiteService(name, "IPNSData");
+            string name = await _csl.DownloadIPNSDatabaseAsync(IPNSText);
+            await _currentIPNSSqlite.SQLConnection.CloseAsync();
+            _currentIPNSSqlite = new SQLiteService(name, "IPNSData");
         }
         catch (Exception e)
         {
             MessageBox.Show($"加载失败。{e.Message}", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-        await PageUpdateAsync(_ipnsSqlite);
+        await PageUpdateAsync(_currentIPNSSqlite);
     });
 
     private RelayCommand? _saveCommand;
@@ -71,7 +71,7 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
                 string ipns = IPNSText.Split(":")[1];
                 if (!IPNS.Contains(IPNSText))
                     IPNS.Add(IPNSText);
-                _csl.RemoteIPNS.Change(ipnsKey, ipns);
+                _csl.Configs["RemoteIPNS"].Change(ipnsKey, ipns);
                 MessageBox.Show($"保存成功。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
@@ -93,7 +93,7 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
                 string ipns = IPNSText.Split(":")[1];
                 if (!IPNS.Contains(IPNSText)) return;
                 IPNS.Remove(IPNSText);
-                _csl.RemoteIPNS.Remove(ipnsKey);
+                _csl.Configs["RemoteIPNS"].Remove(ipnsKey);
                 MessageBox.Show($"删除成功。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
@@ -119,26 +119,12 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
 
     #region 组件
     private CommonServiceLoader _csl = CommonServiceLoader.Instance;
-    private SQLiteService _ipnsSqlite = new();
+    private SQLiteService _currentIPNSSqlite = new();
     #endregion
-
-    private async Task<string> GetIPNSData()
-    {
-        if (string.IsNullOrEmpty(IPNSText)) return "";
-        if (IPNSText.Contains(':'))
-        {
-            string ipnsKey = IPNSText.Split(':')[0];
-            string ipns = IPNSText.Split(":")[1];
-            string cid = await _csl.IPFSApi.ResolveIPNSAsync(ipns);
-            await _csl.IPFSApi.DownloadFileAsync(cid, ipnsKey, "IPNSData");
-            return ipnsKey;
-        }
-        return "";
-    }
 
     public RemoteVM()
     {
-        foreach (var item in _csl.RemoteIPNS.KeyValueList)
+        foreach (var item in _csl.Configs["RemoteIPNS"].KeyValueList)
             IPNS.Add($"{item.Key}:{item.Value}");
         PageMessengerInitialize();
     }
@@ -174,7 +160,7 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
 
     private async void PageMessengerInitialize()
     {
-        await PageUpdateAsync(_csl.SQLite);
+        await PageUpdateAsync(_csl.Databases["Local"]);
         //初始化详情页面时，监听数据请求
         WeakReferenceMessenger.Default.Register(this, "InitializeDetailVM");
         //上传数据更改时，刷新界面

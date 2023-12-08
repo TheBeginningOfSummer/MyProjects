@@ -192,7 +192,11 @@ public class HttpClientAPI
         }
         return ipnsDic;
     }
-
+    /// <summary>
+    /// 从ipns解析cid
+    /// </summary>
+    /// <param name="ipns">ipns</param>
+    /// <returns>cid</returns>
     public async Task<string> ResolveIPNSAsync(string ipns)
     {
         Uri command = BuildCommand("name/resolve", ipns);

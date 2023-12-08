@@ -34,7 +34,7 @@ namespace IPFS.ViewModels
         private RelayCommand? _refreshCommand;
         public RelayCommand RefreshCommand => _refreshCommand ??= new RelayCommand(async () =>
         {
-            await PageUpdateAsync(_csl.SQLite);
+            await PageUpdateAsync(_csl.Databases["Local"]);
         });
 
         private RelayCommand<Album>? _copyCommand;
@@ -57,7 +57,7 @@ namespace IPFS.ViewModels
                         PinFile? pinFile = await _csl.IPFSApi.RemovePinAsync(item.Cid);
                     }
                     Albums.Remove(message);
-                    await _csl.SQLite.SQLConnection.DeleteAsync(message);
+                    await _csl.Databases["Local"].SQLConnection.DeleteAsync(message);
                 }
             }
             catch (Exception e)
@@ -75,7 +75,7 @@ namespace IPFS.ViewModels
                 var targetAlbum = SelectedItem;
                 targetAlbum.Status = "下载中……";
                 foreach (var item in targetAlbum.FilesData!.Values)
-                    await _csl.IPFSApi.DownloadFileAsync(item, $"{_csl.Config.Load("DownloadPath")}\\{targetAlbum.Name}");
+                    await _csl.IPFSApi.DownloadFileAsync(item, $"{_csl.Configs["Config"].Load("DownloadPath")}\\{targetAlbum.Name}");
                 targetAlbum.Status = "下载完成";
             }
             catch (Exception e)
@@ -111,7 +111,7 @@ namespace IPFS.ViewModels
 
         public DisplayVM()
         {
-            _csl.SQLite.InitializeTableAsync<Album?>();
+            _csl.Databases["Local"].InitializeTableAsync<Album?>();
             PageMessengerInitialize();
         }
 
@@ -122,7 +122,7 @@ namespace IPFS.ViewModels
 
         private async void MessageUpdateAsync(object recipient, Album message)
         {
-            await PageUpdateAsync(_csl.SQLite);
+            await PageUpdateAsync(_csl.Databases["Local"]);
         }
 
         private async Task PageUpdateAsync(SQLiteService sqlite)
@@ -151,7 +151,7 @@ namespace IPFS.ViewModels
 
         private async void PageMessengerInitialize()
         {
-            await PageUpdateAsync(_csl.SQLite);
+            await PageUpdateAsync(_csl.Databases["Local"]);
             //初始化详情页面时，监听数据请求
             WeakReferenceMessenger.Default.Register(this, "InitializeDetailVM");
             //上传数据更改时，刷新界面

@@ -73,7 +73,7 @@ public class UploadVM : ObservableObject
             _openFileDialog.Filter = "图片|*.png|图片|*.jpg";
             if (_openFileDialog.ShowDialog() == true)
             {
-                FileData? result = await _csl.LoadAndUploadFileAsync(_openFileDialog.FileName);
+                FileData? result = await _csl.LoadThenUploadFileAsync(_openFileDialog.FileName);
                 CoverImage = new BitmapImage(new Uri(_openFileDialog.FileName));
                 if (result != null) _album.CoverHash = result.Cid;
             }
@@ -98,13 +98,13 @@ public class UploadVM : ObservableObject
                 UploadStatus = "上传中……";
                 foreach (string? path in _openFileDialog.FileNames)
                 {
-                    FileData? result = await _csl.LoadAndUploadFileAsync(path);
+                    FileData? result = await _csl.LoadThenUploadFileAsync(path);
                     AddAlbumData(result);
                 }
                 //数据存储表
                 Album animation = new(_album, _fileDic);
                 //更新数据并上传
-                await _csl.PublishDatabaseAsync(animation, _csl.Config.Load("IPNSName"));
+                await _csl.PublishIPNSDatabaseAsync(animation, _csl.Configs["Config"].Load("IPNSName"));
                 //展示页面数据刷新
                 WeakReferenceMessenger.Default.Send(animation, "DisplayVM");
             }
