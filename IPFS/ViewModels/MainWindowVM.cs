@@ -22,7 +22,7 @@ namespace IPFS.ViewModels
         public MainWindowVM()
         {
             //监听页面切换消息
-            WeakReferenceMessenger.Default.Register(this);
+            WeakReferenceMessenger.Default.Register(this, "ChangePage");
             LoadPageCommand = new RelayCommand<object?>(ChangePage);
             MinimizeCommand = new RelayCommand<object?>(MinimizeWindow);
             MaximizeCommand = new RelayCommand<object?>(MaximizeWindow);

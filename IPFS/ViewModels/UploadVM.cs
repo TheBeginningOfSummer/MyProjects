@@ -1,16 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using IPFS.Models;
-using IPFS.Services;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
 namespace IPFS.ViewModels;
 
-public class UploadVM : ObservableObject
+public class UploadVM : BaseVM
 {
     #region 绑定的属性
     private BitmapImage? _coverImage;
@@ -73,9 +72,9 @@ public class UploadVM : ObservableObject
             _openFileDialog.Filter = "图片|*.png|图片|*.jpg";
             if (_openFileDialog.ShowDialog() == true)
             {
-                FileData? result = await _csl.LoadThenUploadFileAsync(_openFileDialog.FileName);
+                FileData? result = await CSL.LoadThenUploadFileAsync(_openFileDialog.FileName);
                 CoverImage = new BitmapImage(new Uri(_openFileDialog.FileName));
-                if (result != null) _album.CoverHash = result.Cid;
+                if (result != null) coverHash = result.Cid!;
             }
         }
         catch (Exception)
@@ -89,26 +88,7 @@ public class UploadVM : ObservableObject
     {
         try
         {
-            if (string.IsNullOrEmpty(AlbumName)) return;
-            InitializeAlbum();
-            _openFileDialog.Title = "上传文件";
-            _openFileDialog.Filter = "mp4视频|*.mp4|其他文件|*.*";
-            if (_openFileDialog.ShowDialog() == true)
-            {
-                UploadStatus = "上传中……";
-                foreach (string? path in _openFileDialog.FileNames)
-                {
-                    FileData? result = await _csl.LoadThenUploadFileAsync(path);
-                    AddAlbumData(result);
-                }
-                //数据存储表
-                Album animation = new(_album, _fileDic);
-                //更新数据并上传
-                await _csl.PublishIPNSDatabaseAsync(animation, _csl.Configs["Config"].Load("IPNSName"));
-                //展示页面数据刷新
-                WeakReferenceMessenger.Default.Send(animation, "DisplayVM");
-            }
-            UploadStatus = "上传完成";
+            await UploadInfo();
         }
         catch (Exception)
         {
@@ -118,34 +98,44 @@ public class UploadVM : ObservableObject
     #endregion
 
     #region 组件
-    private readonly AlbumData _album = new();//上传专辑信息
-    private readonly Dictionary<string, FileData> _fileDic = new();//专辑数据信息
     private readonly OpenFileDialog _openFileDialog = new();
-    private readonly CommonServiceLoader _csl = CommonServiceLoader.Instance;
     #endregion
+
+    string coverHash = "";
 
     public UploadVM()
     {
         _openFileDialog.Multiselect = true;
     }
 
-    private void InitializeAlbum()
+    private async Task UploadInfo()
     {
-        string albumInfo = "";
-        if (!(string.IsNullOrEmpty(Year) && string.IsNullOrEmpty(Month) && string.IsNullOrEmpty(Day) && string.IsNullOrEmpty(Description)))
-            albumInfo = $"{Year}-{Month}-{Day}{Environment.NewLine}{Description}";
-        _album.Name = AlbumName;
-        _album.Information = albumInfo;
-        _fileDic.Clear();
+        if (string.IsNullOrEmpty(AlbumName)) return;
+        if (string.IsNullOrEmpty(Description)) return;
+        if (string.IsNullOrEmpty(Year) || string.IsNullOrEmpty(Month) || string.IsNullOrEmpty(Day)) return;
+        _openFileDialog.Title = "上传文件";
+        _openFileDialog.Filter = "mp4视频|*.mp4|其他文件|*.*";
+        AlbumData _album = new(AlbumName, Description, $"{Year}-{Month}-{Day}", coverHash, "");
+        Dictionary<string, FileData> _fileDic = new();
+        if (_openFileDialog.ShowDialog() == true)
+        {
+            UploadStatus = "上传中……";
+            foreach (string? path in _openFileDialog.FileNames)
+            {
+                FileData? result = await CSL.LoadThenUploadFileAsync(path);
+                if (result == null) continue;
+                if (!_fileDic.ContainsKey(result.Name!))
+                    _fileDic.Add(result.Name!, result);
+            }
+            //数据存储表
+            Album animation = new(_album, _fileDic);
+            //更新数据并上传
+            await CSL.PublishIPNSDatabaseAsync(animation, CSL.Configs["Config"].Load("IPNSName"));
+            //展示页面数据刷新
+            WeakReferenceMessenger.Default.Send(animation, "DisplayVM");
+        }
+        UploadStatus = "上传完成";
     }
 
-    private void AddAlbumData(FileData? result)
-    {
-        if (result != null)
-        {
-            if (!_fileDic.ContainsKey(result.Name!))
-                _fileDic.Add(result.Name!, result);
-        }
-    }
 
 }

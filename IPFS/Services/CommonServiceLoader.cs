@@ -32,8 +32,8 @@ public class CommonServiceLoader
 
     private CommonServiceLoader()
     {
-        Databases.Add("Local", new SQLiteService());
-        Databases.Add("Remote", new SQLiteService("self", "IPNSData"));
+        Databases.Add("Local", new SQLiteService());//本地数据
+        //Databases.Add("Remote", new SQLiteService("self", "IPNSData"));//
         Configs.Add("Config", new("Configuration.json", "Config"));
         Configs.Add("RemoteIPNS", new("IPNSList.json", "Config"));
     }
@@ -50,7 +50,7 @@ public class CommonServiceLoader
         //文件长度
         long fileLength = new FileInfo(path).Length;
         //上传文件
-        return await IPFSApi.AddAsync
+        return await HttpClientAPI.AddAsync
         (FileManager.GetFileStream(path), fileName, null, fileLength);
     }
     /// <summary>
@@ -63,15 +63,15 @@ public class CommonServiceLoader
     {
         if (changeOrDelete)
             //数据插入或更新（先读取判断此条数据是否存在，不删除原有文件列表）
-            await animation.DatabaseUpdateAsync(Databases["Local"], 1);
+            await animation.DataUpdateAsync(Databases["Local"], 1);
         else
             await Databases["Local"].SQLConnection.DeleteAsync(animation);
         //上传数据库到IPFS
-        var databaseInfo = await IPFSApi.AddAsync
+        var databaseInfo = await HttpClientAPI.AddAsync
         (FileManager.GetFileStream(Databases["Local"].DatabasePath), Databases["Local"].DatabaseName, null, new FileInfo(Databases["Local"].DatabasePath).Length);
         //发布到IPNS
         if (databaseInfo != null)
-            return await IPFSApi.DoCommandAsync
+            return await HttpClientAPI.DoCommandAsync
                     (HttpClientAPI.BuildCommand("name/publish", databaseInfo.Cid, $"key={ipnsName}"));
         return "Failed";
     }
@@ -87,8 +87,8 @@ public class CommonServiceLoader
         {
             string name = ipnsText.Split(':')[0];
             string value = ipnsText.Split(":")[1];
-            string cid = await IPFSApi.ResolveIPNSAsync(value);
-            await IPFSApi.DownloadFileAsync(cid, name, storagePath);
+            string cid = await HttpClientAPI.ResolveIPNSAsync(value);
+            await HttpClientAPI.DownloadFileAsync(cid, name, storagePath);
             return name;
         }
         return "";

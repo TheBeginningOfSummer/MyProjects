@@ -1,23 +1,20 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using IPFS.Models;
 using IPFS.Services;
-using System.Collections.Generic;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Messaging.Messages;
-using CommunityToolkit.Mvvm.Messaging;
 
 namespace IPFS.ViewModels;
 
-public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
+public class RemoteVM : BaseVM, IRecipient<RequestMessage<Album>>
 {
+    #region 属性绑定
     private string? _selectedIPNS;
     public string? SelectedIPNS
     {
@@ -32,23 +29,25 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
         set => SetProperty(ref _ipnsText, value);
     }
 
-    private Album? _album;
-    public Album? MyAlbum
+    private Album? _selectedAlbum;
+    public Album? SelectedAlbum
     {
-        get => _album;
-        set => SetProperty(ref _album, value);
+        get => _selectedAlbum;
+        set => SetProperty(ref _selectedAlbum, value);
     }
 
     public ObservableCollection<string> IPNS { get; } = new ObservableCollection<string>();
     public ObservableCollection<Album> Albums { get; } = new ObservableCollection<Album>();
     public ICollectionView AlbumsView { get { return CollectionViewSource.GetDefaultView(Albums); } }
+    #endregion
 
+    #region 命令绑定
     private RelayCommand? _refreshCommand;
-	public RelayCommand RefreshCommand => _refreshCommand ??= new RelayCommand(async () =>
-	{
+    public RelayCommand RefreshCommand => _refreshCommand ??= new RelayCommand(async () =>
+    {
         try
         {
-            string name = await _csl.DownloadIPNSDatabaseAsync(IPNSText);
+            string name = await CSL.DownloadIPNSDatabaseAsync(IPNSText);
             await _currentIPNSSqlite.SQLConnection.CloseAsync();
             _currentIPNSSqlite = new SQLiteService(name, "IPNSData");
         }
@@ -56,7 +55,7 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
         {
             MessageBox.Show($"加载失败。{e.Message}", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-        await PageUpdateAsync(_currentIPNSSqlite);
+        await UpdateAlbumsAsync(Albums, _currentIPNSSqlite);
     });
 
     private RelayCommand? _saveCommand;
@@ -71,7 +70,7 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
                 string ipns = IPNSText.Split(":")[1];
                 if (!IPNS.Contains(IPNSText))
                     IPNS.Add(IPNSText);
-                _csl.Configs["RemoteIPNS"].Change(ipnsKey, ipns);
+                CSL.Configs["RemoteIPNS"].Change(ipnsKey, ipns);
                 MessageBox.Show($"保存成功。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
@@ -93,7 +92,7 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
                 string ipns = IPNSText.Split(":")[1];
                 if (!IPNS.Contains(IPNSText)) return;
                 IPNS.Remove(IPNSText);
-                _csl.Configs["RemoteIPNS"].Remove(ipnsKey);
+                CSL.Configs["RemoteIPNS"].Remove(ipnsKey);
                 MessageBox.Show($"删除成功。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
@@ -107,65 +106,38 @@ public class RemoteVM : ObservableObject, IRecipient<RequestMessage<Album>>
     {
         try
         {
-            if (MyAlbum == null) return; MyAlbum.Page = "RemotePage.xaml";
+            if (SelectedAlbum == null) return; SelectedAlbum.Page = "RemotePage.xaml";
             if (e.LeftButton == MouseButtonState.Pressed)
-                NavigationService.Navigation("DetailPage.xaml", "DetailVM", MyAlbum);
+                NavigationService.Navigation("DetailPage.xaml", "DetailVM", SelectedAlbum);
         }
         catch (Exception)
         {
 
         }
     }
+    #endregion
 
     #region 组件
-    private CommonServiceLoader _csl = CommonServiceLoader.Instance;
     private SQLiteService _currentIPNSSqlite = new();
     #endregion
 
     public RemoteVM()
     {
-        foreach (var item in _csl.Configs["RemoteIPNS"].KeyValueList)
-            IPNS.Add($"{item.Key}:{item.Value}");
-        PageMessengerInitialize();
+        Initialize();
+    }
+
+    public async void Initialize()
+    {
+        LoadConfig(IPNS);
+        //监听数据请求
+        WeakReferenceMessenger.Default.Register(this, "InitializeDetailVM");
+        //刷新数据列表
+        await UpdateAlbumsAsync(Albums, LocalDatabase);
     }
 
     public void Receive(RequestMessage<Album> message)
     {
-        if (MyAlbum != null) message.Reply(MyAlbum);
+        if (SelectedAlbum != null) message.Reply(SelectedAlbum);
     }
-
-    private async Task PageUpdateAsync(SQLiteService sqlite)
-    {
-        try
-        {
-            Albums.Clear();
-            List<Album>? AlbumsSource = await sqlite.SQLConnection.Table<Album>().ToListAsync();
-            if (AlbumsSource != null)
-                foreach (var animation in AlbumsSource)
-                {
-                    Stream stream = await _csl.IPFSApi.DownloadAsync(HttpClientAPI.BuildCommand("cat", animation.CoverHash));
-                    //加载图片
-                    animation.GetImage(stream);
-                    //读出的json数据解析
-                    animation.GetFilesData();
-
-                    Albums.Add(animation);
-                }
-        }
-        catch (Exception e)
-        {
-            MessageBox.Show($"加载失败。{e.Message}", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void PageMessengerInitialize()
-    {
-        await PageUpdateAsync(_csl.Databases["Local"]);
-        //初始化详情页面时，监听数据请求
-        WeakReferenceMessenger.Default.Register(this, "InitializeDetailVM");
-        //上传数据更改时，刷新界面
-        //WeakReferenceMessenger.Default.Register<Album, string>(this, "RemoteVM", MessageUpdateAsync);
-    }
-
 
 }

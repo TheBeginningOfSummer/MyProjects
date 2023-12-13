@@ -14,7 +14,7 @@ namespace IPFS;
 
 public class HttpClientAPI
 {
-    public readonly HttpClient HttpApi = new();
+    public static readonly HttpClient HttpApi = new();
 
     public HttpClientAPI()
     {
@@ -22,7 +22,7 @@ public class HttpClientAPI
         //HttpRequest.BaseAddress = new Uri("http://localhost:5001/api/v0/");
     }
 
-    public string Test()
+    public static string Test()
     {
         var respones = HttpApi.GetAsync("http://baidu.com");
         var stream = respones.Result.Content.ReadAsStringAsync();
@@ -82,7 +82,7 @@ public class HttpClientAPI
     /// </summary>
     /// <param name="command">指令</param>
     /// <returns>结果（json）</returns>
-    public async Task<string> DoCommandAsync(Uri command)
+    public static async Task<string> DoCommandAsync(Uri command)
     {
         return await HttpApi.PostAsync(command, null).Result.Content.ReadAsStringAsync();
     }
@@ -91,7 +91,7 @@ public class HttpClientAPI
     /// </summary>
     /// <param name="command">下载指令</param>
     /// <returns>下载的流</returns>
-    public async Task<Stream> DownloadAsync(Uri command)
+    public static async Task<Stream> DownloadAsync(Uri command)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, command);
         var response = await HttpApi.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
@@ -104,7 +104,7 @@ public class HttpClientAPI
     /// <param name="streamContent">上传的流</param>
     /// <param name="name">文件名称</param>
     /// <returns>上传结果</returns>
-    public async Task<string> UploadAsync(Uri command, StreamContent streamContent, string? name = null)
+    public static async Task<string> UploadAsync(Uri command, StreamContent streamContent, string? name = null)
     {
         var content = new MultipartFormDataContent();
         streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -124,7 +124,7 @@ public class HttpClientAPI
     /// <param name="streamContent">上传的流</param>
     /// <param name="name">文件名称</param>
     /// <returns>返回的结果流</returns>
-    public async Task<Stream> UploadGetStreamAsync(Uri command, HttpContent streamContent, string? name = null)
+    public static async Task<Stream> UploadGetStreamAsync(Uri command, HttpContent streamContent, string? name = null)
     {
         var content = new MultipartFormDataContent();
         streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -179,7 +179,7 @@ public class HttpClientAPI
     #endregion
 
     #region 进阶方法
-    public async Task<Dictionary<string, string>> GetIPNSAsync()
+    public static async Task<Dictionary<string, string>> GetIPNSAsync()
     {
         Uri command = BuildCommand("key/list");
         string resultString = await DoCommandAsync(command);
@@ -197,7 +197,7 @@ public class HttpClientAPI
     /// </summary>
     /// <param name="ipns">ipns</param>
     /// <returns>cid</returns>
-    public async Task<string> ResolveIPNSAsync(string ipns)
+    public static async Task<string> ResolveIPNSAsync(string ipns)
     {
         Uri command = BuildCommand("name/resolve", ipns);
         string resultString = await DoCommandAsync(command);
@@ -211,7 +211,7 @@ public class HttpClientAPI
     /// <param name="name">文件名</param>
     /// <param name="options">参数设置</param>
     /// <returns>结果</returns>
-    public async Task<FileData?> AddAsync(Stream stream, string name = "", AddFileOptions? options = null, long fileLength = 0)
+    public static async Task<FileData?> AddAsync(Stream stream, string name = "", AddFileOptions? options = null, long fileLength = 0)
     {
         #region 上传参数
         options ??= new AddFileOptions();
@@ -247,7 +247,7 @@ public class HttpClientAPI
     /// </summary>
     /// <param name="cid">取消固定文件的cid</param>
     /// <returns></returns>
-    public async Task<PinFile?> RemovePinAsync(string? cid)
+    public static async Task<PinFile?> RemovePinAsync(string? cid)
     {
         string result = await DoCommandAsync(BuildCommand("pin/rm", cid));
         PinFile? pinFile = JsonConvert.DeserializeObject<PinFile>(result);
@@ -259,7 +259,7 @@ public class HttpClientAPI
     /// <param name="fileData">IPFS文件信息</param>
     /// <param name="path">下载路径</param>
     /// <returns></returns>
-    public async Task DownloadFileAsync(FileData fileData, string path)
+    public static async Task DownloadFileAsync(FileData fileData, string path)
     {
         fileData.CurrentSize = 0;
         using Stream stream = await DownloadAsync(BuildCommand("cat", fileData.Cid));
@@ -282,7 +282,7 @@ public class HttpClientAPI
     /// <param name="fileName">保存的文件名</param>
     /// <param name="path">保存的路径</param>
     /// <returns></returns>
-    public async Task DownloadFileAsync(string cid, string fileName, string path)
+    public static async Task DownloadFileAsync(string cid, string fileName, string path)
     {
         using Stream stream = await DownloadAsync(BuildCommand("cat", cid));
 
