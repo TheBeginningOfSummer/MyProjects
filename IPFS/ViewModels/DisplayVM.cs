@@ -80,12 +80,6 @@ public class DisplayVM : BaseVM, IRecipient<RequestMessage<Album>>
         }
     });
 
-    private RelayCommand? _itemPaddingCommand;
-    public RelayCommand ItemPaddingCommand => _itemPaddingCommand ??= new RelayCommand(() =>
-    {
-
-    });
-
     public void ItemDoubleClick(object sender, MouseButtonEventArgs e)
     {
         try

@@ -11,6 +11,8 @@ namespace IPFS.ViewModels;
 
 public partial class BaseVM : ObservableObject
 {
+    public readonly System.Windows.Forms.FolderBrowserDialog FolderBrowser = new();
+    public readonly Microsoft.Win32.OpenFileDialog OpenFile = new();
     public readonly CommonServiceLoader CSL = CommonServiceLoader.Instance;
     public readonly SQLiteService LocalDatabase;
 

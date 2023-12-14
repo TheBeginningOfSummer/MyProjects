@@ -106,9 +106,7 @@ public class DetailVM : BaseVM
     {
         //从其他页面请求初始数据（初始化页面时请求数据）
         var result = WeakReferenceMessenger.Default.Send(new RequestMessage<Album?>(), "InitializeDetailVM");
-        if (result.Response != null)
-            //更新页面
-            PageUpdate(this, result.Response);
+        if (result.Response != null) PageUpdate(this, result.Response);//更新页面
         //注册数据接收，导航到此页时接收之前页面的数据（导航时接收数据）
         WeakReferenceMessenger.Default.Register<Album, string>(this, "DetailVM", PageUpdate);
     }

@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using IPFS.Models;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -69,11 +68,12 @@ public class UploadVM : BaseVM
     {
         try
         {
-            _openFileDialog.Filter = "图片|*.png|图片|*.jpg";
-            if (_openFileDialog.ShowDialog() == true)
+            OpenFile.Filter = "图片|*.png|图片|*.jpg";
+            OpenFile.Multiselect = true;
+            if (OpenFile.ShowDialog() == true)
             {
-                FileData? result = await CSL.LoadThenUploadFileAsync(_openFileDialog.FileName);
-                CoverImage = new BitmapImage(new Uri(_openFileDialog.FileName));
+                FileData? result = await CSL.LoadThenUploadFileAsync(OpenFile.FileName);
+                CoverImage = new BitmapImage(new Uri(OpenFile.FileName));
                 if (result != null) coverHash = result.Cid!;
             }
         }
@@ -97,15 +97,11 @@ public class UploadVM : BaseVM
     });
     #endregion
 
-    #region 组件
-    private readonly OpenFileDialog _openFileDialog = new();
-    #endregion
-
-    string coverHash = "";
+    private string coverHash = "";
 
     public UploadVM()
     {
-        _openFileDialog.Multiselect = true;
+        OpenFile.Multiselect = true;
     }
 
     private async Task UploadInfo()
@@ -113,14 +109,15 @@ public class UploadVM : BaseVM
         if (string.IsNullOrEmpty(AlbumName)) return;
         if (string.IsNullOrEmpty(Description)) return;
         if (string.IsNullOrEmpty(Year) || string.IsNullOrEmpty(Month) || string.IsNullOrEmpty(Day)) return;
-        _openFileDialog.Title = "上传文件";
-        _openFileDialog.Filter = "mp4视频|*.mp4|其他文件|*.*";
+        OpenFile.Title = "上传文件";
+        OpenFile.Filter = "mp4视频|*.mp4|其他文件|*.*";
         AlbumData _album = new(AlbumName, Description, $"{Year}-{Month}-{Day}", coverHash, "");
         Dictionary<string, FileData> _fileDic = new();
-        if (_openFileDialog.ShowDialog() == true)
+        OpenFile.Multiselect = true;
+        if (OpenFile.ShowDialog() == true)
         {
             UploadStatus = "上传中……";
-            foreach (string? path in _openFileDialog.FileNames)
+            foreach (string? path in OpenFile.FileNames)
             {
                 FileData? result = await CSL.LoadThenUploadFileAsync(path);
                 if (result == null) continue;

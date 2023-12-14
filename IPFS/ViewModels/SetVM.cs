@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using IPFS.Models;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -9,6 +8,7 @@ namespace IPFS.ViewModels;
 
 public class SetVM : BaseVM
 {
+    #region 绑定的属性
     private string? _downloadPath;
     public string? DownloadPath
     {
@@ -31,7 +31,9 @@ public class SetVM : BaseVM
     }
 
     public ObservableDictionary<string, string> IPNS { get; } = new();
-    
+    #endregion
+
+    #region 绑定的命令
     private RelayCommand? _saveCommand;
     public RelayCommand SaveCommand => _saveCommand ??= new RelayCommand(() =>
     {
@@ -43,7 +45,7 @@ public class SetVM : BaseVM
             CSL.Configs["Config"].Change("IPNSId", string.IsNullOrEmpty(SelectedIPNS.Value) ? IPNS["self"]! : SelectedIPNS.Value);
             MessageBox.Show("保存成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-        catch (System.Exception)
+        catch (Exception)
         {
             
         }
@@ -54,10 +56,10 @@ public class SetVM : BaseVM
     {
         try
         {
-            if (_folderBrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                DownloadPath = _folderBrowserDialog.SelectedPath;
+            if (FolderBrowser.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                DownloadPath = FolderBrowser.SelectedPath;
         }
-        catch (System.Exception)
+        catch (Exception)
         {
 
         }
@@ -68,10 +70,11 @@ public class SetVM : BaseVM
     {
         try
         {
-            if (_openFileDialog.ShowDialog() == true)
-                BrowserPath = _openFileDialog.FileName;
+            OpenFile.Multiselect = false;
+            if (OpenFile.ShowDialog() == true)
+                BrowserPath = OpenFile.FileName;
         }
-        catch (System.Exception)
+        catch (Exception)
         {
 
         }
@@ -82,9 +85,7 @@ public class SetVM : BaseVM
     {
         Clipboard.SetText($"{SelectedIPNS.Key}:{SelectedIPNS.Value}");
     });
-
-    readonly System.Windows.Forms.FolderBrowserDialog _folderBrowserDialog = new();
-    readonly OpenFileDialog _openFileDialog = new();
+    #endregion
 
     public SetVM()
     {
