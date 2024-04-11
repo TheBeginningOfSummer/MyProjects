@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CSharpKit.DataManagement;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
+using System.Text.Json;
 using System.Threading.Channels;
-using System.Threading.Tasks;
-using LitJson;
-using MyToolkit.DataManagement;
 
-namespace MyToolkit
+namespace CSharpKit
 {
     namespace Communication
     {
@@ -20,7 +16,7 @@ namespace MyToolkit
         {
             public static List<IPAddress> GetIPV4AddressList()
             {
-                List<IPAddress> ipAddressList = new List<IPAddress>();
+                List<IPAddress> ipAddressList = [];
                 string name = Dns.GetHostName();
                 IPAddress[] ipadrlist = Dns.GetHostAddresses(name);
                 foreach (IPAddress ipa in ipadrlist)
@@ -49,13 +45,13 @@ namespace MyToolkit
             }
         }
 
-        public class SocketTool
+        public class SocketTool(int byteLength = 4096)
         {
             //基本参数
             public Socket? SocketItem { get; set; }
-            public byte[] DataCache { get; set; }
+            public byte[] DataCache { get; set; } = new byte[byteLength];
             //所需参数
-            public Dictionary<string, Socket> ClientDic { get; set; }
+            public Dictionary<string, Socket> ClientDic { get; set; } = [];
             public IPAddress? IP { get; set; }
             public int Port { get; set; }
             public IPEndPoint? IPEndPoint { get; set; }
@@ -64,14 +60,14 @@ namespace MyToolkit
             public Action<Socket, byte[]>? ReceiveFromClient;
             public Action<byte[]>? ReceiveFromServer;
 
-            public SocketTool(int byteLength = 4096)
-            {
-                //SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                DataCache = new byte[byteLength];
-                ClientDic = new Dictionary<string, Socket>();
-            }
-
-            private byte[] GetByteArray(byte[] byteArr, int satrt, int length)//截取特定长度的字节数组
+            /// <summary>
+            /// 截取特定长度的字节数组
+            /// </summary>
+            /// <param name="byteArr">数组</param>
+            /// <param name="satrt">开始位置</param>
+            /// <param name="length">截取长度</param>
+            /// <returns></returns>
+            private static byte[] GetByteArray(byte[] byteArr, int satrt, int length)
             {
                 byte[] res = new byte[length];
                 if (byteArr != null && byteArr.Length >= length)
@@ -90,7 +86,11 @@ namespace MyToolkit
                 try
                 {
                     SocketItem = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    IPAddress.TryParse(IP, out IPAddress iPAddress);
+                    if (!IPAddress.TryParse(IP, out IPAddress? iPAddress))
+                    {
+                        error = "ip地址不正确";
+                        return false;
+                    }
                     IAsyncResult result = SocketItem.BeginConnect(iPAddress, Port, null, null);
                     var isConnect = result.AsyncWaitHandle.WaitOne(5000, true);
                     //SocketItem.Connect(iPAddress, Port);
@@ -101,7 +101,7 @@ namespace MyToolkit
                         return false;
                     }
                     SocketItem.EndConnect(result);
-                    Task.Run(() => this.ReceiveData());
+                    Task.Run(ReceiveData);
                 }
                 catch (Exception e)
                 {
@@ -197,15 +197,16 @@ namespace MyToolkit
                 return true;
             }
 
-            public void StartAcceptClient(object server)//会自动在其他线程上启动ReceiveData（client）方法
+            public void StartAcceptClient(object? server)//会自动在其他线程上启动ReceiveData（client）方法
             {
-                var socketServer = (Socket)server;
+                var socketServer = (Socket?)server;
+                if (socketServer == null) return;
                 while (true)
                 {
                     try
                     {
                         Socket socketClient = socketServer.Accept();
-                        ClientDic.Add(socketClient.RemoteEndPoint.ToString(), socketClient);
+                        ClientDic.Add(socketClient.RemoteEndPoint!.ToString()!, socketClient);
                         ClientListUpdate?.Invoke();//更新客户端列表//更新客户端列表
                         ThreadPool.QueueUserWorkItem(new WaitCallback(ReceiveData), socketClient);
                     }
@@ -216,19 +217,20 @@ namespace MyToolkit
                 }
             }
 
-            public void ReceiveData(object client)//服务端消息监听
+            public void ReceiveData(object? client)//服务端消息监听
             {
-                var socketClient = (Socket)client;
+                Socket? socketClient = (Socket?)client;
+                if (socketClient == null) return;
                 while (true)
                 {
                     int length = -1;
                     try
                     {
-                        length = socketClient.Receive(DataCache);//plc设置的通信数据区字节数
+                        length = socketClient.Receive(DataCache)!;//plc设置的通信数据区字节数
                     }
                     catch (Exception)
                     {
-                        ClientDic.Remove(socketClient.RemoteEndPoint.ToString());
+                        ClientDic.Remove(socketClient.RemoteEndPoint!.ToString()!);
                         socketClient.Shutdown(SocketShutdown.Both);
                         socketClient.Close(100);
                         ClientListUpdate?.Invoke();//更新客户端列表
@@ -241,7 +243,7 @@ namespace MyToolkit
                     }
                     else
                     {
-                        ClientDic.Remove(socketClient.RemoteEndPoint.ToString());
+                        ClientDic.Remove(socketClient.RemoteEndPoint!.ToString()!);
                         socketClient.Shutdown(SocketShutdown.Both);
                         socketClient.Close();
                         ClientListUpdate?.Invoke();//更新客户端列表
@@ -815,7 +817,7 @@ namespace MyToolkit
                 }
                 byte[] crcValue = new byte[value.Length + 2];
                 value.CopyTo(crcValue, 0);
-                crcValue[crcValue.Length - 2] = uchCRCLo;
+                crcValue[^2] = uchCRCLo;
                 crcValue[crcValue.Length - 1] = uchCRCHi;
                 return crcValue;
             }
@@ -1164,6 +1166,14 @@ namespace MyToolkit
                 byte[] bytes = HexStringToBytes(hexString);
                 Array.Reverse(bytes);
                 return BytesToHexString(bytes);
+            }
+
+            public static Stream BitmapToStream(Image<Rgba32> image)
+            {
+                var stream = new MemoryStream();
+                image.SaveAsBmp(stream);
+                stream.Seek(0, SeekOrigin.Begin);
+                return stream;
             }
         }
         /// <summary>
@@ -1555,7 +1565,8 @@ namespace MyToolkit
                 byte[] buffer = new byte[10240]; int length;
                 using FileStream file = new FileStream(path, fileMode);
                 while ((length = await message.ReadAsync(buffer)) != 0)
-                    await file.WriteAsync(buffer, 0, length);
+                    await file.WriteAsync(buffer.AsMemory(0, length));
+                //await file.WriteAsync(buffer, 0, length);
             }
 
             public static async Task WriteStreamProgressAsync(string path, string fileName, int fileSize, Stream message, IProgress<string> progress, FileMode fileMode = FileMode.OpenOrCreate)
@@ -1566,7 +1577,7 @@ namespace MyToolkit
                 using FileStream file = new FileStream(path, fileMode);
                 while ((length = await message.ReadAsync(buffer)) != 0)
                 {
-                    await file.WriteAsync(buffer, 0, length);
+                    await file.WriteAsync(buffer.AsMemory(0, length));
                     progressLength += length;
                     progress.Report($"{length * 100 / fileSize}%");
                 }
@@ -1618,11 +1629,11 @@ namespace MyToolkit
             public static void RecordError(string error, string solution, string path = "Log", string fileName = "错误记录.xls")
             {
                 string rowstr = error;
-                if (rowstr.IndexOf("\n") > 0)
+                if (rowstr.IndexOf('\n') > 0)
                     rowstr = rowstr.Replace("\n", " ");
                 if (rowstr.IndexOf("\r\n") > 0)
                     rowstr = rowstr.Replace("\r\n", " ");
-                if (rowstr.IndexOf("\t") > 0)
+                if (rowstr.IndexOf('\t') > 0)
                     rowstr = rowstr.Replace("\t", " ");
                 FileManager.AppendLog(path, $"{DateTime.Now:yyy-MM-dd}{fileName}",
                    $"日期\t错误信息\t处理方法{Environment.NewLine}", $"{rowstr}\t{solution}");
@@ -1657,12 +1668,9 @@ namespace MyToolkit
         {
             public static void SaveJsonString(string path, string fileName, object data)
             {
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 path += "/" + fileName;
-                string jsonString = JsonMapper.ToJson(data);
+                string jsonString = JsonSerializer.Serialize(data);
                 byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
                 FileStream file = new FileStream(path, FileMode.Create);
                 file.Write(jsonBytes, 0, jsonBytes.Length);//整块写入
@@ -1670,36 +1678,24 @@ namespace MyToolkit
                 file.Close();
             }
 
-            public static T ReadJsonString<T>(string path, string fileName)
+            public static T? ReadJsonString<T>(string path, string fileName)
             {
-                try
-                {
-                    if (!Directory.Exists(path))
-                        Directory.CreateDirectory(path);
-                    path += "/" + fileName;
-                    if (File.Exists(path))
-                    {
-                        FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                        StreamReader stream = new StreamReader(file);
-                        T jsonData = JsonMapper.ToObject<T>(stream.ReadToEnd());
-                        file.Flush();
-                        file.Close();
-                        //T jsonData = JsonMapper.ToObject<T>(File.ReadAllText(path));
-                        return jsonData;
-                    }
-                }
-                catch (Exception)
-                {
-
-                }
-                return default!;
-            }
-
-            public static JsonData ReadSimpleJsonString(string path)
-            {
-                JsonData jsonData = JsonMapper.ToObject(File.ReadAllText(path));
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                path += "/" + fileName;
+                FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                StreamReader stream = new StreamReader(file);
+                T? jsonData = JsonSerializer.Deserialize<T?>(stream.ReadToEnd());
+                file.Flush();
+                file.Close();
+                //T jsonData = JsonMapper.ToObject<T>(File.ReadAllText(path));
                 return jsonData;
             }
+
+            //public static JsonData ReadSimpleJsonString(string path)
+            //{
+            //    JsonData jsonData = JsonMapper.ToObject(File.ReadAllText(path));
+            //    return jsonData;
+            //}
         }
         /// <summary>
         /// 文件配置存储类
@@ -1708,14 +1704,14 @@ namespace MyToolkit
         {
             public string FileName { get; set; }
             public string ConfigurationPath { get; set; }
-            public Dictionary<string, string> KeyValueList;
+            public Dictionary<string, string>? KeyValueList;
 
             public KeyValueManager(string fileName, string path, params string[] keyValues)
             {
                 FileName = fileName;
                 ConfigurationPath = path;
                 KeyValueList = JsonManager.ReadJsonString<Dictionary<string, string>>(ConfigurationPath, FileName);
-                KeyValueList ??= new Dictionary<string, string>();
+                KeyValueList ??= [];
                 if (keyValues.Length % 2 == 0 && keyValues.Length != 0)
                 {
                     for (int i = 0; i < keyValues.Length; i += 2)
@@ -1731,19 +1727,19 @@ namespace MyToolkit
 
             public void Add(string key, string value)
             {
-                KeyValueList.Add(key, value);
+                KeyValueList!.Add(key, value);
                 JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
             }
 
             public void Remove(string key)
             {
-                KeyValueList.Remove(key);
+                KeyValueList!.Remove(key);
                 JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
             }
 
             public void Change(string key, string value)
             {
-                if (KeyValueList.ContainsKey(key))
+                if (KeyValueList!.ContainsKey(key))
                 {
                     KeyValueList[key] = value;
                     JsonManager.SaveJsonString(ConfigurationPath, FileName, KeyValueList);
@@ -1758,8 +1754,8 @@ namespace MyToolkit
             {
                 try
                 {
-                    if (KeyValueList.ContainsKey(key))
-                        return KeyValueList[key];
+                    if (KeyValueList!.TryGetValue(key, out string? value))
+                        return value;
                     else
                         return "";
                 }
@@ -1779,7 +1775,7 @@ namespace MyToolkit
 
             public string Load(string key, string defaultValue)
             {
-                if (!KeyValueList.ContainsKey(key))
+                if (!KeyValueList!.ContainsKey(key))
                     Change(key, defaultValue);
                 return KeyValueList[key];
             }
@@ -1793,7 +1789,7 @@ namespace MyToolkit
     {
         public AutoResetEvent CheckTime = new AutoResetEvent(false);
         //时间组件
-        public System.Threading.Timer ThreadTimer;
+        public Timer ThreadTimer;
         //计数锁
         private readonly object countLock = new object();
 
@@ -1818,14 +1814,14 @@ namespace MyToolkit
 
         public TimerToolkit()
         {
-            ThreadTimer = new System.Threading.Timer(
-                new System.Threading.TimerCallback(TimerUp), null, System.Threading.Timeout.Infinite, 1000);
+            ThreadTimer = new Timer(
+                new TimerCallback(TimerUp), null, System.Threading.Timeout.Infinite, 1000);
             CurrentCount = 0;
             IsTiming = false;
         }
 
         #region 基础功能
-        private void TimerUp(object value)
+        private void TimerUp(object? value)
         {
             lock (countLock)
             {
@@ -2074,5 +2070,5 @@ namespace MyToolkit
             TargetProcess.Close();
         }
     }
-    
+
 }
