@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace WinFormsLibrary
 {
@@ -24,7 +25,37 @@ namespace WinFormsLibrary
             bitmap.Save(path + "\\" + name + ".bmp");
         }
 
+        public static Label AddLabel(Control.ControlCollection controls, Point point, string name, string text, Size size, Color color, string tag)
+        {
+            Label label = new()
+            {
+                Name = $"LB{name}",
+                Location = point,
+                Text = text,
+                Size = size,
+                BackColor = color,
+                Tag = tag,
+                AutoSize = false,
+            };
+            controls.Add(label);
+            return label;
+        }
 
+        public static TextBox AddTextBox(Control.ControlCollection controls, Point point, string name, string text, Size size, Color color, string tag)
+        {
+            TextBox textBox = new()
+            {
+                Name = $"TB{name}",
+                Location = point,
+                Text = text,
+                Size = size,
+                BackColor = color,
+                Tag = tag,
+                AutoSize = false,
+            };
+            controls.Add(textBox);
+            return textBox;
+        }
     }
 
     public class ControlLayout
