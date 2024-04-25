@@ -1,4 +1,4 @@
-﻿using CSharpKit.DataManagement;
+﻿using CSKit.Data;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Diagnostics;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
 
-namespace CSharpKit
+namespace CSKit
 {
     namespace Communication
     {
@@ -354,7 +354,7 @@ namespace CSharpKit
                     Array.Reverse(addressBytes);
                     addressBytes.CopyTo(requestMessage, 8);
                 }
-                return ByteArrayToolkit.SpliceBytes(requestMessage, data);
+                return ByteArraykit.SpliceBytes(requestMessage, data);
             }
             /// <summary>
             /// 写入多个寄存器的报文
@@ -389,7 +389,7 @@ namespace CSharpKit
                     amountBytes.CopyTo(requestMessage, 10);
                 }
                 requestMessage[12] = (byte)data.Length;
-                return ByteArrayToolkit.SpliceBytes(requestMessage, data);
+                return ByteArraykit.SpliceBytes(requestMessage, data);
             }
             /// <summary>
             /// 解析响应报文
@@ -569,7 +569,7 @@ namespace CSharpKit
                 Array.Reverse(dataLengthBytes);
                 dataLengthBytes.CopyTo(mbap, 4);
                 //返回读取响应
-                return ByteArrayToolkit.SpliceBytes(mbap, responseData);
+                return ByteArraykit.SpliceBytes(mbap, responseData);
             }
             /// <summary>
             /// 写多个寄存器的返回报文
@@ -724,7 +724,7 @@ namespace CSharpKit
                 string prefixString = "46494E53" + codeLength.ToString("X8") + "00000002" + "00000000" + "80" + "0002" +
                         "00" + remoteAddress.ToString("X2") + "00" + "00" + localAddress.ToString("X2") + "00" +
                         "FF0102" + memoryArea + startAddress.ToString("X4") + "00" + addressLength.ToString("X4");
-                return ByteArrayToolkit.SpliceBytes(DataConverter.HexStringToBytes(prefixString), data);
+                return ByteArraykit.SpliceBytes(DataConverter.HexStringToBytes(prefixString), data);
             }
             /// <summary>
             /// Fins协议写入PLC指定内存数据
@@ -751,7 +751,7 @@ namespace CSharpKit
                 if (header == null) return false;
                 if (header.Length < 16) return false;
                 if (header[0] != 0x46 || header[1] != 0x49 || header[2] != 0x4E || header[3] != 0x53) return false;
-                finsDataLength = DataConverter.FourBytesToInt(ByteArrayToolkit.CutBytesByLength(header, 4, 4));
+                finsDataLength = DataConverter.FourBytesToInt(ByteArraykit.CutBytesByLength(header, 4, 4));
                 command = (int)header[11];
                 return true;
             }
@@ -885,7 +885,7 @@ namespace CSharpKit
                 while (PackageLength > 0)
                 {
                     //检测包头包尾
-                    ByteArrayToolkit.CheckPackage(DataCache, PackageMark, out int head, out int tail);
+                    ByteArraykit.CheckPackage(DataCache, PackageMark, out int head, out int tail);
                     //无包尾,返回继续拼接
                     if (tail == -1) return;
                     //有包头且在0位置
@@ -1059,7 +1059,7 @@ namespace CSharpKit
         //}
     }
 
-    namespace DataManagement
+    namespace Data
     {
         /// <summary>
         /// 静态数据转换类
@@ -1179,7 +1179,7 @@ namespace CSharpKit
         /// <summary>
         /// 静态字节工具类
         /// </summary>
-        public class ByteArrayToolkit
+        public class ByteArraykit
         {
             //==========静态函数==========//
             #region 插入与拼接
@@ -1523,7 +1523,7 @@ namespace CSharpKit
         }
     }
 
-    namespace FileManagement
+    namespace File
     {
         /// <summary>
         /// 静态文件管理类
@@ -1680,15 +1680,22 @@ namespace CSharpKit
 
             public static T? ReadJsonString<T>(string path, string fileName)
             {
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                path += "/" + fileName;
-                FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                StreamReader stream = new StreamReader(file);
-                T? jsonData = JsonSerializer.Deserialize<T?>(stream.ReadToEnd());
-                file.Flush();
-                file.Close();
-                //T jsonData = JsonMapper.ToObject<T>(File.ReadAllText(path));
-                return jsonData;
+                try
+                {
+                    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                    path += "/" + fileName;
+                    FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    StreamReader stream = new StreamReader(file);
+                    T? jsonData = JsonSerializer.Deserialize<T?>(stream.ReadToEnd());
+                    file.Flush();
+                    file.Close();
+                    //T jsonData = JsonMapper.ToObject<T>(File.ReadAllText(path));
+                    return jsonData;
+                }
+                catch (Exception)
+                {
+                    return default;
+                }
             }
 
             //public static JsonData ReadSimpleJsonString(string path)
@@ -1739,6 +1746,7 @@ namespace CSharpKit
 
             public void Change(string key, string value)
             {
+                KeyValueList ??= [];
                 if (KeyValueList!.ContainsKey(key))
                 {
                     KeyValueList[key] = value;
@@ -1775,7 +1783,9 @@ namespace CSharpKit
 
             public string Load(string key, string defaultValue)
             {
-                if (!KeyValueList!.ContainsKey(key))
+                if (KeyValueList!.TryGetValue(key, out string? value))
+                    return value;
+                else
                     Change(key, defaultValue);
                 return KeyValueList[key];
             }
@@ -1983,12 +1993,12 @@ namespace CSharpKit
     /// <summary>
     /// 进程管理工具
     /// </summary>
-    public class ProcessToolkit
+    public class Processkit
     {
         public Process TargetProcess { get; set; }
         public string Output { get; set; }
 
-        public ProcessToolkit(string processPath)
+        public Processkit(string processPath)
         {
             TargetProcess = new Process();
             Output = "Default";
@@ -2068,6 +2078,20 @@ namespace CSharpKit
             //TargetProcess.CancelOutputRead();
             TargetProcess.WaitForExit();
             TargetProcess.Close();
+        }
+
+        public static void StartTask(Task? task, Action action)
+        {
+            if (task == null)
+            {
+                task = new Task(action);
+            }
+            else
+            {
+                task.Wait();
+                task = new Task(action);
+            }
+            task.Start();
         }
     }
 
